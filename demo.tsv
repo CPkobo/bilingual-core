@@ -1,0 +1,112 @@
+./jp/demo.docx
+_@λ_ PARAGRAPH _λ@_
+これはサンプル文書です。
+_@λ_ PARAGRAPH _λ@_
+サンプルなので適当な内容が書かれています。
+特に意味はありません。
+_@λ_ PARAGRAPH _λ@_
+適当なデータの表を以下に示します。
+_@λ_ PARAGRAPH _λ@_
+(n=1000)
+_@λ_ TABLE _λ@_
+絶対数
+比率
+男性
+45%
+女性
+55%
+_@λ_ PARAGRAPH _λ@_
+これは特に意味のない統計データです
+_@λ_ PARAGRAPH _λ@_
+上記よりわかることは特にありません。
+./jp/demo.pptx
+_@λ_ SLIDE1 _λ@_
+CATOVISデモ
+抽出したり
+対訳を作成したり
+_@λ_ SLIDE1 note _λ@_
+CATOVISで抽出と対訳を作成するための、特に意味のないファイルです。
+_@λ_ SLIDE2 _λ@_
+適当な統計データ
+(n=1000)
+ 
+絶対数
+比率
+男性
+45%
+女性
+55%
+_@λ_ SLIDE2 note _λ@_
+男性と女性の何かを比較した結果です。
+_@λ_ SLIDE3 _λ@_
+結論
+適当な統計データ
+特になし
+./jp/demo.xlsx
+_@λ_ SHEET1 _λ@_
+(n=1000)
+絶対数
+比率
+男性
+女性
+_@λ_ SHEET2 _λ@_
+Sheet2
+ここにあるのは特に意味のないテキストです。
+XMLファイルを用いて
+抽出をしているので
+こんなことも可能に
+なります。
+.\en\/demo-en.docx
+_@λ_ PARAGRAPH _λ@_
+This is a sample document.
+_@λ_ PARAGRAPH _λ@_
+It's a sample, so it has appropriate content, and it doesn't make any sense.
+_@λ_ PARAGRAPH _λ@_
+A table of the appropriate data is given below.
+_@λ_ PARAGRAPH _λ@_
+(n=1000)
+_@λ_ TABLE _λ@_
+absolute number
+ratio
+Male
+45%
+Female
+55%
+_@λ_ PARAGRAPH _λ@_
+This is not a particularly meaningful statistic.
+_@λ_ PARAGRAPH _λ@_
+The above does not tell us anything in particular.
+.\en\/demo-en.pptx
+_@λ_ SLIDE1 _λ@_
+CATOVIS Demonstration
+Extract/Create a bilingual file
+_@λ_ SLIDE1 note _λ@_
+This is a file of no particular significance for creating extraction and bilingualism in CATOVIS.
+_@λ_ SLIDE2 _λ@_
+Appropriate statistics
+(n=1000)
+ 
+absolute number
+Ratio
+Male
+45%
+Female
+55%
+_@λ_ SLIDE2 note _λ@_
+It's the result of comparing something about men and women.
+_@λ_ SLIDE3 _λ@_
+Conclusion
+Appropriate statistics
+none in particular
+.\en\/demo-en.xlsx
+_@λ_ SHEET1 _λ@_
+(n=1000)
+absolute number
+ratio
+male
+female
+_@λ_ SHEET2 _λ@_
+Sheet2
+What you see here is text that doesn't make any particular sense.
+The extraction is done using XML files, 
+which allows you to do this.
