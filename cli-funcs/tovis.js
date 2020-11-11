@@ -3,6 +3,8 @@ exports.__esModule = true;
 exports.Tovis = void 0;
 var fs_1 = require("fs");
 var readline_1 = require("readline");
+var diff_1 = require("./diff");
+var extract_1 = require("./extract");
 var Tovis = /** @class */ (function () {
     function Tovis() {
         this.meta = {
@@ -22,64 +24,57 @@ var Tovis = /** @class */ (function () {
             try {
                 fs_1.statSync(path);
                 if (fileType === 'tovis') {
-                    _this.parse(path).then(function (message) {
-                        resolve(message);
+                    _this.parseFromTovis(path).then(function (message) {
+                        resolve({
+                            isOk: true,
+                            message: message
+                        });
                     })["catch"](function (errMessage) {
-                        reject(errMessage);
+                        reject({
+                            isOk: false,
+                            message: errMessage
+                        });
                     });
                 }
                 else if (fileType === 'diff') {
                     var diffStr = fs_1.readFileSync(path).toString();
                     _this.parseDiffInfo(JSON.parse(diffStr)).then(function (message) {
-                        resolve(message);
+                        resolve({
+                            isOk: true,
+                            message: message
+                        });
                     })["catch"](function (errMessage) {
-                        reject(errMessage);
+                        reject({
+                            isOk: false,
+                            message: errMessage
+                        });
                     });
                 }
                 else if (fileType === 'plain') {
                     console.log('under development');
                 }
                 else {
-                    reject('fileType sholud designate from "tovis"/"diff"/"plain"');
+                    reject({
+                        isOk: false,
+                        message: 'fileType sholud designate from "tovis"/"diff"/"plain"'
+                    });
                 }
             }
             catch (_a) {
-                reject('file did not found');
+                reject({
+                    isOk: false,
+                    message: 'file did not found'
+                });
             }
         });
     };
-    Tovis.prototype.parseDiffInfo = function (diff) {
-        var _this = this;
-        return new Promise(function (resolve, reject) {
-            var codeDict = {
-                replace: '~',
-                "delete": '-',
-                insert: '+'
-            };
-            for (var _i = 0, diff_1 = diff; _i < diff_1.length; _i++) {
-                var dseg = diff_1[_i];
-                var block = _this.createBlock();
-                block.s = dseg.text;
-                for (var _a = 0, _b = dseg.sims; _a < _b.length; _a++) {
-                    var sim = _b[_a];
-                    var refInfo = {
-                        from: sim.advPid,
-                        to: dseg.pid,
-                        ratio: sim.ratio,
-                        op: sim.opcode.filter(function (c) {
-                            return c[0] !== 'equal';
-                        }).map(function (c2) {
-                            var mark = c2[0] === 'replace' ? '~' : c2[0] === 'delete' ? '-' : '+';
-                            return [mark, c2[1], c2[2], c2[3], c2[4]];
-                        })
-                    };
-                    block.d.push(refInfo);
-                    _this.blocks[sim.advPid - 1].d.push(refInfo);
-                }
-                _this.blocks.push(block);
-            }
-            resolve('ok');
-        });
+    Tovis.prototype.parseFromObj = function (data) {
+        if (data instanceof extract_1.CatovisContext) {
+            // 
+        }
+        else if (data instanceof diff_1.DiffInfo) {
+            this.parseDiffInfo(data.dsegs);
+        }
     };
     Tovis.prototype.dump = function () {
         var tovisStr = [
@@ -158,14 +153,14 @@ var Tovis = /** @class */ (function () {
         }
         return opcodes;
     };
-    Tovis.prototype.parse = function (path) {
+    Tovis.prototype.parseFromTovis = function (path) {
         var _this = this;
         return new Promise(function (resolve, reject) {
             var rs = fs_1.createReadStream(path);
             var lines = readline_1.createInterface(rs);
             var count = 1;
             var lineHead = new RegExp('^(@|λ|_|\\^|\\!)+:(\\d+)}\\s?');
-            var blocks = [];
+            // const blocks: TovisBlock[] = []
             lines.on('line', function (line) {
                 if (line.startsWith('#')) {
                     var metaData = line.split(':');
@@ -214,114 +209,59 @@ var Tovis = /** @class */ (function () {
                     var matchObj = line.match(lineHead);
                     if (matchObj !== null) {
                         var index = Number(matchObj[2]);
-                        while (blocks.length < index) {
-                            blocks.push(_this.createBlock());
+                        while (_this.blocks.length < index) {
+                            _this.blocks.push(_this.createBlock());
                         }
-                        _this.upsertBlocks(blocks, line.substr(0, 1), index, line.replace(lineHead, '').trim());
+                        _this.upsertBlocks(line.substr(0, 1), index, line.replace(lineHead, '').trim());
                         count++;
                     }
                 }
-                // switch(line.substr(0,1)) {
-                //     case '#': {
-                //         if (line.startsWith('#SourceLang')) {
-                //             this.meta.srcLang = line.replace('#SourceLang:', '').replace(' ', '')
-                //             count++
-                //         } else if (line.startsWith('#TargetLang')) {
-                //             this.meta.tgtLang = line.replace('#TargetLang:', '').replace(' ', '')
-                //             count++
-                //         } else if (line.startsWith('#IncludingFiles')) {
-                //             this.meta.files = line.replace('#IncludingFiles:', '').replace(' ', '').split(',')
-                //             count++
-                //         } else if (line.startsWith('#Tags')) {
-                //             this.meta.tags = line.replace('#Tags:', '').replace(' ', '').split(',')
-                //             count++
-                //         } else if (line.startsWith('#Groups')) {
-                //             const byGroups = line.replace('#Groups:', '').replace(' ', '').split(',')
-                //             for (const byGroup of byGroups) {
-                //                 const fromAndTo = byGroup.split('-')
-                //                 if (fromAndTo.length >= 2) {
-                //                     this.meta.groups.push([Number(fromAndTo[0]), Number(fromAndTo[1])])
-                //                     count++
-                //                 }
-                //             }
-                //         } else {
-                //             this.meta.remarks += line + '\n'
-                //             count++
-                //         }
-                //         break
-                //     }
-                //     case '@': {
-                //         const matchObj: RegExpMatchArray | null = line.match(lineHead)
-                //         if (matchObj === null) {
-                //             break
-                //         }
-                //         const index = Number(matchObj[2])
-                //         const valid = this.upsertBlock('s', index, line.replace(lineHead, ''))
-                //         if (!valid) {
-                //             reject(`At row ${count}  @:${index}} is duplicated`)
-                //         } else {
-                //             count++
-                //         }
-                //         break
-                //     }
-                //     case 'λ': {
-                //         const matchObj: RegExpMatchArray | null = line.match(lineHead)
-                //         if (matchObj === null) {
-                //             break
-                //         }
-                //         const index = Number(matchObj[2])
-                //         const valid = this.upsertBlock('t', index, line.replace(lineHead, ''))
-                //         if (!valid) {
-                //             reject(`At row ${count}  λ:${index}} is duplicated`)
-                //         } else {
-                //             count++
-                //         }
-                //         break
-                //     }
-                //     case '^': {
-                //         const matchObj: RegExpMatchArray | null = line.match(lineHead)
-                //         if (matchObj === null) {
-                //             break
-                //         }
-                //         const index = Number(matchObj[2])
-                //         const valid = this.upsertBlock('d', index, line.replace(lineHead, ''))
-                //         if (!valid) {
-                //             reject(`At row ${count}  ^:${index}} is duplicated`)
-                //         } else {
-                //             count++
-                //         }
-                //         break
-                //     }
-                //     case '!': {
-                //         const matchObj: RegExpMatchArray | null = line.match(lineHead)
-                //         if (matchObj === null) {
-                //             break
-                //         }
-                //         const index = Number(matchObj[2])
-                //         const valid = this.upsertBlock('c', index, line.replace(lineHead, ''))
-                //         if (valid) {
-                //             count++
-                //         }
-                //         break
-                //     }
-                //     default:
-                //         count++
-                //         break
-                // }
             });
             lines.on('close', function () {
-                _this.blocks = blocks;
                 resolve("success to read " + count + " rows");
             });
         });
     };
-    Tovis.prototype.upsertBlocks = function (blocks, keyChara, index, contents) {
+    Tovis.prototype.parseDiffInfo = function (diff) {
+        var _this = this;
+        return new Promise(function (resolve, reject) {
+            var codeDict = {
+                replace: '~',
+                "delete": '-',
+                insert: '+'
+            };
+            for (var _i = 0, diff_2 = diff; _i < diff_2.length; _i++) {
+                var dseg = diff_2[_i];
+                var block = _this.createBlock();
+                block.s = dseg.text;
+                for (var _a = 0, _b = dseg.sims; _a < _b.length; _a++) {
+                    var sim = _b[_a];
+                    var refInfo = {
+                        from: sim.advPid,
+                        to: dseg.pid,
+                        ratio: sim.ratio,
+                        op: sim.opcode.filter(function (c) {
+                            return c[0] !== 'equal';
+                        }).map(function (c2) {
+                            var mark = c2[0] === 'replace' ? '~' : c2[0] === 'delete' ? '-' : '+';
+                            return [mark, c2[1], c2[2], c2[3], c2[4]];
+                        })
+                    };
+                    block.d.push(refInfo);
+                    _this.blocks[sim.advPid - 1].d.push(refInfo);
+                }
+                _this.blocks.push(block);
+            }
+            resolve('DiffInfo successfully parsed into TOVIS');
+        });
+    };
+    Tovis.prototype.upsertBlocks = function (keyChara, index, contents) {
         var isValid = false;
         switch (keyChara) {
             case '@': {
                 if (contents !== '') {
-                    if (blocks[index - 1].s === '') {
-                        blocks[index - 1].s = contents;
+                    if (this.blocks[index - 1].s === '') {
+                        this.blocks[index - 1].s = contents;
                         isValid = true;
                     }
                 }
@@ -332,8 +272,8 @@ var Tovis = /** @class */ (function () {
             }
             case 'λ': {
                 if (contents !== '') {
-                    if (blocks[index - 1].t === '') {
-                        blocks[index - 1].t = contents;
+                    if (this.blocks[index - 1].t === '') {
+                        this.blocks[index - 1].t = contents;
                         isValid = true;
                     }
                 }
@@ -346,10 +286,10 @@ var Tovis = /** @class */ (function () {
                 if (contents !== '') {
                     var matchObj = contents.match(/^\[.+\]/);
                     if (matchObj === null) {
-                        blocks[index - 1].m.push({ type: 'Hm?', text: contents });
+                        this.blocks[index - 1].m.push({ type: 'Hm?', text: contents });
                     }
                     else {
-                        blocks[index - 1].m.push({
+                        this.blocks[index - 1].m.push({
                             type: matchObj[0].replace('[', '').replace(']', ''),
                             text: contents.replace(matchObj[0], '')
                         });
@@ -360,14 +300,14 @@ var Tovis = /** @class */ (function () {
             }
             case '!': {
                 if (contents !== '') {
-                    blocks[index - 1].c += contents + ';';
+                    this.blocks[index - 1].c += contents + ';';
                 }
                 isValid = true;
                 break;
             }
             case '^': {
                 if (contents !== '') {
-                    if (blocks[index - 1].d.length === 0) {
+                    if (this.blocks[index - 1].d.length === 0) {
                         var refs = [];
                         var singleCodes = contents.split(';');
                         for (var _i = 0, singleCodes_1 = singleCodes; _i < singleCodes_1.length; _i++) {
@@ -387,7 +327,7 @@ var Tovis = /** @class */ (function () {
                             refs.push(ref);
                             // blocks[ref.from - 1].d.push(ref)
                         }
-                        blocks[index - 1].d = refs;
+                        this.blocks[index - 1].d = refs;
                         isValid = true;
                     }
                 }

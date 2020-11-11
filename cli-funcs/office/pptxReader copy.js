@@ -92,7 +92,6 @@ function pptxReader(pptxFile, fileName, opt) {
                             var datas = [];
                             var noteRelation = {};
                             var dgmRelation = {};
-                            var chtRelation = {};
                             for (var _i = 0, rels_1 = rels; _i < rels_1.length; _i++) {
                                 var rel = rels_1[_i];
                                 if (rel.note !== '') {
@@ -100,9 +99,6 @@ function pptxReader(pptxFile, fileName, opt) {
                                 }
                                 if (rel.dgm !== '') {
                                     dgmRelation[rel.dgm] = Number(rel.main);
-                                }
-                                if (rel.chart !== '') {
-                                    chtRelation[rel.chart] = Number(rel.main);
                                 }
                             }
                             for (var _a = 0, rs_1 = rs; _a < rs_1.length; _a++) {
@@ -121,10 +117,6 @@ function pptxReader(pptxFile, fileName, opt) {
                                     r.position = Number(dgmRelation[r.position]);
                                     datas.push(r);
                                 }
-                                else if (r.type === 'PPT-Chart') {
-                                    r.position = Number(chtRelation[r.position]);
-                                    datas.push(r);
-                                }
                             }
                             var sortedDatas = datas.sort(function (a, b) {
                                 if (a.position > b.position) {
@@ -137,7 +129,7 @@ function pptxReader(pptxFile, fileName, opt) {
                                     if (a.type === 'PPT-Slide') {
                                         return -1;
                                     }
-                                    else if (b.type === 'PPT-Note' || b.type === 'PPT-Diagram' || b.type === 'PPT-Chart') {
+                                    else if (b.type === 'PPT-Note' || b.type === 'PPT-Diagram') {
                                         return 1;
                                     }
                                     else {
@@ -284,7 +276,7 @@ function pptRelReader(path, fileObj) {
                                         relInfo.dgm = r.$.Target.replace('../diagrams/data', '').replace('.xml', '');
                                     }
                                     if (r.$.Target.startsWith('../charts/')) {
-                                        relInfo.chart = r.$.Target.replace('../charts/chart', '').replace('Ex', '10000').replace('.xml', '');
+                                        relInfo.dgm = r.$.Target.replace('../charts/chart', '').replace('.xml', '');
                                     }
                                 }
                                 resolve(relInfo);
@@ -391,13 +383,23 @@ function slideChartReader(path, fileObj, opt) {
                     fileObj.async('string').then(function (chtxml) {
                         var dom = require('xmldom').DOMParser;
                         var cht = new dom().parseFromString(chtxml);
-                        var chtSpace = cht.lastChild;
-                        var chtSpCds = chtSpace.childNodes !== undefined ? chtSpace.childNodes : [];
+                        
+                        const chtSpace = cht.lastChild
+                        const chtSpCds = chtSpace.childNodes !== undefined ? chtSpace.childNodes : []
+                        const texts = []
+                        texts.push(slideChartVisitor(chtSpCds))
+                        console.log(391)
+                        console.log(texts)
+                        // for (let i = 0; i < chtSpCds.length; i++) {
+                        //     slideChartVisitor(chtSpCds[i])
+                        // }
+                        
+                        
+                        // console.log(cht.childNodes['1']);
                         var textInChart = [];
-                        slideChartVisitor(chtSpace, textInChart);
                         var chartContents = {
-                            type: 'PPT-Chart',
-                            position: Number(path.replace('chart', '').replace('Ex', '10000').replace('.xml', '')),
+                            type: 'PPT-Diagram',
+                            position: Number(path.replace('chart', '').replace('.xml', '')),
                             isActive: true,
                             value: util_1.applySegRules(textInChart, opt)
                         };
@@ -407,23 +409,79 @@ function slideChartReader(path, fileObj, opt) {
         });
     });
 }
-function slideChartVisitor(anyNode, chartTexts) {
+
+function slideChartVisitor(anyNode) {
     if (anyNode.childNodes === undefined || anyNode.childNodes === null) {
+        // console.log(data.parentNode.nodeName)
+        // console.log(data.parentNode.nodeName === 'a:t' || data.parentNode.nodeName === 'c:v')
+        // console.log(data.data)
         if (anyNode.parentNode.nodeName === 'a:t' || anyNode.parentNode.nodeName === 'c:v') {
-            if (anyNode.data !== undefined && anyNode.data !== '') {
-                var text = anyNode.data;
-                if (chartTexts.indexOf(text) === -1) {
-                    chartTexts.push(text);
-                }
-            }
+            console.log(anyNode.data)
+            return anyNode.data
         }
-        return chartTexts;
-    }
-    else {
-        var cdNds = anyNode.childNodes;
-        for (var j = 0; j < cdNds.length; j++) {
-            slideChartVisitor(cdNds[j], chartTexts);
+    } else {
+        const cdNds = anyNode.childNodes
+        for (let j = 0; j < cdNds.length; j++) {
+            texts.push(slideChartVisitor(cdNds[j]))
         }
-        return chartTexts;
     }
+}
+
+function slideChartReaderV1(path, fileObj, opt) {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            return [2 /*return*/, new Promise(function (resolve, reject) {
+                    fileObj.async('string').then(function (cht) {
+                        xml2js_1.parseString(cht, function (err, root) {
+                            if (err) {
+                                console.log(err);
+                            }
+                            else {
+                                var textInChart = [];
+                                var chart = root['c:chartSpace']['c:chart'][0] !== undefined ? root['c:chartSpace']['c:chart'][0] : {};
+                                var titleRuns = void 0;
+                                try {
+                                    titleRuns = chart['c:title'][0]['c:tx'][0]['c:rich'][0]['a:p'][0]['a:r'];
+                                }
+                                catch (e) {
+                                    // console.log(e)
+                                    titleRuns = [];
+                                }
+                                var title = '';
+                                for (var i = 0; i < titleRuns.length; i++) {
+                                    title += titleRuns[i]['a:t'];
+                                }
+                                if (title !== '') {
+                                    textInChart.push(title);
+                                }
+                                var plots = chart['c:plotArea'] !== undefined ? chart['c:plotArea'] : [];
+                                console.log(plots);
+                                // for (const pattern of patterns) {
+                                //   const dgmt: any[] = pattern['dgm:t'] !== undefined ? pattern['dgm:t'] : []
+                                //   if (dgmt.length === 0) {
+                                //     continue
+                                //   }
+                                //   const dgmtp: any[] = dgmt[0]['a:p'] !== undefined ? dgmt[0]['a:p'] : []
+                                //   if (dgmtp.length === 0) {
+                                //     continue
+                                //   }
+                                //   const dgmtprun: any[] = dgmtp[0]['a:r'] !== undefined ? dgmtp[0]['a:r'] : []
+                                //   if (dgmtprun.length === 0) {
+                                //     continue
+                                //   }
+                                //   textInChart.push(...dgmtprun[0]['a:t'])
+                                // }
+                                var chartContents = {
+                                    type: 'PPT-Diagram',
+                                    position: Number(path.replace('chart', '').replace('.xml', '')),
+                                    isActive: true,
+                                    value: util_1.applySegRules(textInChart, opt)
+                                };
+                                resolve(chartContents);
+                            }
+                        });
+                    });
+                })];
+        });
+    });
 }

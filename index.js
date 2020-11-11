@@ -373,7 +373,7 @@ var CLIParams = /** @class */ (function () {
                     case 10:
                         tovis = new tovis_1.Tovis();
                         if (data.diff !== undefined) {
-                            tovis.parseDiffInfo(data.diff.dsegs);
+                            tovis.parseFromObj(data.diff);
                             if (oFile.endsWith('tovis')) {
                                 result = tovis.dump();
                             }

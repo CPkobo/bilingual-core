@@ -100,7 +100,7 @@ var CatovisContext = /** @class */ (function () {
                 }
                 for (var _a = 0, _b = file.exts; _a < _b.length; _a++) {
                     var text = _b[_a];
-                    if (!opt.excelReadHidden && !text.isActive) {
+                    if (!opt.excelReadHidden || !text.isActive) {
                         continue;
                     }
                     if (opt.withSeparator) {
@@ -123,6 +123,9 @@ var CatovisContext = /** @class */ (function () {
                                 break;
                             case 'PPT-Diagram':
                                 mark = "_@\u03BB_ SLIDE" + text.position + " diagram _\u03BB@_";
+                                break;
+                            case 'PPT-Chart':
+                                mark = "_@\u03BB_ SLIDE" + text.position + " chart _\u03BB@_";
                                 break;
                             case 'PPT-Note':
                                 mark = "_@\u03BB_ SLIDE" + text.position + " note _\u03BB@_";
@@ -148,13 +151,13 @@ var CatovisContext = /** @class */ (function () {
             var sums = [];
             var spaces_1 = new RegExp('\\s+', 'g');
             var marks_1 = new RegExp('(\\,|\\.|:|;|\\!|\\?|\\s)+', 'g');
-            var _loop_1 = function (text) {
-                if (!opt.excelReadHidden && !text.isActive) {
+            var _loop_1 = function (ext) {
+                if (!opt.excelReadHidden || !ext.isActive) {
                     sums.push(0);
                     return "continue";
                 }
                 var sum = 0;
-                text.value.map(function (val) {
+                ext.value.map(function (val) {
                     if (unit === 'chara') {
                         sum += val.replace(spaces_1, '').length;
                     }
@@ -165,8 +168,8 @@ var CatovisContext = /** @class */ (function () {
                 sums.push(sum);
             };
             for (var _i = 0, _a = this.src[fx].exts; _i < _a.length; _i++) {
-                var text = _a[_i];
-                _loop_1(text);
+                var ext = _a[_i];
+                _loop_1(ext);
             }
             return sums;
         }

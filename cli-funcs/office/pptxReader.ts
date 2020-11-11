@@ -36,22 +36,26 @@ export async function pptxReader(pptxFile: any, fileName: string, opt: ReadingOp
         }
       })
       // チャートの種類が多岐にわたるため、課題
-      // inzip.folder('ppt/charts/').forEach((path: string, file: any) => {
-      //   if (path.startsWith('chart') && path.endsWith('.xml')) {
-      //     prs.push(slideChartReader(path, file, opt))
-      //   }
-      // })
+      inzip.folder('ppt/charts/').forEach((path: string, file: any) => {
+        if (path.startsWith('chart') && path.endsWith('.xml')) {
+          prs.push(slideChartReader(path, file, opt))
+        }
+      })
 
       Promise.all(prs).then((rs: ExtractedText[]) => {
         const datas: ExtractedText[] = []
         const noteRelation: any = {}
         const dgmRelation: any = {}
+        const chtRelation: any = {}
         for (const rel of rels) {
           if (rel.note !== '') {
             noteRelation[rel.note] = Number(rel.main)
           }
           if (rel.dgm !== '') {
             dgmRelation[rel.dgm] = Number(rel.main)
+          }
+          if (rel.chart !== '') {
+            chtRelation[rel.chart] = Number(rel.main)
           }
         }
         for (const r of rs) {
@@ -66,6 +70,9 @@ export async function pptxReader(pptxFile: any, fileName: string, opt: ReadingOp
           } else if (r.type === 'PPT-Diagram') {
             r.position = Number(dgmRelation[r.position])
             datas.push(r)
+          } else if (r.type === 'PPT-Chart') {
+            r.position = Number(chtRelation[r.position])
+            datas.push(r)
           }
         }
         const sortedDatas: ExtractedText[] = datas.sort((a: ExtractedText, b: ExtractedText): any => {
@@ -74,7 +81,7 @@ export async function pptxReader(pptxFile: any, fileName: string, opt: ReadingOp
           if (a.position === b.position) {
             if (a.type === 'PPT-Slide') {
               return -1
-            } else if (b.type === 'PPT-Note' || b.type === 'PPT-Diagram') {
+            } else if (b.type === 'PPT-Note' || b.type === 'PPT-Diagram' || b.type === 'PPT-Chart') {
               return 1
             } else {
               return 0
@@ -199,7 +206,7 @@ async function pptRelReader(path: string, fileObj: any): Promise<PPTSubInfoRel> 
               relInfo.dgm = r.$.Target.replace('../diagrams/data', '').replace('.xml', '')
             }
             if (r.$.Target.startsWith('../charts/')) {
-              relInfo.dgm = r.$.Target.replace('../charts/chart', '').replace('.xml', '')
+              relInfo.chart = r.$.Target.replace('../charts/chart', '').replace('Ex', '10000').replace('.xml', '')
             }
           }
           resolve(relInfo)
@@ -288,53 +295,43 @@ async function slideDiagramReader(path: string, fileObj: any, opt: ReadingOption
 
 async function slideChartReader(path: string, fileObj: any, opt: ReadingOption): Promise<ExtractedText> {
   return new Promise((resolve, reject) => {
-    fileObj.async('string').then((cht: any) => {
-      parseString(cht, (err: any, root: any) => {
-        if (err) {
-          console.log(err)
-        } else {
-          const textInChart: string[] = [];
-          const chart: any = root['c:chartSpace']['c:chart'][0] !== undefined ? root['c:chartSpace']['c:chart'][0] : {}
-          let titleRuns: any
-          try {
-              titleRuns = chart['c:title'][0]['c:tx'][0]['c:rich'][0]['a:p'][0]['a:r']
-          } catch(e) {
-              // console.log(e)
-              titleRuns = []
-          }
-          let title = ''
-          for (let i = 0; i < titleRuns.length; i++) {
-              title += titleRuns[i]['a:t']
-          }
-          if (title !== '') {
-              textInChart.push(title)
-          }
-          const plots: any[] = chart['c:plotArea'] !== undefined ? chart['c:plotArea'] : []
-          console.log(plots)
-          // for (const pattern of patterns) {
-          //   const dgmt: any[] = pattern['dgm:t'] !== undefined ? pattern['dgm:t'] : []
-          //   if (dgmt.length === 0) {
-          //     continue
-          //   }
-          //   const dgmtp: any[] = dgmt[0]['a:p'] !== undefined ? dgmt[0]['a:p'] : []
-          //   if (dgmtp.length === 0) {
-          //     continue
-          //   }
-          //   const dgmtprun: any[] = dgmtp[0]['a:r'] !== undefined ? dgmtp[0]['a:r'] : []
-          //   if (dgmtprun.length === 0) {
-          //     continue
-          //   }
-          //   textInChart.push(...dgmtprun[0]['a:t'])
-          // }
-          const chartContents: ExtractedText = {
-            type: 'PPT-Diagram',
-            position: Number(path.replace('chart', '').replace('.xml', '')),
-            isActive: true,
-            value: applySegRules(textInChart, opt)
-          }
-          resolve(chartContents)
-        }
-      })
+    fileObj.async('string').then((chtxml: any) => {
+      const dom: any = require('xmldom').DOMParser;
+      const cht: any = new dom().parseFromString(chtxml)
+      const chtSpace = cht.lastChild
+      const chtSpCds = chtSpace.childNodes !== undefined ? chtSpace.childNodes : []
+      
+      const textInChart: string[] = []
+      slideChartVisitor(chtSpace, textInChart)
+
+      const chartContents: ExtractedText = {
+        type: 'PPT-Chart',
+        position: Number(path.replace('chart', '').replace('Ex', '10000').replace('.xml', '')),
+        isActive: true,
+        value: applySegRules(textInChart, opt)
+      }
+      resolve(chartContents)
     })
   })
 }
+
+function slideChartVisitor(anyNode: any, chartTexts: string[]): string[] {
+  if (anyNode.childNodes === undefined || anyNode.childNodes === null) {
+      if (anyNode.parentNode.nodeName === 'a:t' || anyNode.parentNode.nodeName === 'c:v') {
+        if (anyNode.data !== undefined && anyNode.data !== '') {
+          const text = anyNode.data as string
+          if (chartTexts.indexOf(text) === -1) {
+            chartTexts.push(text)
+          }
+        }
+      }
+      return chartTexts
+  } else {
+    const cdNds = anyNode.childNodes
+    for (let j = 0; j < cdNds.length; j++) {
+      slideChartVisitor(cdNds[j], chartTexts)
+    }
+    return chartTexts
+  }
+}
+

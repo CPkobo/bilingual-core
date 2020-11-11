@@ -354,7 +354,7 @@ class CLIParams {
             case 'TOVIS':
                 const tovis = new Tovis()
                 if (data.diff !== undefined) {
-                    tovis.parseDiffInfo(data.diff.dsegs)
+                    tovis.parseFromObj(data.diff)
                     if (oFile.endsWith('tovis')) {
                         result = tovis.dump()
                     } else {

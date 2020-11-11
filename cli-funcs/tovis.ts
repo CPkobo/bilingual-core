@@ -2,10 +2,16 @@ import { statSync, readFileSync, writeFileSync, createReadStream } from 'fs'
 import { createInterface } from 'readline'
 
 import { DiffInfo, DiffSeg, Opcode } from './diff'
+import { CatovisContext, ExtractedText } from './extract'
 
 // export type TovisOpcodeSymbol = '='|'~'|'+'|'-'
 
 // export type TovisOpcode = [string, number, number, number, number]
+
+export interface ParseResult {
+    isOk: boolean
+    message: string
+}
 
 export interface TovisRef {
     to: number
@@ -57,25 +63,37 @@ export class Tovis {
         this.blocks = []
     }
 
-    public parseFromFile(path: string, fileType: 'tovis' | 'diff' | 'plain'): Promise<string> {
+    public parseFromFile(path: string, fileType: 'tovis' | 'diff' | 'plain'): Promise<ParseResult> {
         // const fs = require('fs')
         return new Promise((resolve, reject) => {
             try {
                 statSync(path)
                 if (fileType === 'tovis') {
-                    this.parse(path).then((message) => {
-                        resolve(message)
+                    this.parseFromTovis(path).then((message) => {
+                        resolve({
+                            isOk: true,
+                            message
+                        })
                     }).catch((errMessage) => {
-                        reject(errMessage)
+                        reject({
+                            isOk: false,
+                            message: errMessage
+                        })
                     })
                 }
 
                 else if (fileType === 'diff') {
                     const diffStr = readFileSync(path).toString()
                     this.parseDiffInfo(JSON.parse(diffStr)).then((message) => {
-                        resolve(message)
+                        resolve({
+                            isOk: true,
+                            message
+                        })
                     }).catch((errMessage) => {
-                        reject(errMessage)
+                        reject({
+                            isOk: false,
+                            message: errMessage
+                        })
                     })
                 }
 
@@ -84,43 +102,27 @@ export class Tovis {
                 }
 
                 else {
-                    reject('fileType sholud designate from "tovis"/"diff"/"plain"')
+                    reject({
+                        isOk: false,
+                        message: 'fileType sholud designate from "tovis"/"diff"/"plain"'
+                    })
                 }
             } catch {
-                reject('file did not found')
+                reject({
+                    isOk: false,
+                    message: 'file did not found'
+                })
             }
         })
     }
 
-    public parseDiffInfo(diff: DiffSeg[]): Promise<string> {
-        return new Promise((resolve, reject) => {
-            const codeDict = {
-                replace: '~',
-                delete: '-',
-                insert: '+',
-            }
-            for (const dseg of diff) {
-                const block = this.createBlock()
-                block.s = dseg.text
-                for (const sim of dseg.sims) {
-                    const refInfo: TovisRef = {
-                        from: sim.advPid,
-                        to: dseg.pid,
-                        ratio: sim.ratio,
-                        op: sim.opcode.filter((c: Opcode) => {
-                            return c[0] !== 'equal'
-                        }).map((c2: Opcode) => {
-                            const mark = c2[0] === 'replace' ? '~' : c2[0] === 'delete' ? '-' : '+'
-                            return [mark, c2[1], c2[2], c2[3], c2[4]]
-                        })
-                    }
-                    block.d.push(refInfo)
-                    this.blocks[sim.advPid - 1].d.push(refInfo)
-                }
-                this.blocks.push(block)
-            }
-            resolve('ok')
-        })
+    public parseFromObj(data: CatovisContext | DiffInfo) {
+        if (data instanceof CatovisContext) {
+            // 
+        } else if (data instanceof DiffInfo) {
+            this.parseDiffInfo(data.dsegs)
+        }
+
     }
 
     public dump(): string[] {
@@ -200,13 +202,13 @@ export class Tovis {
         return opcodes
     }
 
-    private parse(path: string): Promise<string> {
+    private parseFromTovis(path: string): Promise<string> {
         return new Promise((resolve, reject) => {
             const rs = createReadStream(path)
             const lines = createInterface(rs)
             let count: number = 1;
             const lineHead = new RegExp('^(@|λ|_|\\^|\\!)+:(\\d+)}\\s?')
-            const blocks: TovisBlock[] = []
+            // const blocks: TovisBlock[] = []
             lines.on('line', (line) => {
                 if (line.startsWith('#')) {
                     const metaData = line.split(':')
@@ -254,120 +256,58 @@ export class Tovis {
                     const matchObj: RegExpMatchArray | null = line.match(lineHead)
                     if (matchObj !== null) {
                         const index = Number(matchObj[2])
-                        while(blocks.length < index) {
-                            blocks.push(this.createBlock())
+                        while(this.blocks.length < index) {
+                            this.blocks.push(this.createBlock())
                         }
-                        this.upsertBlocks(blocks, line.substr(0,1), index, line.replace(lineHead, '').trim())
+                        this.upsertBlocks(line.substr(0,1), index, line.replace(lineHead, '').trim())
                         count++
                     }
                 }
-                // switch(line.substr(0,1)) {
-                //     case '#': {
-                //         if (line.startsWith('#SourceLang')) {
-                //             this.meta.srcLang = line.replace('#SourceLang:', '').replace(' ', '')
-                //             count++
-                //         } else if (line.startsWith('#TargetLang')) {
-                //             this.meta.tgtLang = line.replace('#TargetLang:', '').replace(' ', '')
-                //             count++
-                //         } else if (line.startsWith('#IncludingFiles')) {
-                //             this.meta.files = line.replace('#IncludingFiles:', '').replace(' ', '').split(',')
-                //             count++
-                //         } else if (line.startsWith('#Tags')) {
-                //             this.meta.tags = line.replace('#Tags:', '').replace(' ', '').split(',')
-                //             count++
-                //         } else if (line.startsWith('#Groups')) {
-                //             const byGroups = line.replace('#Groups:', '').replace(' ', '').split(',')
-                //             for (const byGroup of byGroups) {
-                //                 const fromAndTo = byGroup.split('-')
-                //                 if (fromAndTo.length >= 2) {
-                //                     this.meta.groups.push([Number(fromAndTo[0]), Number(fromAndTo[1])])
-                //                     count++
-                //                 }
-                //             }
-                //         } else {
-                //             this.meta.remarks += line + '\n'
-                //             count++
-                //         }
-                //         break
-                //     }
-
-                //     case '@': {
-                //         const matchObj: RegExpMatchArray | null = line.match(lineHead)
-                //         if (matchObj === null) {
-                //             break
-                //         }
-                //         const index = Number(matchObj[2])
-                //         const valid = this.upsertBlock('s', index, line.replace(lineHead, ''))
-                //         if (!valid) {
-                //             reject(`At row ${count}  @:${index}} is duplicated`)
-                //         } else {
-                //             count++
-                //         }
-                //         break
-                //     }
-
-                //     case 'λ': {
-                //         const matchObj: RegExpMatchArray | null = line.match(lineHead)
-                //         if (matchObj === null) {
-                //             break
-                //         }
-                //         const index = Number(matchObj[2])
-                //         const valid = this.upsertBlock('t', index, line.replace(lineHead, ''))
-                //         if (!valid) {
-                //             reject(`At row ${count}  λ:${index}} is duplicated`)
-                //         } else {
-                //             count++
-                //         }
-                //         break
-                //     }
-
-                //     case '^': {
-                //         const matchObj: RegExpMatchArray | null = line.match(lineHead)
-                //         if (matchObj === null) {
-                //             break
-                //         }
-                //         const index = Number(matchObj[2])
-                //         const valid = this.upsertBlock('d', index, line.replace(lineHead, ''))
-                //         if (!valid) {
-                //             reject(`At row ${count}  ^:${index}} is duplicated`)
-                //         } else {
-                //             count++
-                //         }
-                //         break
-                //     }
-
-                //     case '!': {
-                //         const matchObj: RegExpMatchArray | null = line.match(lineHead)
-                //         if (matchObj === null) {
-                //             break
-                //         }
-                //         const index = Number(matchObj[2])
-                //         const valid = this.upsertBlock('c', index, line.replace(lineHead, ''))
-                //         if (valid) {
-                //             count++
-                //         }
-                //         break
-                //     }
-
-                //     default:
-                //         count++
-                //         break
-                // }
             })
             lines.on('close', () => {
-                this.blocks = blocks
                 resolve(`success to read ${count} rows`)
             })
         })
     }
 
-    private upsertBlocks(blocks: TovisBlock[], keyChara: string, index: number, contents: string): boolean {
+    private parseDiffInfo(diff: DiffSeg[]): Promise<string> {
+        return new Promise((resolve, reject) => {
+            const codeDict = {
+                replace: '~',
+                delete: '-',
+                insert: '+',
+            }
+            for (const dseg of diff) {
+                const block = this.createBlock()
+                block.s = dseg.text
+                for (const sim of dseg.sims) {
+                    const refInfo: TovisRef = {
+                        from: sim.advPid,
+                        to: dseg.pid,
+                        ratio: sim.ratio,
+                        op: sim.opcode.filter((c: Opcode) => {
+                            return c[0] !== 'equal'
+                        }).map((c2: Opcode) => {
+                            const mark = c2[0] === 'replace' ? '~' : c2[0] === 'delete' ? '-' : '+'
+                            return [mark, c2[1], c2[2], c2[3], c2[4]]
+                        })
+                    }
+                    block.d.push(refInfo)
+                    this.blocks[sim.advPid - 1].d.push(refInfo)
+                }
+                this.blocks.push(block)
+            }
+            resolve('DiffInfo successfully parsed into TOVIS')
+        })
+    }
+
+    private upsertBlocks(keyChara: string, index: number, contents: string): boolean {
         let isValid: boolean = false
         switch(keyChara) {
             case '@': {
                 if (contents !== '') {
-                    if (blocks[index - 1].s === '') {
-                        blocks[index - 1].s = contents
+                    if (this.blocks[index - 1].s === '') {
+                        this.blocks[index - 1].s = contents
                         isValid = true
                     }
                 } else {
@@ -378,8 +318,8 @@ export class Tovis {
 
             case 'λ': {
                 if (contents !== '') {
-                    if (blocks[index - 1].t === '') {
-                        blocks[index - 1].t = contents
+                    if (this.blocks[index - 1].t === '') {
+                        this.blocks[index - 1].t = contents
                         isValid = true
                     }
                 } else {
@@ -392,9 +332,9 @@ export class Tovis {
                 if (contents !== '') {
                     const matchObj: RegExpMatchArray | null = contents.match(/^\[.+\]/)
                     if (matchObj === null) {
-                        blocks[index - 1].m.push({type: 'Hm?', text: contents})
+                        this.blocks[index - 1].m.push({type: 'Hm?', text: contents})
                     } else {
-                        blocks[index - 1].m.push({
+                        this.blocks[index - 1].m.push({
                             type: matchObj[0].replace('[', '').replace(']', ''),
                             text: contents.replace(matchObj[0], '')
                         })
@@ -405,14 +345,14 @@ export class Tovis {
             }
             case '!': {
                 if (contents !== '') {
-                    blocks[index - 1].c += contents + ';'
+                    this.blocks[index - 1].c += contents + ';'
                 }
                 isValid = true
                 break
             }
             case '^': {
                 if (contents !== '') {
-                    if (blocks[index - 1].d.length === 0) { 
+                    if (this.blocks[index - 1].d.length === 0) { 
                         const refs: TovisRef[] = []
                         const singleCodes = contents.split(';')
                         for (const singleCode of singleCodes) {
@@ -431,7 +371,7 @@ export class Tovis {
                             refs.push(ref)
                             // blocks[ref.from - 1].d.push(ref)
                         }
-                        blocks[index - 1].d = refs
+                        this.blocks[index - 1].d = refs
                         isValid = true
                     }
                 } else {

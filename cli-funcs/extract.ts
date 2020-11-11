@@ -19,7 +19,7 @@ export interface ExtractedContent {
 }
 
 export interface ExtractedText {
-  type: 'Word-Paragraph' | 'Word-Table' | 'Excel-Sheet' | 'Excel-Shape' | 'PPT-Slide' | 'PPT-Note' | 'PPT-Diagram'
+  type: 'Word-Paragraph' | 'Word-Table' | 'Excel-Sheet' | 'Excel-Shape' | 'PPT-Slide' | 'PPT-Note' | 'PPT-Diagram' | 'PPT-Chart'
   position: number
   isActive: boolean
   value: string[]
@@ -132,7 +132,7 @@ export class CatovisContext {
           result.push(file.name)
         }
         for (const text of file.exts) {
-          if (!opt.excelReadHidden && !text.isActive) {
+          if (!opt.excelReadHidden || !text.isActive) {
             continue
           }
           if (opt.withSeparator) {
@@ -162,6 +162,10 @@ export class CatovisContext {
                 mark = `_@λ_ SLIDE${text.position} diagram _λ@_`
                 break;
 
+              case 'PPT-Chart':
+                mark = `_@λ_ SLIDE${text.position} chart _λ@_`
+                break;
+
               case 'PPT-Note':
                 mark = `_@λ_ SLIDE${text.position} note _λ@_`
                 break;
@@ -187,13 +191,13 @@ export class CatovisContext {
       const sums: number[] = []
       const spaces = new RegExp('\\s+', 'g')
       const marks = new RegExp('(\\,|\\.|:|;|\\!|\\?|\\s)+', 'g')
-      for (const text of this.src[fx].exts) {
-        if (!opt.excelReadHidden && !text.isActive) {
+      for (const ext of this.src[fx].exts) {
+        if (!opt.excelReadHidden || !ext.isActive) {
           sums.push(0)
           continue
         }
         let sum: number = 0
-        text.value.map((val: string) => {
+        ext.value.map((val: string) => {
           if (unit === 'chara') {
             sum += val.replace(spaces, '').length
           } else if (unit === 'word') {
