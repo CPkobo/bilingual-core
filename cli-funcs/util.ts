@@ -4,6 +4,7 @@ import { pptxReader } from './office/pptxReader'
 import { ReadingOption, OptionQue } from './option'
 
 import { ExtractedContent } from './extract'
+import { Opcode } from './diff'
 
 export interface ReadFailure {
   name: string
@@ -81,3 +82,44 @@ export function regexExclusion(texts: string[], ex: RegExp): string[] {
   })
   return excluded
 }
+
+export function applyOpcodes(original: string, diffed: string, opcodes: Opcode[]): string {
+  // OpcodeのDelete / Replace 用にオリジナルテキストをとっておく
+  const crtSegment = original;
+  // 類似テキストを一つずつ取得して処理
+  let tagged: string = diffed.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const processCodes: Opcode[] = opcodes.reverse();
+  for (const processCode of processCodes) {
+    switch (processCode[0]) {
+      case 'equal':
+      case '=':
+        break;
+      case 'delete':
+      case '-':
+        tagged =
+            tagged.slice(0, processCode[3]) +
+            '<span class="ins">' + crtSegment.slice(processCode[1], processCode[2]) + '</span>' +
+            tagged.slice(processCode[4]);
+        break;
+      case 'replace':
+      case '~':
+        tagged =
+            tagged.slice(0, processCode[3]) +
+            '<span class="ins">' + crtSegment.slice(processCode[1], processCode[2]) + '</span>' +
+            '<span class="del">' + tagged.slice(processCode[3], processCode[4]) + '</span>' +
+            tagged.slice(processCode[4]);
+        break;
+      case 'insert':
+      case '+':
+        tagged =
+            tagged.slice(0, processCode[3]) +
+            '<span class="del">' + tagged.slice(processCode[3], processCode[4]) + '</span>' +
+            tagged.slice(processCode[4]);
+        break;
+      default:
+        break;
+    }
+  }
+  return tagged;
+}
+

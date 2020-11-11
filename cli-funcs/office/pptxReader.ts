@@ -1,7 +1,6 @@
 const JSZip = require('jszip')
 import { parseString } from 'xml2js'
 
-
 import { ExtractedText, ExtractedContent, PPTSubInfoRel } from '../extract'
 import { ReadingOption } from '../option'
 import { applySegRules, ReadFailure } from '../util'
