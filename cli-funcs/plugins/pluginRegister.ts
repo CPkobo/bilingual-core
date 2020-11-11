@@ -1,20 +1,35 @@
 import { readFileSync } from 'fs'
 
-export type testFunc = (text: string) => Promise<string[]>;
+type testFunc = (text: string) => string;
 
-export class MyPlugins {
+interface ObjPlugin {
+  type: string
+  name: string
+  f: testFunc
+}
+
+class MyPlugins {
   public funcs: testFunc[]
 
   constructor() {
     this.funcs = []
   }
 
-  public registerFunction(scriptPath: string): void {
-    const myScript = readFileSync(scriptPath).toString()
-    const myFunc = eval(myScript)
-    console.log(myFunc)
-    myFunc('hoge')
-    this.funcs.push(myFunc)
+  public registerFunction(scriptPath: string | string[]): void {
+    if (typeof(scriptPath) === 'string') {
+      const myFunc = require(scriptPath)
+      this.funcs.push(myFunc)
+    } else {
+      for (const path of scriptPath) {
+        const myFunc = require(path)
+        this.funcs.push(myFunc)
+      }
+    }
+  }
+
+  public registerObjFunction(scriptPath: string): void {
+    const myObjFunc: ObjPlugin = require(scriptPath)
+    this.funcs.push(myObjFunc.f)
   }
 
   public execFuncs(): void {
@@ -22,7 +37,7 @@ export class MyPlugins {
       console.log('no functions')
     } else {
       for (const f of this.funcs) {
-        f('text')
+        console.log(f('text'))
       }
     }
   }
@@ -30,4 +45,7 @@ export class MyPlugins {
 
 const pl = new MyPlugins()
 pl.registerFunction('./firstPL.js')
+pl.registerFunction('./secondPL.js')
+pl.registerFunction(['./firstPL.js', './secondPL.js'])
+pl.registerObjFunction('./thirdPL.js')
 pl.execFuncs()

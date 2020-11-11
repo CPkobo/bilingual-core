@@ -1,18 +1,25 @@
 "use strict";
 exports.__esModule = true;
-exports.MyPlugins = void 0;
-var fs_1 = require("fs");
 var MyPlugins = /** @class */ (function () {
     function MyPlugins() {
         this.funcs = [];
     }
     MyPlugins.prototype.registerFunction = function (scriptPath) {
-        var myScript = fs_1.readFileSync(scriptPath).toString();
-        console.log(myScript)
-        var myFunc = eval(myScript);
-        console.log(myFunc);
-        myFunc('hoge');
-        this.funcs.push(myFunc);
+        if (typeof (scriptPath) === 'string') {
+            var myFunc = require(scriptPath);
+            this.funcs.push(myFunc);
+        }
+        else {
+            for (var _i = 0, scriptPath_1 = scriptPath; _i < scriptPath_1.length; _i++) {
+                var path = scriptPath_1[_i];
+                var myFunc = require(path);
+                this.funcs.push(myFunc);
+            }
+        }
+    };
+    MyPlugins.prototype.registerObjFunction = function (scriptPath) {
+        var myObjFunc = require(scriptPath);
+        this.funcs.push(myObjFunc.f);
     };
     MyPlugins.prototype.execFuncs = function () {
         if (this.funcs.length === 0) {
@@ -21,13 +28,15 @@ var MyPlugins = /** @class */ (function () {
         else {
             for (var _i = 0, _a = this.funcs; _i < _a.length; _i++) {
                 var f = _a[_i];
-                f('text');
+                console.log(f('text'));
             }
         }
     };
     return MyPlugins;
 }());
-exports.MyPlugins = MyPlugins;
 var pl = new MyPlugins();
 pl.registerFunction('./firstPL.js');
+pl.registerFunction('./secondPL.js');
+pl.registerFunction(['./firstPL.js', './secondPL.js']);
+pl.registerObjFunction('./thirdPL.js');
 pl.execFuncs();

@@ -1,5 +1,6 @@
 function myFirst(text) {
-  console.log(text & text)
+  // console.log('-----------')
+  return `---${text}----`
 }
 
-module.exports(myFirst)
+module.exports = myFirst
