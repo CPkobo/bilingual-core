@@ -23,7 +23,8 @@ export interface WWCReport extends WWCInfo {
 export interface DiffSeg {
   pid: number;
   file: string;
-  text: string;
+  st: string;
+  tt: string;
   len: number;
   sims: SimilarSegment[];
   max: number;
@@ -32,9 +33,15 @@ export interface DiffSeg {
 
 export interface SimilarSegment {
   advPid: number;
-  text2: string;
+  st2: string;
   ratio: number;
   opcode: Opcode[];
+}
+
+type Calcresult = {
+  sims: SimilarSegment[],
+  max: number,
+  maxp: number
 }
 
 // オペコードのタイプ。類似分の表示に使用
@@ -56,33 +63,49 @@ export class DiffInfo {
     this.spaces = new RegExp('\\s+', 'g');
   }
 
-  public analyze(cons: ExtractedContent[], adding?: boolean) {
+  public analyze(cons: ExtractedContent[], adding?: boolean): void {
     if (adding === undefined || adding === false) {
       this.dsegs.length = 0;
     }
     let i = 0;
     for (const con of cons) {
-      for (const text of con.exts) {
-        if (!text.isActive) {
+      for (const ext of con.exts) {
+        if (!ext.isActive) {
           continue;
         }
-        for (const val of text.value) {
+        for (const val of ext.value) {
           if (val === '') {
             continue;
           }
-          const sims = this.calcRatio(val);
-          const diff: DiffSeg = {
-            pid: ++i,
-            file: con.name,
-            text: val,
-            len: val.replace(this.spaces, '').length,
-            sims: sims.sims,
-            max: sims.max,
-            maxp: sims.maxp,
-          };
-          this.dsegs.push(diff);
+          i++
+          this.addDseg(i, con.name, val, '')
+          // const sims = this.calcRatio(val);
+          // const diff: DiffSeg = {
+          //   pid: ++i,
+          //   file: con.name,
+          //   st: val,
+          //   tt: '',
+          //   len: val.replace(this.spaces, '').length,
+          //   sims: sims.sims,
+          //   max: sims.max,
+          //   maxp: sims.maxp,
+          // };
+          // this.dsegs.push(diff);
         }
       }
+    }
+  }
+
+  public analyzeFromText(texts: string[], biLang: boolean, adding?: boolean): void {
+    if (adding === undefined || adding === false) {
+      this.dsegs.length = 0;
+    }
+    let i = 0
+    for (const text of texts) {
+      const st = biLang ? text.split(`\t`)[0] : text
+      const tt = biLang ? text.split(`\t`)[1] : ''
+      i++
+      this.addDseg(i, '', st, tt)
     }
   }
 
@@ -158,8 +181,8 @@ export class DiffInfo {
       if (unit === 'chara') {
         len = dseg.len;
       } else if (unit === 'word') {
-        const wordText = dseg.text + '.';
-        len = `${dseg.text}.`.replace(/(\,|\.|:|;|\!|\?|\s)+/g, ' ').split(' ').length - 1;
+        const wordText = dseg.st + '.';
+        len = `${dseg.st}.`.replace(/(\,|\.|:|;|\!|\?|\s)+/g, ' ').split(' ').length - 1;
       } else {
         len = 0;
       }
@@ -266,7 +289,22 @@ export class DiffInfo {
     }
   }
 
-  private calcRatio(st: string): { sims: SimilarSegment[], max: number, maxp: number } {
+  private addDseg(index: number, file: string, st: string, tt: string) {
+    const sims = this.calcRatio(st);
+    const diff: DiffSeg = {
+      pid: index,
+      file,
+      st,
+      tt,
+      len: st.replace(this.spaces, '').length,
+      sims: sims.sims,
+      max: sims.max,
+      maxp: sims.maxp,
+    };
+    this.dsegs.push(diff);
+  }
+
+  private calcRatio(st: string): Calcresult {
     const uBound = 1.35;
     const lBound = 0.65;
     const ratioLimit = 51;
@@ -280,7 +318,7 @@ export class DiffInfo {
       if (lenDistance > uBound || lenDistance < lBound) {
         continue;
       }
-      this.d.setSeq2(seg.text);
+      this.d.setSeq2(seg.st);
       const r = Math.floor(this.d.ratio() * 100);
       if (r > max) {
         max = r;
@@ -290,7 +328,7 @@ export class DiffInfo {
       if (r > ratioLimit) {
         const sim: SimilarSegment = {
           advPid: seg.pid,
-          text2: seg.text,
+          st2: seg.st,
           ratio: r,
           opcode: this.d.getOpcodes(),
         };

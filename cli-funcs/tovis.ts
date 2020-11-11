@@ -25,6 +25,11 @@ export interface TransCandidate {
     text: string
 }
 
+export type UsedTerms = {
+    s: string
+    t: string[]
+}
+
 export interface TovisMeta {
     srcLang: string,
     tgtLang: string,
@@ -43,6 +48,7 @@ export interface TovisBlock {
     s: string
     t: string
     m: TransCandidate[]
+    u: UsedTerms[]
     d: TovisRef[]
     c: string
 }
@@ -64,41 +70,33 @@ export class Tovis {
     }
 
     public parseFromFile(path: string, fileType: 'tovis' | 'diff' | 'plain'): Promise<ParseResult> {
-        // const fs = require('fs')
         return new Promise((resolve, reject) => {
             try {
                 statSync(path)
                 if (fileType === 'tovis') {
                     this.parseFromTovis(path).then((message) => {
-                        resolve({
-                            isOk: true,
-                            message
-                        })
+                        resolve({isOk: true, message})
                     }).catch((errMessage) => {
-                        reject({
-                            isOk: false,
-                            message: errMessage
-                        })
+                        reject({ isOk: false, message: errMessage })
                     })
                 }
 
                 else if (fileType === 'diff') {
                     const diffStr = readFileSync(path).toString()
                     this.parseDiffInfo(JSON.parse(diffStr)).then((message) => {
-                        resolve({
-                            isOk: true,
-                            message
-                        })
+                        resolve({ isOk: true, message })
                     }).catch((errMessage) => {
-                        reject({
-                            isOk: false,
-                            message: errMessage
-                        })
+                        reject({ isOk: false, message: errMessage})
                     })
                 }
 
                 else if (fileType === 'plain') {
-                    console.log('under development')
+                    // const plainStr: string = readFileSync(path).toString()
+                    this.parseFromPlainText(path, true).then((message) => {
+                        resolve({isOk: true,message})
+                    }).catch((errMessage) => {
+                        reject({isOk: false,message: errMessage})
+                    })
                 }
 
                 else {
@@ -149,6 +147,13 @@ export class Tovis {
                     tovisStr.push(`_:${i+1}}[${tmmt.type}] ${tmmt.text}`)
                 }
             }
+            if (this.blocks[i].u.length > 0) {
+                const used: string[] = []
+                for (const usedPair of this.blocks[i].u) {
+                    used.push(`${usedPair.s}::${usedPair.t.join('|')}`)
+                }
+                tovisStr.push(`$:${i}} ${used.join(';')}`)
+            }
             const refs: string[] = []
             for (const d of this.blocks[i].d) {
                 let ref: string = `${d.from}>${d.to}|${d.ratio}`
@@ -173,6 +178,7 @@ export class Tovis {
             s: '',
             t: '',
             m: [],
+            u: [],
             d: [],
             c: ''
         }
@@ -279,7 +285,8 @@ export class Tovis {
             }
             for (const dseg of diff) {
                 const block = this.createBlock()
-                block.s = dseg.text
+                block.s = dseg.st
+                block.t = dseg.tt
                 for (const sim of dseg.sims) {
                     const refInfo: TovisRef = {
                         from: sim.advPid,
@@ -301,9 +308,54 @@ export class Tovis {
         })
     }
 
+    public parseFromPlainText(path: string, withDiff: boolean): Promise<string> {
+        return new Promise((resolve, reject) => {
+            const rs = createReadStream(path)
+            const lines = createInterface(rs)
+            let count: number = 1;
+            let preCount: number = 1
+            const sepMarkA = '_@@_'
+            const sepMarkB = '_@λ_'
+            const isBiLang = path.endsWith('.tsv')
+            const texts: string[] = []
+            lines.on('line', (line) => {
+                if (line.startsWith(sepMarkA)) {
+                    if (!line.endsWith('EOF')) {
+                        const fileName = isBiLang ? line.split('\t')[0].replace(sepMarkA, '') : line.replace(sepMarkA, '')
+                        this.meta.files.push(fileName)
+                    }
+                } else if (line.startsWith(sepMarkB)) {
+                    this.meta.groups.push([preCount, count])
+                    preCount = count
+                } else if (line !== '') {
+                    count++
+                    if (withDiff) {
+                        texts.push(line)
+                    } else {
+                        const block: TovisBlock = this.createBlock()
+                        block.s = isBiLang ? line.split('\t')[0] : line
+                        block.t = isBiLang ? line.split('\t')[1] : ''
+                    }
+                }
+            })
+            lines.on('close', () => {
+                if (withDiff) {
+                    const diff: DiffInfo = new DiffInfo()
+                    diff.analyzeFromText(texts, isBiLang)
+                    this.parseDiffInfo(diff.dsegs).then(() => {
+                        resolve(`success to read ${count} rows with Diff`)
+                    })
+                } else {
+                    resolve(`success to read ${count} rows`)
+                }
+            })
+        })
+    }
+
     private upsertBlocks(keyChara: string, index: number, contents: string): boolean {
         let isValid: boolean = false
         switch(keyChara) {
+            // 原文
             case '@': {
                 if (contents !== '') {
                     if (this.blocks[index - 1].s === '') {
@@ -316,6 +368,7 @@ export class Tovis {
                 break
             }
 
+            // 確定訳文
             case 'λ': {
                 if (contents !== '') {
                     if (this.blocks[index - 1].t === '') {
@@ -328,6 +381,7 @@ export class Tovis {
                 break
             }
 
+            // 訳文候補
             case '_': {
                 if (contents !== '') {
                     const matchObj: RegExpMatchArray | null = contents.match(/^\[.+\]/)
@@ -343,6 +397,23 @@ export class Tovis {
                 isValid = true 
                 break
             }
+
+            // 用語
+            case '$': {
+                if (contents !== '') {
+                    const pairs: string[] = contents.split(';')
+                    for (const pair of pairs) {
+                        const srcAndTgt = pair.split('::')
+                        const used: UsedTerms = {
+                            s: srcAndTgt[0],
+                            t: srcAndTgt[1].split('|')
+                        }
+                        this.blocks[index - 1].u.push(used)
+                    }
+                }
+            }
+
+            // コメント
             case '!': {
                 if (contents !== '') {
                     this.blocks[index - 1].c += contents + ';'
@@ -350,6 +421,8 @@ export class Tovis {
                 isValid = true
                 break
             }
+
+            // 類似情報
             case '^': {
                 if (contents !== '') {
                     if (this.blocks[index - 1].d.length === 0) { 
