@@ -70,27 +70,28 @@ export class Tovis {
     };
     this.blocks = [];
     this.plugins = new MyPlugins()
-    const pwd = '.'
+    const pwd = process.cwd()
     const plPaths: string[][] = []
     try {
       statSync('./.tovisrc')
       const rcs = readFileSync('./.tovisrc').toString()
-      for (const rc of rcs.split('\n')) {
-        if (!rc.startsWith('#')) {
-          const pathAndEx = rc.split('::')
-          const plPath = pathAndEx[0].trim().replace('<pwd>', pwd)
-          const exOption = pathAndEx.length > 1 ? pathAndEx[1].trim() : ''
-          if (plPath !== '') {
-            plPaths.push([plPath, exOption])
+      if (!rcs.startsWith('!')) {
+        for (const rc of rcs.split('\n')) {
+          if (!rc.startsWith('#')) {
+            const pathAndEx = rc.split('::')
+            const plPath = pathAndEx[0].trim().replace('<pwd>', pwd)
+            const exOption = pathAndEx.length > 1 ? pathAndEx[1].trim() : ''
+            if (plPath !== '') {
+              plPaths.push([plPath, exOption])
+            }
           }
         }
       }
     } catch (e) {
       console.log('No .tovisrc file')
-      console.log(e)
+      // console.log(e)
     }
     for (const pathAndOption of plPaths) {
-      console.log(pathAndOption)
       this.plugins.register(pathAndOption[0], pathAndOption[1])
     }
   }

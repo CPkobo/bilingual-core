@@ -1,7 +1,7 @@
 {
   "scripts": {
-    "tsc": "npx tsc --build tsconfig.json",
-    "start": "node index.ts"
+    "build": "npx tsc --build tsconfig.json",
+    "start": "node ./dist/index.js"
   },
   "dependencies": {
     "@types/jszip": "^3.4.1",

@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "target": "esnext",
-    "module": "esnext",
+    "target": "ES5",
+    "module": "CommonJS",
     "strict": true,
     "importHelpers": true,
     "moduleResolution": "node",
@@ -10,6 +10,7 @@
     "allowSyntheticDefaultImports": true,
     "sourceMap": false,
     "baseUrl": ".",
+    "outDir": "./dist",
     "types": [
       "node",
     ],

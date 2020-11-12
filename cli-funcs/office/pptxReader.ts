@@ -157,6 +157,9 @@ async function slideReader(path: string, fileObj: any, opt: ReadingOption): Prom
               for (const row of rows) {
                 const cells: any[] = row['a:tc'] !== undefined ? row['a:tc'] : [];
                 for (const cell of cells) {
+                  if (cell['a:txBody'] === undefined) {
+                    continue
+                  }
                   const paras = cell['a:txBody'][0]['a:p'] !== undefined ? cell['a:txBody'][0]['a:p'] : [];
                   let textInCell = '';
                   for (const para of paras) {
