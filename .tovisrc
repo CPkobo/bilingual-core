@@ -1,0 +1,6 @@
+# <pwd> 現在のディレクトリに置換される
+# #で始まる行はコメントとして無視される
+# ファイル名の後ろに :: を入れることでstring または JSON形式でオプションを記載できる
+
+<pwd>/cli-funcs/plugins/normalize.js :: NFC
+<pwd>/cli-funcs/plugins/numHalf.js

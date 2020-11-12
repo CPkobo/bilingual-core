@@ -8,7 +8,7 @@
     "experimentalDecorators": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "sourceMap": true,
+    "sourceMap": false,
     "baseUrl": ".",
     "types": [
       "node",
@@ -20,6 +20,8 @@
   },
   "include": [
     "cli-funcs/*.ts",
+    "cli-funcs/office/*.ts",
+    "cli-funcs/plugins/*.ts",
     "index.ts",
   ],
   "exclude": [

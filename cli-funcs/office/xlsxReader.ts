@@ -1,17 +1,17 @@
-const JSZip = require('jszip')
-import { parseString } from 'xml2js'
+const JSZip = require('jszip');
+import { parseString } from 'xml2js';
 
-import { ExtractedText, ExtractedContent, ExcelSubInfoRel } from '../extract'
-import { ReadingOption } from '../option'
-import { applySegRules, ReadFailure } from '../util'
+import { ExtractedText, ExtractedContent, ExcelSubInfoRel } from '../extract';
+import { ReadingOption } from '../option';
+import { applySegRules, ReadFailure } from '../util';
 
 // Excelファイルを読み込むための関数
 export async function xlsxReader(xlsxFile: any, fileName: string, opt: ReadingOption): Promise<ExtractedContent> {
   return new Promise((resolve, reject) => {
-    const zip = new JSZip()
+    const zip = new JSZip();
     zip.loadAsync(xlsxFile).then((inzip: any) => {
       // const wsNums = inzip.folder("xl/worksheets/_rels/").file(/.rels/).length
-      inzip.file("xl/sharedStrings.xml").async('string').then(async (sst: string) => {
+      inzip.file('xl/sharedStrings.xml').async('string').then(async (sst: string) => {
         parseString(sst, async (err: any, root: any) => {
           if (err) {
             reject(err);
@@ -29,187 +29,187 @@ export async function xlsxReader(xlsxFile: any, fileName: string, opt: ReadingOp
                   if (rVal.t[0].$ !== undefined) {
                     return rVal.t[0]._ !== undefined ? rVal.t[0]._ : ' ';
                   } else {
-                    return rVal.t.join('')
+                    return rVal.t.join('');
                   }
-                }).join('')
+                }).join('');
               }
-            })
-            const notHidden: boolean[] = await workbookRelReader(inzip, opt.excelReadHidden)
-            const filled: string[] = await styleRelReader(inzip, opt)
+            });
+            const notHidden: boolean[] = await workbookRelReader(inzip, opt.excelReadHidden);
+            const filled: string[] = await styleRelReader(inzip, opt);
             xlsxContentsReader(inzip, shared, notHidden, filled, opt).then((datas: ExtractedText[]) => {
               const sortedDatas: ExtractedText[] = datas.sort((a: ExtractedText, b: ExtractedText): any => {
-                if (a.position > b.position) { return 1 }
-                if (a.position < b.position) { return -1 }
+                if (a.position > b.position) { return 1; }
+                if (a.position < b.position) { return -1; }
                 if (a.position === b.position) {
                   if (a.type === 'Excel-Sheet') {
-                    return -1
+                    return -1;
                   } else if (b.type === 'Excel-Shape') {
-                    return 1
+                    return 1;
                   }
-                  return 0
+                  return 0;
                 }
-              })
+              });
               const excelContents: ExtractedContent = {
                 name: fileName,
                 format: 'xlsx',
-                exts: sortedDatas
-              }
-              resolve(excelContents)
-            })
+                exts: sortedDatas,
+              };
+              resolve(excelContents);
+            });
           }
-        })
-      })
+        });
+      });
     }).catch((err: any) => {
       const fail: ReadFailure = {
         name: fileName,
-        detail: err
-      }
-      reject(fail)
-    })
-  })
+        detail: err,
+      };
+      reject(fail);
+    });
+  });
 }
 
 // 非表示のシートを読み飛ばすための関数
 async function workbookRelReader(zipOjt: any, readHidden: boolean): Promise<boolean[]> {
   return new Promise((resolve, reject) => {
-    zipOjt.file("xl/workbook.xml").async('string').then((wb: any) => {
+    zipOjt.file('xl/workbook.xml').async('string').then((wb: any) => {
       parseString(wb, (err: any, root: any) => {
         if (err) {
           console.log(err);
         } else {
-          const sheets: any[] = root.workbook.sheets[0].sheet
-          const sheetsNum = sheets.length
-          const necesaries: boolean[] = Array(sheetsNum).fill(true)
+          const sheets: any[] = root.workbook.sheets[0].sheet;
+          const sheetsNum = sheets.length;
+          const necesaries: boolean[] = Array(sheetsNum).fill(true);
           if (!readHidden) {
             for (let i = 0; i < sheetsNum; i++) {
-              necesaries[i] = sheets[i].$.state !== 'hidden'
+              necesaries[i] = sheets[i].$.state !== 'hidden';
             }
           }
-          resolve(necesaries)
+          resolve(necesaries);
         }
-      })
-    })
-  })
+      });
+    });
+  });
 }
 
 // 特定の色のセルを読み飛ばすための関数
 async function styleRelReader(zipOjt: any, opt: ReadingOption): Promise<string[]> {
   return new Promise((resolve, reject) => {
-    zipOjt.file("xl/styles.xml").async('string').then((styles: any) => {
+    zipOjt.file('xl/styles.xml').async('string').then((styles: any) => {
       parseString(styles, (err: any, root: any) => {
         if (err) {
           console.log(err);
-          reject(err)
+          reject(err);
         } else {
-          const filled = []
-          const myStyle: any = root.styleSheet
+          const filled = [];
+          const myStyle: any = root.styleSheet;
           if (myStyle === undefined) {
-            reject('styles.xml not found')
+            reject('styles.xml not found');
           }
           const xfs: any = myStyle.cellXfs !== undefined ? myStyle.cellXfs : undefined;
           if (xfs === undefined || xfs[0] === undefined) {
-            resolve(['0'])
+            resolve(['0']);
           }
-          const xfNds: any[] = xfs[0].xf !== undefined ? xfs[0].xf : []
-          for (var i = 0; i < xfNds.length; i++) {
-            filled.push(xfNds[i].$.fillId)
+          const xfNds: any[] = xfs[0].xf !== undefined ? xfs[0].xf : [];
+          for (let i = 0; i < xfNds.length; i++) {
+            filled.push(xfNds[i].$.fillId);
           }
-          resolve(filled)
+          resolve(filled);
         }
-      })
-    })
-  })
+      });
+    });
+  });
 
 }
 
 async function xlsxContentsReader(zipOjt: any, shared: string[], notHidden: boolean[], filled: string[], opt: ReadingOption): Promise<ExtractedText[]> {
-  return new Promise(resolve => {
-    const prs: Promise<ExtractedText>[] = []
-    const rels: ExcelSubInfoRel[] = []
-    zipOjt.folder("xl/worksheets/").forEach(async (path: string, file: any) => {
-      if (!path.startsWith("_rels")) {
-        prs.push(eachSheetReader(path, file, shared, filled, opt))
+  return new Promise((resolve) => {
+    const prs: Array<Promise<ExtractedText>> = [];
+    const rels: ExcelSubInfoRel[] = [];
+    zipOjt.folder('xl/worksheets/').forEach(async (path: string, file: any) => {
+      if (!path.startsWith('_rels')) {
+        prs.push(eachSheetReader(path, file, shared, filled, opt));
       } else {
         if (path.indexOf('xml') !== -1) {
-          rels.push(await wsRelReader(path, file))
+          rels.push(await wsRelReader(path, file));
         }
       }
-    })
-    zipOjt.folder("xl/drawings/").forEach((path: string, file: any) => {
-      if (!path.startsWith("_rels") && !path.endsWith('.vml')) {
-        prs.push(eachDrawingReader(path, file, opt))
+    });
+    zipOjt.folder('xl/drawings/').forEach((path: string, file: any) => {
+      if (!path.startsWith('_rels') && !path.endsWith('.vml')) {
+        prs.push(eachDrawingReader(path, file, opt));
       }
-    })
+    });
     Promise.all(prs).then((rs: ExtractedText[]) => {
-      const datas: ExtractedText[] = []
-      const relation: any = {}
+      const datas: ExtractedText[] = [];
+      const relation: any = {};
       for (const rel of rels) {
-        relation[rel.sub] = Number(rel.main)
+        relation[rel.sub] = Number(rel.main);
       }
       for (const r of rs) {
         if (r.value.length === 0) {
-          continue
+          continue;
         }
         if (r.type === 'Excel-Sheet') {
-          r.isActive = notHidden[r.position - 1]
-          datas.push(r)
+          r.isActive = notHidden[r.position - 1];
+          datas.push(r);
         } else if (r.type === 'Excel-Shape') {
-          r.position = relation[r.position]
-          r.isActive = notHidden[r.position - 1]
-          datas.push(r)
+          r.position = relation[r.position];
+          r.isActive = notHidden[r.position - 1];
+          datas.push(r);
         }
       }
-      resolve(datas)
-    })
-  })
+      resolve(datas);
+    });
+  });
 }
 
 async function wsRelReader(path: string, fileObj: any): Promise<ExcelSubInfoRel> {
-  return new Promise(resolve => {
-    fileObj.async('string').then((rel: any) => {
-      parseString(rel, (err: any, root: any) => {
+  return new Promise((resolve) => {
+    fileObj.async('string').then((relxml: any) => {
+      parseString(relxml, (err: any, root: any) => {
         if (err) {
           console.log(err);
         } else {
           const relInfo: ExcelSubInfoRel = {
             main: path.replace('_rels/sheet', '').replace('.xml.rels', ''),
-            sub: ''
-          }
+            sub: '',
+          };
           for (const rel of root.Relationships.Relationship) {
             if (rel.$.Target.startsWith('../drawings/')) {
-              relInfo.sub = rel.$.Target.replace('../drawings/drawing', '').replace('.xml', '')
+              relInfo.sub = rel.$.Target.replace('../drawings/drawing', '').replace('.xml', '');
             }
           }
-          resolve(relInfo)
+          resolve(relInfo);
         }
-      })
-    })
-  })
+      });
+    });
+  });
 }
 
 async function eachSheetReader(path: string, fileObj: any, shared: string[], filled: string[], opt: ReadingOption): Promise<ExtractedText> {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     fileObj.async('string').then((sht: any) => {
       parseString(sht, (err: any, root: any) => {
         if (err) {
           console.log(err);
         } else {
-          const rows: any = root.worksheet.sheetData[0].row !== undefined ? root.worksheet.sheetData[0].row : []
-          const textInSheet: string[] = []
+          const rows: any = root.worksheet.sheetData[0].row !== undefined ? root.worksheet.sheetData[0].row : [];
+          const textInSheet: string[] = [];
           for (const row of rows) {
             if (row.c === undefined) {
-              continue
+              continue;
             }
             for (const col of row.c) {
               if (col.$.s !== undefined) {
                 if (!opt.excelReadFilled) {
                   if (filled[Number(col.$.s)] !== '0') {
-                    continue
+                    continue;
                   }
                 }
               }
               if (col.$.t === 's') {
-                textInSheet.push(shared[col.v])
+                textInSheet.push(shared[col.v]);
               }
             }
           }
@@ -218,51 +218,51 @@ async function eachSheetReader(path: string, fileObj: any, shared: string[], fil
             position: Number(path.replace('sheet', '').replace('.xml', '')),
             isActive: true,
             value: applySegRules(textInSheet, opt),
-          }
-          resolve(sheetContents)
+          };
+          resolve(sheetContents);
         }
-      })
-    })
-  })
+      });
+    });
+  });
 }
 
 async function eachDrawingReader(path: string, fileObj: any, opt: ReadingOption): Promise<ExtractedText> {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     fileObj.async('string').then((sht: any) => {
       parseString(sht, (err: any, root: any) => {
         if (err) {
           console.log(err);
         } else {
-          const shapes: any = root['xdr:wsDr']['xdr:twoCellAnchor'] !== undefined ? root['xdr:wsDr']['xdr:twoCellAnchor'] : []
-          const drawingText: string[] = []
+          const shapes: any = root['xdr:wsDr']['xdr:twoCellAnchor'] !== undefined ? root['xdr:wsDr']['xdr:twoCellAnchor'] : [];
+          const drawingText: string[] = [];
           for (const shape of shapes) {
             if (shape['xdr:sp'] === undefined) {
-              continue
+              continue;
             }
             if (shape['xdr:sp'][0]['xdr:txBody'] === undefined) {
-              continue
+              continue;
             }
-            const shapePara = shape['xdr:sp'][0]['xdr:txBody'][0]['a:p'] !== undefined ? shape['xdr:sp'][0]['xdr:txBody'][0]['a:p'] : []
+            const shapePara = shape['xdr:sp'][0]['xdr:txBody'][0]['a:p'] !== undefined ? shape['xdr:sp'][0]['xdr:txBody'][0]['a:p'] : [];
             for (const para of shapePara) {
               if (para['a:r'] === undefined) {
-                continue
+                continue;
               }
               drawingText.push(para['a:r'].map((val: any) => {
                 if (val['a:t'] !== undefined) {
-                  return val['a:t']
+                  return val['a:t'];
                 }
-              }).join(''))
+              }).join(''));
             }
           }
           const shapeContents: ExtractedText = {
             type: 'Excel-Shape',
             position: Number(path.replace('drawing', '').replace('.xml', '')),
             isActive: true,
-            value: applySegRules(drawingText, opt)
-          }
-          resolve(shapeContents)
+            value: applySegRules(drawingText, opt),
+          };
+          resolve(shapeContents);
         }
-      })
-    })
-  })
+      });
+    });
+  });
 }

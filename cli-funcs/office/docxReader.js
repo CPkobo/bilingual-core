@@ -51,7 +51,7 @@ function docxReader(docxFile, fileName, opt) {
                     };
                     zip.loadAsync(docxFile).then(function (inzip) {
                         if (inzip !== null) {
-                            inzip.file("word/document.xml").async("string").then(function (wordxml) {
+                            inzip.file('word/document.xml').async('string').then(function (wordxml) {
                                 var dom = require('xmldom').DOMParser;
                                 var doc = new dom().parseFromString(wordxml);
                                 var bodyNd = doc.lastChild.firstChild;

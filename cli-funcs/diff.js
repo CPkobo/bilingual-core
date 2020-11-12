@@ -18,28 +18,44 @@ var DiffInfo = /** @class */ (function () {
         for (var _i = 0, cons_1 = cons; _i < cons_1.length; _i++) {
             var con = cons_1[_i];
             for (var _a = 0, _b = con.exts; _a < _b.length; _a++) {
-                var text = _b[_a];
-                if (!text.isActive) {
+                var ext = _b[_a];
+                if (!ext.isActive) {
                     continue;
                 }
-                for (var _c = 0, _d = text.value; _c < _d.length; _c++) {
+                for (var _c = 0, _d = ext.value; _c < _d.length; _c++) {
                     var val = _d[_c];
                     if (val === '') {
                         continue;
                     }
-                    var sims = this.calcRatio(val);
-                    var diff = {
-                        pid: ++i,
-                        file: con.name,
-                        text: val,
-                        len: val.replace(this.spaces, '').length,
-                        sims: sims.sims,
-                        max: sims.max,
-                        maxp: sims.maxp
-                    };
-                    this.dsegs.push(diff);
+                    i++;
+                    this.addDseg(i, con.name, val, '');
+                    // const sims = this.calcRatio(val);
+                    // const diff: DiffSeg = {
+                    //   pid: ++i,
+                    //   file: con.name,
+                    //   st: val,
+                    //   tt: '',
+                    //   len: val.replace(this.spaces, '').length,
+                    //   sims: sims.sims,
+                    //   max: sims.max,
+                    //   maxp: sims.maxp,
+                    // };
+                    // this.dsegs.push(diff);
                 }
             }
+        }
+    };
+    DiffInfo.prototype.analyzeFromText = function (texts, biLang, adding) {
+        if (adding === undefined || adding === false) {
+            this.dsegs.length = 0;
+        }
+        var i = 0;
+        for (var _i = 0, texts_1 = texts; _i < texts_1.length; _i++) {
+            var text = texts_1[_i];
+            var st = biLang ? text.split("\t")[0] : text;
+            var tt = biLang ? text.split("\t")[1] : '';
+            i++;
+            this.addDseg(i, '', st, tt);
         }
     };
     DiffInfo.prototype.calcWWC = function (unit, wordWeight) {
@@ -111,8 +127,8 @@ var DiffInfo = /** @class */ (function () {
                 len = dseg.len;
             }
             else if (unit === 'word') {
-                var wordText = dseg.text + '.';
-                len = (dseg.text + ".").replace(/(\,|\.|:|;|\!|\?|\s)+/g, ' ').split(' ').length - 1;
+                var wordText = dseg.st + '.';
+                len = (dseg.st + ".").replace(/(\,|\.|:|;|\!|\?|\s)+/g, ' ').split(' ').length - 1;
             }
             else {
                 len = 0;
@@ -214,6 +230,20 @@ var DiffInfo = /** @class */ (function () {
             return '';
         }
     };
+    DiffInfo.prototype.addDseg = function (index, file, st, tt) {
+        var sims = this.calcRatio(st);
+        var diff = {
+            pid: index,
+            file: file,
+            st: st,
+            tt: tt,
+            len: st.replace(this.spaces, '').length,
+            sims: sims.sims,
+            max: sims.max,
+            maxp: sims.maxp
+        };
+        this.dsegs.push(diff);
+    };
     DiffInfo.prototype.calcRatio = function (st) {
         var uBound = 1.35;
         var lBound = 0.65;
@@ -228,7 +258,7 @@ var DiffInfo = /** @class */ (function () {
             if (lenDistance > uBound || lenDistance < lBound) {
                 continue;
             }
-            this.d.setSeq2(seg.text);
+            this.d.setSeq2(seg.st);
             var r = Math.floor(this.d.ratio() * 100);
             if (r > max) {
                 max = r;
@@ -238,7 +268,7 @@ var DiffInfo = /** @class */ (function () {
             if (r > ratioLimit) {
                 var sim = {
                     advPid: seg.pid,
-                    text2: seg.text,
+                    st2: seg.st,
                     ratio: r,
                     opcode: this.d.getOpcodes()
                 };

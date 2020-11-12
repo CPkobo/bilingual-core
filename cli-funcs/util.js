@@ -1,6 +1,6 @@
 "use strict";
 exports.__esModule = true;
-exports.regexExclusion = exports.splitSegmentation = exports.applySegRules = exports.blobContentsReader = exports.cnm = void 0;
+exports.applyOpcodes = exports.regexExclusion = exports.splitSegmentation = exports.applySegRules = exports.blobContentsReader = exports.cnm = void 0;
 var docxReader_1 = require("./office/docxReader");
 var xlsxReader_1 = require("./office/xlsxReader");
 var pptxReader_1 = require("./office/pptxReader");
@@ -78,3 +78,44 @@ function regexExclusion(texts, ex) {
     return excluded;
 }
 exports.regexExclusion = regexExclusion;
+function applyOpcodes(original, diffed, opcodes) {
+    // OpcodeのDelete / Replace 用にオリジナルテキストをとっておく
+    var crtSegment = original;
+    // 類似テキストを一つずつ取得して処理
+    var tagged = diffed.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    var processCodes = opcodes.reverse();
+    for (var _i = 0, processCodes_1 = processCodes; _i < processCodes_1.length; _i++) {
+        var processCode = processCodes_1[_i];
+        switch (processCode[0]) {
+            case 'equal':
+            case '=':
+                break;
+            case 'delete':
+            case '-':
+                tagged =
+                    tagged.slice(0, processCode[3]) +
+                        '<span class="ins">' + crtSegment.slice(processCode[1], processCode[2]) + '</span>' +
+                        tagged.slice(processCode[4]);
+                break;
+            case 'replace':
+            case '~':
+                tagged =
+                    tagged.slice(0, processCode[3]) +
+                        '<span class="ins">' + crtSegment.slice(processCode[1], processCode[2]) + '</span>' +
+                        '<span class="del">' + tagged.slice(processCode[3], processCode[4]) + '</span>' +
+                        tagged.slice(processCode[4]);
+                break;
+            case 'insert':
+            case '+':
+                tagged =
+                    tagged.slice(0, processCode[3]) +
+                        '<span class="del">' + tagged.slice(processCode[3], processCode[4]) + '</span>' +
+                        tagged.slice(processCode[4]);
+                break;
+            default:
+                break;
+        }
+    }
+    return tagged;
+}
+exports.applyOpcodes = applyOpcodes;

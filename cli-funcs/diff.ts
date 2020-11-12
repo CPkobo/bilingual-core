@@ -41,8 +41,8 @@ export interface SimilarSegment {
 type Calcresult = {
   sims: SimilarSegment[],
   max: number,
-  maxp: number
-}
+  maxp: number,
+};
 
 // オペコードのタイプ。類似分の表示に使用
 export type Opcode = [string, number, number, number, number];
@@ -77,8 +77,8 @@ export class DiffInfo {
           if (val === '') {
             continue;
           }
-          i++
-          this.addDseg(i, con.name, val, '')
+          i++;
+          this.addDseg(i, con.name, val, '');
           // const sims = this.calcRatio(val);
           // const diff: DiffSeg = {
           //   pid: ++i,
@@ -100,12 +100,12 @@ export class DiffInfo {
     if (adding === undefined || adding === false) {
       this.dsegs.length = 0;
     }
-    let i = 0
+    let i = 0;
     for (const text of texts) {
-      const st = biLang ? text.split(`\t`)[0] : text
-      const tt = biLang ? text.split(`\t`)[1] : ''
-      i++
-      this.addDseg(i, '', st, tt)
+      const st = biLang ? text.split(`\t`)[0] : text;
+      const tt = biLang ? text.split(`\t`)[1] : '';
+      i++;
+      this.addDseg(i, '', st, tt);
     }
   }
 

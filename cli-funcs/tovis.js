@@ -5,6 +5,7 @@ var fs_1 = require("fs");
 var readline_1 = require("readline");
 var diff_1 = require("./diff");
 var extract_1 = require("./extract");
+var plugins_1 = require("./plugins");
 var Tovis = /** @class */ (function () {
     function Tovis() {
         this.meta = {
@@ -16,61 +17,69 @@ var Tovis = /** @class */ (function () {
             remarks: ''
         };
         this.blocks = [];
+        this.plugins = new plugins_1.MyPlugins();
+        var pwd = process.cwd();
+        var plPaths = [];
+        try {
+            fs_1.statSync('./.tovisrc');
+            var rcs = fs_1.readFileSync('./.tovisrc').toString();
+            for (var _i = 0, _a = rcs.split('\n'); _i < _a.length; _i++) {
+                var rc = _a[_i];
+                if (!rc.startsWith('#')) {
+                    plPaths.push(rc.trim().replace('<pwd>', pwd));
+                }
+            }
+        }
+        catch (e) {
+            console.log('No .tovisrc file');
+            console.log(e);
+        }
+        for (var _b = 0, plPaths_1 = plPaths; _b < plPaths_1.length; _b++) {
+            var path = plPaths_1[_b];
+            console.log(path);
+            this.plugins.register(path);
+        }
     }
     Tovis.prototype.parseFromFile = function (path, fileType) {
         var _this = this;
-        // const fs = require('fs')
         return new Promise(function (resolve, reject) {
             try {
                 fs_1.statSync(path);
                 if (fileType === 'tovis') {
                     _this.parseFromTovis(path).then(function (message) {
-                        resolve({
-                            isOk: true,
-                            message: message
-                        });
+                        resolve({ isOk: true, message: message });
                     })["catch"](function (errMessage) {
-                        reject({
-                            isOk: false,
-                            message: errMessage
-                        });
+                        reject({ isOk: false, message: errMessage });
                     });
                 }
                 else if (fileType === 'diff') {
                     var diffStr = fs_1.readFileSync(path).toString();
                     _this.parseDiffInfo(JSON.parse(diffStr)).then(function (message) {
-                        resolve({
-                            isOk: true,
-                            message: message
-                        });
+                        resolve({ isOk: true, message: message });
                     })["catch"](function (errMessage) {
-                        reject({
-                            isOk: false,
-                            message: errMessage
-                        });
+                        reject({ isOk: false, message: errMessage });
                     });
                 }
                 else if (fileType === 'plain') {
-                    console.log('under development');
+                    // const plainStr: string = readFileSync(path).toString()
+                    _this.parseFromPlainText(path, true).then(function (message) {
+                        resolve({ isOk: true, message: message });
+                    })["catch"](function (errMessage) {
+                        reject({ isOk: false, message: errMessage });
+                    });
                 }
                 else {
-                    reject({
-                        isOk: false,
-                        message: 'fileType sholud designate from "tovis"/"diff"/"plain"'
-                    });
+                    reject({ isOk: false, message: 'fileType sholud designate from "tovis"/"diff"/"plain"' });
                 }
             }
             catch (_a) {
-                reject({
-                    isOk: false,
-                    message: 'file did not found'
-                });
+                reject({ isOk: false, message: 'file did not found' });
             }
         });
     };
     Tovis.prototype.parseFromObj = function (data) {
         if (data instanceof extract_1.CatovisContext) {
-            // 
+            //
         }
         else if (data instanceof diff_1.DiffInfo) {
             this.parseDiffInfo(data.dsegs);
@@ -102,12 +111,20 @@ var Tovis = /** @class */ (function () {
                     tovisStr.push("_:" + (i + 1) + "}[" + tmmt.type + "] " + tmmt.text);
                 }
             }
+            if (this.blocks[i].u.length > 0) {
+                var used = [];
+                for (var _d = 0, _e = this.blocks[i].u; _d < _e.length; _d++) {
+                    var usedPair = _e[_d];
+                    used.push(usedPair.s + "::" + usedPair.t.join('|'));
+                }
+                tovisStr.push("$:" + i + "} " + used.join(';'));
+            }
             var refs = [];
-            for (var _d = 0, _e = this.blocks[i].d; _d < _e.length; _d++) {
-                var d = _e[_d];
+            for (var _f = 0, _g = this.blocks[i].d; _f < _g.length; _f++) {
+                var d = _g[_f];
                 var ref = d.from + ">" + d.to + "|" + d.ratio;
-                for (var _f = 0, _g = d.op; _f < _g.length; _f++) {
-                    var op = _g[_f];
+                for (var _h = 0, _j = d.op; _h < _j.length; _h++) {
+                    var op = _j[_h];
                     ref += "|" + op.join(',');
                 }
                 refs.push(ref);
@@ -126,6 +143,7 @@ var Tovis = /** @class */ (function () {
             s: '',
             t: '',
             m: [],
+            u: [],
             d: [],
             c: ''
         };
@@ -233,7 +251,9 @@ var Tovis = /** @class */ (function () {
             for (var _i = 0, diff_2 = diff; _i < diff_2.length; _i++) {
                 var dseg = diff_2[_i];
                 var block = _this.createBlock();
-                block.s = dseg.text;
+                // block.s = dseg.st;
+                _this.setSource(block, dseg.st);
+                block.t = dseg.tt;
                 for (var _a = 0, _b = dseg.sims; _a < _b.length; _a++) {
                     var sim = _b[_a];
                     var refInfo = {
@@ -255,13 +275,65 @@ var Tovis = /** @class */ (function () {
             resolve('DiffInfo successfully parsed into TOVIS');
         });
     };
+    Tovis.prototype.parseFromPlainText = function (path, withDiff) {
+        var _this = this;
+        return new Promise(function (resolve, reject) {
+            var rs = fs_1.createReadStream(path);
+            var lines = readline_1.createInterface(rs);
+            var count = 1;
+            var preCount = 1;
+            var sepMarkA = '_@@_';
+            var sepMarkB = '_@λ_';
+            var isBiLang = path.endsWith('.tsv');
+            var texts = [];
+            lines.on('line', function (line) {
+                if (line.startsWith(sepMarkA)) {
+                    if (!line.endsWith('EOF')) {
+                        var fileName = isBiLang ? line.split('\t')[0].replace(sepMarkA, '') : line.replace(sepMarkA, '');
+                        _this.meta.files.push(fileName);
+                    }
+                }
+                else if (line.startsWith(sepMarkB)) {
+                    _this.meta.groups.push([preCount, count]);
+                    preCount = count;
+                }
+                else if (line !== '') {
+                    count++;
+                    if (withDiff) {
+                        texts.push(line);
+                    }
+                    else {
+                        var block = _this.createBlock();
+                        // block.s = isBiLang ? line.split('\t')[0] : line;
+                        var st = isBiLang ? line.split('\t')[0] : line;
+                        _this.setSource(block, st);
+                        block.t = isBiLang ? line.split('\t')[1] : '';
+                    }
+                }
+            });
+            lines.on('close', function () {
+                if (withDiff) {
+                    var diff = new diff_1.DiffInfo();
+                    diff.analyzeFromText(texts, isBiLang);
+                    _this.parseDiffInfo(diff.dsegs).then(function () {
+                        resolve("success to read " + count + " rows with Diff");
+                    });
+                }
+                else {
+                    resolve("success to read " + count + " rows");
+                }
+            });
+        });
+    };
     Tovis.prototype.upsertBlocks = function (keyChara, index, contents) {
         var isValid = false;
         switch (keyChara) {
+            // 原文
             case '@': {
                 if (contents !== '') {
                     if (this.blocks[index - 1].s === '') {
-                        this.blocks[index - 1].s = contents;
+                        // this.blocks[index - 1].s = contents;
+                        this.setSource(this.blocks[index - 1], contents);
                         isValid = true;
                     }
                 }
@@ -270,6 +342,7 @@ var Tovis = /** @class */ (function () {
                 }
                 break;
             }
+            // 確定訳文
             case 'λ': {
                 if (contents !== '') {
                     if (this.blocks[index - 1].t === '') {
@@ -282,6 +355,7 @@ var Tovis = /** @class */ (function () {
                 }
                 break;
             }
+            // 訳文候補
             case '_': {
                 if (contents !== '') {
                     var matchObj = contents.match(/^\[.+\]/);
@@ -298,6 +372,22 @@ var Tovis = /** @class */ (function () {
                 isValid = true;
                 break;
             }
+            // 用語
+            case '$': {
+                if (contents !== '') {
+                    var pairs = contents.split(';');
+                    for (var _i = 0, pairs_1 = pairs; _i < pairs_1.length; _i++) {
+                        var pair = pairs_1[_i];
+                        var srcAndTgt = pair.split('::');
+                        var used = {
+                            s: srcAndTgt[0],
+                            t: srcAndTgt[1].split('|')
+                        };
+                        this.blocks[index - 1].u.push(used);
+                    }
+                }
+            }
+            // コメント
             case '!': {
                 if (contents !== '') {
                     this.blocks[index - 1].c += contents + ';';
@@ -305,13 +395,14 @@ var Tovis = /** @class */ (function () {
                 isValid = true;
                 break;
             }
+            // 類似情報
             case '^': {
                 if (contents !== '') {
                     if (this.blocks[index - 1].d.length === 0) {
                         var refs = [];
                         var singleCodes = contents.split(';');
-                        for (var _i = 0, singleCodes_1 = singleCodes; _i < singleCodes_1.length; _i++) {
-                            var singleCode = singleCodes_1[_i];
+                        for (var _a = 0, singleCodes_1 = singleCodes; _a < singleCodes_1.length; _a++) {
+                            var singleCode = singleCodes_1[_a];
                             var elements = singleCode.split('|');
                             var fromAndTo = elements[0].split('>');
                             if (fromAndTo.length < 2) {
@@ -340,6 +431,32 @@ var Tovis = /** @class */ (function () {
                 break;
         }
         return isValid;
+    };
+    Tovis.prototype.setSource = function (block, text) {
+        if (this.plugins.onSetSouce.length === 0) {
+            block.s = text;
+        }
+        else {
+            var processed = text;
+            for (var _i = 0, _a = this.plugins.onSetSouce; _i < _a.length; _i++) {
+                var plugin = _a[_i];
+                processed = plugin.f(processed);
+            }
+            block.s = processed;
+        }
+    };
+    Tovis.prototype.setMT = function (block, type, text) {
+        if (this.plugins.onSetMT.length === 0) {
+            block.m.push({ type: type, text: text });
+        }
+        else {
+            var processed = text;
+            for (var _i = 0, _a = this.plugins.onSetMT; _i < _a.length; _i++) {
+                var plugin = _a[_i];
+                processed = plugin.f(processed);
+            }
+            block.m.push({ type: type, text: processed });
+        }
     };
     return Tovis;
 }());

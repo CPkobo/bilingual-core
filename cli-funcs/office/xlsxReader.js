@@ -49,7 +49,7 @@ function xlsxReader(xlsxFile, fileName, opt) {
                     var zip = new JSZip();
                     zip.loadAsync(xlsxFile).then(function (inzip) {
                         // const wsNums = inzip.folder("xl/worksheets/_rels/").file(/.rels/).length
-                        inzip.file("xl/sharedStrings.xml").async('string').then(function (sst) { return __awaiter(_this, void 0, void 0, function () {
+                        inzip.file('xl/sharedStrings.xml').async('string').then(function (sst) { return __awaiter(_this, void 0, void 0, function () {
                             var _this = this;
                             return __generator(this, function (_a) {
                                 xml2js_1.parseString(sst, function (err, root) { return __awaiter(_this, void 0, void 0, function () {
@@ -138,7 +138,7 @@ function workbookRelReader(zipOjt, readHidden) {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
             return [2 /*return*/, new Promise(function (resolve, reject) {
-                    zipOjt.file("xl/workbook.xml").async('string').then(function (wb) {
+                    zipOjt.file('xl/workbook.xml').async('string').then(function (wb) {
                         xml2js_1.parseString(wb, function (err, root) {
                             if (err) {
                                 console.log(err);
@@ -165,7 +165,7 @@ function styleRelReader(zipOjt, opt) {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
             return [2 /*return*/, new Promise(function (resolve, reject) {
-                    zipOjt.file("xl/styles.xml").async('string').then(function (styles) {
+                    zipOjt.file('xl/styles.xml').async('string').then(function (styles) {
                         xml2js_1.parseString(styles, function (err, root) {
                             if (err) {
                                 console.log(err);
@@ -200,12 +200,12 @@ function xlsxContentsReader(zipOjt, shared, notHidden, filled, opt) {
             return [2 /*return*/, new Promise(function (resolve) {
                     var prs = [];
                     var rels = [];
-                    zipOjt.folder("xl/worksheets/").forEach(function (path, file) { return __awaiter(_this, void 0, void 0, function () {
+                    zipOjt.folder('xl/worksheets/').forEach(function (path, file) { return __awaiter(_this, void 0, void 0, function () {
                         var _a, _b;
                         return __generator(this, function (_c) {
                             switch (_c.label) {
                                 case 0:
-                                    if (!!path.startsWith("_rels")) return [3 /*break*/, 1];
+                                    if (!!path.startsWith('_rels')) return [3 /*break*/, 1];
                                     prs.push(eachSheetReader(path, file, shared, filled, opt));
                                     return [3 /*break*/, 3];
                                 case 1:
@@ -219,8 +219,8 @@ function xlsxContentsReader(zipOjt, shared, notHidden, filled, opt) {
                             }
                         });
                     }); });
-                    zipOjt.folder("xl/drawings/").forEach(function (path, file) {
-                        if (!path.startsWith("_rels") && !path.endsWith('.vml')) {
+                    zipOjt.folder('xl/drawings/').forEach(function (path, file) {
+                        if (!path.startsWith('_rels') && !path.endsWith('.vml')) {
                             prs.push(eachDrawingReader(path, file, opt));
                         }
                     });
@@ -256,8 +256,8 @@ function wsRelReader(path, fileObj) {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
             return [2 /*return*/, new Promise(function (resolve) {
-                    fileObj.async('string').then(function (rel) {
-                        xml2js_1.parseString(rel, function (err, root) {
+                    fileObj.async('string').then(function (relxml) {
+                        xml2js_1.parseString(relxml, function (err, root) {
                             if (err) {
                                 console.log(err);
                             }
@@ -267,9 +267,9 @@ function wsRelReader(path, fileObj) {
                                     sub: ''
                                 };
                                 for (var _i = 0, _a = root.Relationships.Relationship; _i < _a.length; _i++) {
-                                    var rel_1 = _a[_i];
-                                    if (rel_1.$.Target.startsWith('../drawings/')) {
-                                        relInfo.sub = rel_1.$.Target.replace('../drawings/drawing', '').replace('.xml', '');
+                                    var rel = _a[_i];
+                                    if (rel.$.Target.startsWith('../drawings/')) {
+                                        relInfo.sub = rel.$.Target.replace('../drawings/drawing', '').replace('.xml', '');
                                     }
                                 }
                                 resolve(relInfo);

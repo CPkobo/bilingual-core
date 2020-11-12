@@ -193,22 +193,21 @@ function slideReader(path, fileObj, opt) {
                                     var paras = shape['p:txBody'][0]['a:p'] !== undefined ? shape['p:txBody'][0]['a:p'] : [];
                                     for (var _b = 0, paras_1 = paras; _b < paras_1.length; _b++) {
                                         var para = paras_1[_b];
-                                        var runs = para['a:r'];
-                                        if (runs === undefined) {
-                                            continue;
-                                        }
-                                        else {
-                                            var runs_3 = para['a:r'] !== undefined ? para['a:r'] : [];
-                                            var textInPara = '';
-                                            for (var _c = 0, runs_1 = runs_3; _c < runs_1.length; _c++) {
-                                                var run = runs_1[_c];
-                                                if (run['a:t'] === undefined) {
-                                                    continue;
-                                                }
-                                                textInPara += run['a:t'];
+                                        // const runs = para['a:r'];
+                                        // if (runs === undefined) {
+                                        //   continue;
+                                        // } else {
+                                        var runs = para['a:r'] !== undefined ? para['a:r'] : [];
+                                        var textInPara = '';
+                                        for (var _c = 0, runs_1 = runs; _c < runs_1.length; _c++) {
+                                            var run = runs_1[_c];
+                                            if (run['a:t'] === undefined) {
+                                                continue;
                                             }
-                                            textInSlide.push(textInPara.replace('\t', '\n'));
+                                            textInPara += run['a:t'];
                                         }
+                                        textInSlide.push(textInPara.replace('\t', '\n'));
+                                        // }
                                     }
                                 }
                                 var gFrames = pTree['p:graphicFrame'] !== undefined ? pTree['p:graphicFrame'] : [];
@@ -319,8 +318,8 @@ function noteReader(path, fileObj, opt) {
                                         var para = paras_3[_a];
                                         var textInPara = [];
                                         var runs = para['a:r'] !== undefined ? para['a:r'] : [];
-                                        for (var _b = 0, runs_4 = runs; _b < runs_4.length; _b++) {
-                                            var run = runs_4[_b];
+                                        for (var _b = 0, runs_3 = runs; _b < runs_3.length; _b++) {
+                                            var run = runs_3[_b];
                                             if (run['a:t'][0] !== '' && run['a:t'][0] !== '\t') {
                                                 textInPara.push.apply(textInPara, run['a:t']);
                                             }

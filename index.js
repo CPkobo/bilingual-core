@@ -151,6 +151,20 @@ var CLIParams = /** @class */ (function () {
             }
         }
     }
+    CLIParams.prototype.exportAsOptionQue = function () {
+        return {
+            name: 'via-cli',
+            withSeparator: this.withSeparator,
+            excluding: this.excluding,
+            exclusion: this.exclusion,
+            segmentation: true,
+            delimiters: '(\\。|\\. |\\! |\\? |\\！|\\？)',
+            wordRev: this.wordRev,
+            excelReadHidden: this.excelReadHidden,
+            excelReadFilled: this.excelReadFilled,
+            pptNote: this.pptNote
+        };
+    };
     CLIParams.prototype.updateFromDialog = function (ans) {
         this.mode = ans.mode;
         this.excluding = ans.exclusion !== '';
@@ -351,25 +365,25 @@ var CLIParams = /** @class */ (function () {
                     case 3:
                         result = _b.sent();
                         _b.label = 4;
-                    case 4: return [3 /*break*/, 11];
+                    case 4: return [3 /*break*/, 12];
                     case 5:
                         if (!(data.cxt !== undefined)) return [3 /*break*/, 7];
                         return [4 /*yield*/, data.cxt.getAlignedText(opt)];
                     case 6:
                         result = _b.sent();
                         _b.label = 7;
-                    case 7: return [3 /*break*/, 11];
+                    case 7: return [3 /*break*/, 12];
                     case 8:
                         if (data.diff !== undefined) {
                             format = oMode === 'json' ? 'json' : 'human';
                             result = [data.diff.exportResult('wwc-chara', format)];
                         }
-                        return [3 /*break*/, 11];
+                        return [3 /*break*/, 12];
                     case 9:
                         if (data.diff !== undefined) {
-                            result = [data.diff.exportResult("diff", "json")];
+                            result = [data.diff.exportResult('diff', 'json')];
                         }
-                        return [3 /*break*/, 11];
+                        return [3 /*break*/, 12];
                     case 10:
                         tovis = new tovis_1.Tovis();
                         if (data.diff !== undefined) {
@@ -381,8 +395,9 @@ var CLIParams = /** @class */ (function () {
                                 result = [tovis.dumpToJson()];
                             }
                         }
-                        return [3 /*break*/, 11];
-                    case 11:
+                        return [3 /*break*/, 12];
+                    case 11: return [3 /*break*/, 12];
+                    case 12:
                         switch (oMode) {
                             case 'console':
                                 console.log(result.join('\n'));
@@ -398,20 +413,6 @@ var CLIParams = /** @class */ (function () {
                 }
             });
         });
-    };
-    CLIParams.prototype.exportAsOptionQue = function () {
-        return {
-            name: 'via-cli',
-            withSeparator: this.withSeparator,
-            excluding: this.excluding,
-            exclusion: this.exclusion,
-            segmentation: true,
-            delimiters: '(\\。|\\. |\\! |\\? |\\！|\\？)',
-            wordRev: this.wordRev,
-            excelReadHidden: this.excelReadHidden,
-            excelReadFilled: this.excelReadFilled,
-            pptNote: this.pptNote
-        };
     };
     CLIParams.prototype.validate = function () {
         var errMes = '';
@@ -534,7 +535,11 @@ function inquirerDialog(sourceFiles) {
             type: 'checkbox',
             name: 'others',
             message: 'Designate other options(Multiple select with space bar).',
-            choices: ['Dont add separation marks', 'Word-Before-Revision', 'PPT-Note', 'Excel-Hidden-Sheet', 'Excel-Filled-Cell', 'DEBUG']
+            choices: [
+                'Dont add separation marks',
+                'Word-Before-Revision', 'PPT-Note', 'Excel-Hidden-Sheet', 'Excel-Filled-Cell',
+                'DEBUG'
+            ]
         },
     ];
     inquirer.prompt(prompts).then(function (answer) {
