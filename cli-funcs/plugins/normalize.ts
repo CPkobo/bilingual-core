@@ -1,8 +1,10 @@
-import { OnSetString, TovisPluginExternal } from '../plugins'
+import { OnSetString, Triger, TovisPluginExternal } from '../plugins'
 
 const name = 'normalize'
+const triger: Triger[] = ['onSetSouce', 'onSetMT']
+const ex = 'NFKD'
 
-const func: OnSetString = (text: string, ex: any): string => {
+const f: OnSetString = (text: string, ex: any): string => {
   const normalizer = ['NFC', 'NFD', 'NFKC', 'NFKD']
   let method: string = 'NFKD'
   if (typeof (ex) === 'string') {
@@ -14,10 +16,10 @@ const func: OnSetString = (text: string, ex: any): string => {
 }
 
 const plugin: TovisPluginExternal = {
-  triger: ['onSetSouce', 'onSetMT'],
+  triger,
   name,
-  f: func,
-  ex: 'NFKD'
+  f,
+  ex
 }
 
 module.exports = plugin
