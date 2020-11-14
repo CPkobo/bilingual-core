@@ -22,6 +22,7 @@ export interface WWCReport extends WWCInfo {
 
 export interface DiffSeg {
   pid: number;
+  gid: number;
   file: string;
   st: string;
   tt: string;
@@ -289,10 +290,11 @@ export class DiffInfo {
     }
   }
 
-  private addDseg(index: number, file: string, st: string, tt: string) {
+  private addDseg(pid: number, gid: number, file: string, st: string, tt: string) {
     const sims = this.calcRatio(st);
     const diff: DiffSeg = {
-      pid: index,
+      pid,
+      gid,
       file,
       st,
       tt,
