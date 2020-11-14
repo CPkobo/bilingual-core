@@ -69,7 +69,9 @@ export class DiffInfo {
       this.dsegs.length = 0;
     }
     let i = 0;
+    let j = 0
     for (const con of cons) {
+      j++
       for (const ext of con.exts) {
         if (!ext.isActive) {
           continue;
@@ -79,7 +81,7 @@ export class DiffInfo {
             continue;
           }
           i++;
-          this.addDseg(i, con.name, val, '');
+          this.addDseg(i, j, con.name, val, '');
           // const sims = this.calcRatio(val);
           // const diff: DiffSeg = {
           //   pid: ++i,
@@ -102,11 +104,15 @@ export class DiffInfo {
       this.dsegs.length = 0;
     }
     let i = 0;
+    let j = 0;
     for (const text of texts) {
       const st = biLang ? text.split(`\t`)[0] : text;
       const tt = biLang ? text.split(`\t`)[1] : '';
+      if (st.startsWith('_@')) {
+        j++
+      }
       i++;
-      this.addDseg(i, '', st, tt);
+      this.addDseg(i, j, '', st, tt);
     }
   }
 
