@@ -1,4 +1,6 @@
 import { ExtractedContent } from './extract';
+import { createReadStream } from 'fs'
+import { createInterface } from 'readline';
 
 export interface WWCRate {
   dupli: number;
@@ -71,11 +73,11 @@ export class DiffInfo {
     let i = 0;
     let j = 0
     for (const con of cons) {
-      j++
       for (const ext of con.exts) {
         if (!ext.isActive) {
           continue;
         }
+        j++
         for (const val of ext.value) {
           if (val === '') {
             continue;
@@ -99,21 +101,38 @@ export class DiffInfo {
     }
   }
 
-  public analyzeFromText(texts: string[], biLang: boolean, adding?: boolean): void {
+  public analyzeFromText(path: string, adding?: boolean): Promise<number> {
     if (adding === undefined || adding === false) {
       this.dsegs.length = 0;
     }
-    let i = 0;
-    let j = 0;
-    for (const text of texts) {
-      const st = biLang ? text.split(`\t`)[0] : text;
-      const tt = biLang ? text.split(`\t`)[1] : '';
-      if (st.startsWith('_@')) {
-        j++
-      }
-      i++;
-      this.addDseg(i, j, '', st, tt);
-    }
+    const rs = createReadStream(path);
+    const lines = createInterface(rs);
+    let i: number = 0
+    let j: number = 0
+    const sepMarkA = '_@@_';
+    const sepMarkB = '_@λ_';
+    const isBiLang = path.endsWith('.tsv');
+    // const texts: string[] = [];
+    let fileName: string = ''
+    return new Promise((resolve, reject) => {
+      lines.on('line', (line) => {
+        if (line.startsWith(sepMarkA)) {
+          if (!line.endsWith('EOF')) {
+            fileName = isBiLang ? line.split('\t')[0].replace(sepMarkA, '') : line.replace(sepMarkA, '');
+          }
+        } else if (line.startsWith(sepMarkB)) {
+          j++
+        } else if (line !== '') {
+          i++;
+          const st = isBiLang ? line.split('\t')[0] : line;
+          const tt = isBiLang ? line.split('\t')[1] : '';
+          this.addDseg(i, j, fileName, st, tt);
+        }
+      });
+      lines.on('close', () => {
+        resolve(i)
+      })
+    })
   }
 
   public calcWWC(unit: 'word' | 'chara', wordWeight?: WWCRate): void {

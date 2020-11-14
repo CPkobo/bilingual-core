@@ -9,34 +9,7 @@ import { DiffInfo, DiffSeg } from './cli-funcs/diff';
 import { FileStats } from './cli-funcs/stats';
 import { Tovis } from './cli-funcs/tovis';
 
-import { docxReader } from './cli-funcs/office/docxReader';
-import { xlsxReader } from './cli-funcs/office/xlsxReader';
-import { pptxReader } from './cli-funcs/office/pptxReader';
-
-import { cnm, ReadFailure } from './cli-funcs/util';
-
-export function pathContentsReader(paths: string[], opq?: OptionQue): Promise<ExtractedContent[]> {
-  const que = opq !== undefined ? opq : {};
-  const opt = new ReadingOption(que);
-  return new Promise((resolve, reject) => {
-    const prs: Array<Promise<any>> = [];
-    for (const path of paths) {
-      const read = readFileSync(path);
-      if (path.endsWith('.docx')) {
-        prs.push(docxReader(read, path, opt));
-      } else if (path.endsWith('.xlsx')) {
-        prs.push(xlsxReader(read, path, opt));
-      } else if (path.endsWith('.pptx')) {
-        prs.push(pptxReader(read, path, opt));
-      }
-    }
-    Promise.all(prs).then((res) => {
-      resolve(res);
-    }).catch((failure: ReadFailure) => {
-      reject(failure);
-    });
-  });
-}
+import { cnm, pathContentsReader, ReadFailure } from './cli-funcs/util';
 
 const modeChoices = ['EXTRACT', 'ALIGN', 'COUNT', 'DIFF', 'TOVIS'];
 
@@ -337,6 +310,8 @@ class CLIParams {
     oFile: string, data: { cxt?: CatovisContext, diff?: DiffInfo },
   ): Promise<void> {
 
+    console.log(`${eMode}->${oFile}@${oMode}`)
+
     let result: string[] = [];
     switch (eMode) {
       case 'EXTRACT':
@@ -541,6 +516,7 @@ console.log('------------------------');
 const program = require('commander');
 program
   .option('-c, --cmd', 'Use full CLI when true. Default value is "false"', false)
+  .option('-p, --preset', 'Use this flag for executing with pre-designated params')
   .option('-m, --mode <item>', 'Select Execution Mode. Choose From "EXTRACT" | "ALIGN" | "COUNT" | "DIFF" | "TOVIS"')
   .option('-s, --source <item>', 'Source input file(s)/folder(s) with comma separated. You can input directly without option. Remain blank for current directory')
   .option('-t, --target <item>', 'Target input file(s)/folder(s) with comma separated.')
@@ -553,7 +529,18 @@ program
 
 const args: any = program.parse(process.argv);
 
-if (args.cmd === false) {
+if (args.preset) {
+  const params = new CLIParams({})
+  // あらかじめ動作を設定する
+  params.source = './demo.docx'
+  // params.mode = 'DIFF'
+  // params.oFile = './preset.json'
+  // params.oMode = 'json'
+  params.mode = 'TOVIS'
+  params.oFile = './preset.tovis'
+  params.oMode = 'plain'
+  params.executeByParams();
+} else if (args.cmd === false) {
   if (args.args.length !== 0) {
     inquirerDialog(args.args[0]);
   } else {

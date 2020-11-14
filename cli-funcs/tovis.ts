@@ -135,7 +135,6 @@ export class Tovis {
     } else if (data instanceof DiffInfo) {
       this.parseDiffInfo(data.dsegs);
     }
-
   }
 
   public dump(): string[] {
@@ -298,7 +297,19 @@ export class Tovis {
         delete: '-',
         insert: '+',
       };
+      let fileName: string = ''
+      let prevGroup: number = 1
+      let prevPid: number = 1
       for (const dseg of diff) {
+        if (fileName !== dseg.file) {
+          this.meta.files.push(dseg.file)
+          fileName = dseg.file
+        }
+        if (prevGroup !== dseg.gid) {
+          this.meta.groups.push([prevPid, dseg.pid - 1])
+          prevPid = dseg.pid
+          prevGroup = dseg.gid
+        }
         const block = this.createBlock();
         // block.s = dseg.st;
         this.setSource(block, dseg.st)
@@ -326,48 +337,46 @@ export class Tovis {
 
   private parseFromPlainText(path: string, withDiff: boolean): Promise<string> {
     return new Promise((resolve, reject) => {
-      const rs = createReadStream(path);
-      const lines = createInterface(rs);
-      let count: number = 1;
-      let preCount: number = 1;
-      const sepMarkA = '_@@_';
-      const sepMarkB = '_@λ_';
-      const isBiLang = path.endsWith('.tsv');
-      const texts: string[] = [];
-      lines.on('line', (line) => {
-        if (line.startsWith(sepMarkA)) {
-          if (!line.endsWith('EOF')) {
-            const fileName = isBiLang ? line.split('\t')[0].replace(sepMarkA, '') : line.replace(sepMarkA, '');
-            this.meta.files.push(fileName);
-          }
-        } else if (line.startsWith(sepMarkB)) {
-          this.meta.groups.push([preCount, count]);
-          preCount = count;
-        } else if (line !== '') {
-          count++;
-          if (withDiff) {
-            texts.push(line);
-          } else {
-            const block: TovisBlock = this.createBlock();
-            // block.s = isBiLang ? line.split('\t')[0] : line;
-            const st = isBiLang ? line.split('\t')[0] : line;
-            this.setSource(block, st)
-            block.t = isBiLang ? line.split('\t')[1] : '';
-          }
-        }
-      });
-      lines.on('close', () => {
-        if (withDiff) {
-          const diff: DiffInfo = new DiffInfo();
-          diff.analyzeFromText(texts, isBiLang);
+      if (withDiff) {
+        const diff: DiffInfo = new DiffInfo();
+        diff.analyzeFromText(path).then((count: number) => {
           this.parseDiffInfo(diff.dsegs).then(() => {
             resolve(`success to read ${count} rows with Diff`);
           });
-        } else {
-          resolve(`success to read ${count} rows`);
-        }
-      });
-    });
+        })
+      } else {
+        const rs = createReadStream(path);
+        const lines = createInterface(rs);
+        let i: number = 0
+        let j: number = 0
+        const sepMarkA = '_@@_';
+        const sepMarkB = '_@λ_';
+        const isBiLang = path.endsWith('.tsv');
+        // const texts: string[] = [];
+        lines.on('line', (line) => {
+          if (line.startsWith(sepMarkA)) {
+            if (!line.endsWith('EOF')) {
+              const fileName = isBiLang ? line.split('\t')[0].replace(sepMarkA, '') : line.replace(sepMarkA, '');
+              this.meta.files.push(fileName)
+            }
+          } else if (line.startsWith(sepMarkB)) {
+            this.meta.groups.push([i, j])
+            j = i
+          } else if (line !== '') {
+            i++;
+            const st = isBiLang ? line.split('\t')[0] : line;
+            const tt = isBiLang ? line.split('\t')[1] : '';
+            const block = this.createBlock()
+            this.setSource(block, st)
+            block.t = tt
+            this.blocks.push(block)
+          }
+        });
+        lines.on('close', () => {
+          resolve(`success to read ${i} rows`)
+        })
+      }
+    }) 
   }
 
   private upsertBlocks(keyChara: string, index: number, contents: string): boolean {
