@@ -297,7 +297,7 @@ export class Tovis {
           const matchObj: RegExpMatchArray | null = line.match(lineHead);
           if (matchObj !== null) {
             const index = Number(matchObj[2]);
-            while (this.blocks.length < index) {
+            while (this.blocks.length < index + 1) {
               this.blocks.push(this.createBlock());
             }
             this.upsertBlocks(line.substr(0, 1), index, line.replace(lineHead, '').trim());
@@ -406,9 +406,9 @@ export class Tovis {
       // 原文
       case '@': {
         if (contents !== '') {
-          if (this.blocks[index - 1].s === '') {
+          if (this.blocks[index].s === '') {
             // this.blocks[index - 1].s = contents;
-            this.setSource(this.blocks[index - 1], contents)
+            this.setSource(this.blocks[index], contents)
             isValid = true;
           }
         } else {
@@ -420,8 +420,8 @@ export class Tovis {
       // 確定訳文
       case 'λ': {
         if (contents !== '') {
-          if (this.blocks[index - 1].t === '') {
-            this.blocks[index - 1].t = contents;
+          if (this.blocks[index].t === '') {
+            this.blocks[index].t = contents;
             isValid = true;
           }
         } else {
@@ -435,9 +435,9 @@ export class Tovis {
         if (contents !== '') {
           const matchObj: RegExpMatchArray | null = contents.match(/^\[.+\]/);
           if (matchObj === null) {
-            this.blocks[index - 1].m.push({ type: 'Hm?', text: contents });
+            this.blocks[index].m.push({ type: 'Hm?', text: contents });
           } else {
-            this.blocks[index - 1].m.push({
+            this.blocks[index].m.push({
               type: matchObj[0].replace('[', '').replace(']', ''),
               text: contents.replace(matchObj[0], ''),
             });
@@ -457,7 +457,7 @@ export class Tovis {
               s: srcAndTgt[0],
               t: srcAndTgt[1].split('|'),
             };
-            this.blocks[index - 1].u.push(used);
+            this.blocks[index].u.push(used);
           }
         }
         break;
@@ -466,7 +466,7 @@ export class Tovis {
       // コメント
       case '!': {
         if (contents !== '') {
-          this.blocks[index - 1].c += contents + ';';
+          this.blocks[index].c += contents + ';';
         }
         isValid = true;
         break;
@@ -475,7 +475,7 @@ export class Tovis {
       // 類似情報
       case '%': {
         if (contents !== '') {
-          if (this.blocks[index - 1].d.length === 0) {
+          if (this.blocks[index].d.length === 0) {
             const refs: TovisRef[] = [];
             const singleCodes = contents.split(';');
             for (const singleCode of singleCodes) {
@@ -494,7 +494,7 @@ export class Tovis {
               refs.push(ref);
               // blocks[ref.from - 1].d.push(ref)
             }
-            this.blocks[index - 1].d = refs;
+            this.blocks[index].d = refs;
             isValid = true;
           }
         } else {
