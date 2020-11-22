@@ -397,7 +397,8 @@ class CLIParams {
   }
 
   private convertIntoFiles(srcOrTgt: 'source' | 'target'): boolean {
-    const oooxml = ['.docx', '.xlsx', '.pptx'];
+    // const oooxml = ['.docx', '.docm', '.xlsx', '.xlsm', '.pptx', '.pptm'];
+    const validFormat = ['.docx', '.docm', '.xlsx', '.xlsm', '.pptx', '.pptm', '.json'];
     const isWhich = srcOrTgt === 'source' ? this.source : this.target;
     const toWhich = srcOrTgt === 'source' ? this.sFiles : this.tFiles;
     const files = isWhich.split(',');
@@ -408,12 +409,12 @@ class CLIParams {
           const dirName = f.replace('\\', '').endsWith('/') ? f : `${f}/`;
           const clds = readdirSync(f);
           for (const cld of clds) {
-            if (oooxml.indexOf(cld.substr(-5, 5)) !== -1) {
+            if (validFormat.indexOf(cld.substr(-5, 5)) !== -1) {
               toWhich.push(`${dirName}${cld}`);
             }
           }
         } else {
-          if (oooxml.indexOf(f.substr(-5, 5)) !== -1) {
+          if (validFormat.indexOf(f.substr(-5, 5)) !== -1) {
             toWhich.push(f);
           }
         }

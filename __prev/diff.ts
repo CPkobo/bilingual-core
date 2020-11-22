@@ -42,9 +42,9 @@ export interface SimilarSegment {
 }
 
 type Calcresult = {
-  sims: SimilarSegment[];
-  max: number;
-  maxp: number;
+  sims: SimilarSegment[],
+  max: number,
+  maxp: number,
 };
 
 // オペコードのタイプ。類似分の表示に使用
@@ -70,8 +70,8 @@ export class DiffInfo {
     if (adding === undefined || adding === false) {
       this.dsegs.length = 0;
     }
-    let i = -1;
-    let j = -1;
+    let i = 0;
+    let j = 0
     for (const con of cons) {
       for (const ext of con.exts) {
         if (!ext.isActive) {
@@ -84,6 +84,18 @@ export class DiffInfo {
           }
           i++;
           this.addDseg(i, j, con.name, val, '');
+          // const sims = this.calcRatio(val);
+          // const diff: DiffSeg = {
+          //   pid: ++i,
+          //   file: con.name,
+          //   st: val,
+          //   tt: '',
+          //   len: val.replace(this.spaces, '').length,
+          //   sims: sims.sims,
+          //   max: sims.max,
+          //   maxp: sims.maxp,
+          // };
+          // this.dsegs.push(diff);
         }
       }
     }
@@ -95,13 +107,13 @@ export class DiffInfo {
     }
     const rs = createReadStream(path);
     const lines = createInterface(rs);
-    let i = -1
-    let j = -1
+    let i: number = 0
+    let j: number = 0
     const sepMarkA = '_@@_';
     const sepMarkB = '_@λ_';
     const isBiLang = path.endsWith('.tsv');
     // const texts: string[] = [];
-    let fileName = ''
+    let fileName: string = ''
     return new Promise((resolve, reject) => {
       lines.on('line', (line) => {
         if (line.startsWith(sepMarkA)) {
@@ -196,7 +208,7 @@ export class DiffInfo {
         len = dseg.len;
       } else if (unit === 'word') {
         const wordText = dseg.st + '.';
-        len = `${dseg.st}.`.replace(/(,|\.|:|;|!|\?|\s)+/g, ' ').split(' ').length - 1;
+        len = `${dseg.st}.`.replace(/(\,|\.|:|;|\!|\?|\s)+/g, ' ').split(' ').length - 1;
       } else {
         len = 0;
       }
@@ -261,7 +273,7 @@ export class DiffInfo {
           return 'under construction, please wait';
 
         case 'wwc-chara':
-        case 'wwc-word': {
+        case 'wwc-word':
           const unit = prop === 'wwc-chara' ? 'chara' : 'word';
           const unitHead = prop === 'wwc-chara' ? '文字' : '単語';
           const line: string[] = [`ファイル名\t${unitHead}数\tWWC適用後\t重複\t95-99%\t85-94%\t75-84%\t50-74%\t0-49%`];
@@ -294,7 +306,6 @@ export class DiffInfo {
             }
           }
           return line.join('\n');
-        }
 
         default:
           return '';

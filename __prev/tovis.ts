@@ -2,9 +2,8 @@ import { statSync, readFileSync, writeFileSync, createReadStream } from 'fs';
 import { createInterface } from 'readline';
 
 import { DiffInfo, DiffSeg, Opcode } from './diff';
-import { CatovisContext, ExtractedContent, ExtractedText } from './extract';
+import { CatovisContext, ExtractedText } from './extract';
 import { MyPlugins, Triger, TovisPlugin, OnSetString } from './plugins'
-import { cnm } from './util';
 
 // export type TovisOpcodeSymbol = '='|'~'|'+'|'-'
 
@@ -28,8 +27,8 @@ export interface TransCandidate {
 }
 
 export type UsedTerms = {
-  s: string;
-  t: string[];
+  s: string
+  t: string[],
 };
 
 export interface TovisMeta {
@@ -130,30 +129,12 @@ export class Tovis {
     });
   }
 
-  public parseFromObj(data: CatovisContext | DiffInfo): Promise<ParseResult> {
-    return new Promise((resolve, reject) => {
-      if (data instanceof CatovisContext) {
-        const diff = new DiffInfo()
-        const srcContent = data.getRawContent('src')
-        if (srcContent !== null) {
-          diff.analyze(srcContent)
-        this.parseDiffInfo(diff.dsegs).then((message) => {
-          resolve({isOk: true, message})
-        }).catch((errMessage) => {
-          reject({ isOk: false, message: errMessage });
-        });
-        } else {
-          reject({ isOk: false, message: 'No Catovis Context'})
-        }
-      } else if (data instanceof DiffInfo) {
-        this.parseDiffInfo(data.dsegs).then((message) => {
-          resolve({isOk: true, message})
-        }).catch((errMessage) => {
-          reject({ isOk: false, message: errMessage });
-        });
-      }
-    })
-    
+  public parseFromObj(data: CatovisContext | DiffInfo) {
+    if (data instanceof CatovisContext) {
+      //
+    } else if (data instanceof DiffInfo) {
+      this.parseDiffInfo(data.dsegs);
+    }
   }
 
   public dump(): string[] {
@@ -163,7 +144,7 @@ export class Tovis {
       `#IncludingFiles: ${this.meta.files.join(',')}`,
       `#Tags: ${this.meta.tags.join(',')}`,
     ];
-    const groupsStr: string[] = [];
+    let groupsStr: string[] = [];
     for (const group of this.meta.groups) {
       groupsStr.push(`${group[0]}-${group[1]}`);
     }
@@ -173,11 +154,11 @@ export class Tovis {
     }
     tovisStr.push('-----\n');
     for (let i = 0; i < this.blocks.length; i++) {
-      tovisStr.push(`@:${i}} ${this.blocks[i].s}`);
-      tovisStr.push(`λ:${i}} ${this.blocks[i].t}`);
+      tovisStr.push(`@:${i + 1}} ${this.blocks[i].s}`);
+      tovisStr.push(`λ:${i + 1}} ${this.blocks[i].t}`);
       if (this.blocks[i].m.length > 0) {
         for (const tmmt of this.blocks[i].m) {
-          tovisStr.push(`_:${i}}[${tmmt.type}] ${tmmt.text}`);
+          tovisStr.push(`_:${i + 1}}[${tmmt.type}] ${tmmt.text}`);
         }
       }
       if (this.blocks[i].u.length > 0) {
@@ -189,14 +170,14 @@ export class Tovis {
       }
       const refs: string[] = [];
       for (const d of this.blocks[i].d) {
-        let ref = `${d.from}>${d.to}|${d.ratio}`;
+        let ref: string = `${d.from}>${d.to}|${d.ratio}`;
         for (const op of d.op) {
           ref += `|${op.join(',')}`;
         }
         refs.push(ref);
       }
-      tovisStr.push(`%:${i}} ${refs.join(';')}`);
-      tovisStr.push(`!:${i}} ${this.blocks[i].c}`);
+      tovisStr.push(`^:${i + 1}} ${refs.join(';')}`);
+      tovisStr.push(`!:${i + 1}} ${this.blocks[i].c}`);
       tovisStr.push('');
     }
     return tovisStr;
@@ -245,8 +226,8 @@ export class Tovis {
     return new Promise((resolve, reject) => {
       const rs = createReadStream(path);
       const lines = createInterface(rs);
-      let count = 1;
-      const lineHead = new RegExp('^(@|λ|_|%|\\!)+:(\\d+)}\\s?');
+      let count: number = 1;
+      const lineHead = new RegExp('^(@|λ|_|\\^|\\!)+:(\\d+)}\\s?');
       // const blocks: TovisBlock[] = []
       lines.on('line', (line) => {
         if (line.startsWith('#')) {
@@ -269,22 +250,20 @@ export class Tovis {
                 this.meta.tags = metaData[1].trim().split(',');
                 count++;
                 break;
-              case '#Groups': {
-                  const byGroups = metaData[1].trim().split(',');
-                  for (const byGroup of byGroups) {
-                    const fromAndTo = byGroup.split('-');
-                    if (fromAndTo.length >= 2) {
-                      this.meta.groups.push([Number(fromAndTo[0]), Number(fromAndTo[1])]);
-                    }
+              case '#Groups':
+                const byGroups = metaData[1].trim().split(',');
+                for (const byGroup of byGroups) {
+                  const fromAndTo = byGroup.split('-');
+                  if (fromAndTo.length >= 2) {
+                    this.meta.groups.push([Number(fromAndTo[0]), Number(fromAndTo[1])]);
                   }
+                }
                 count++;
                 break;
-              }
 
               case '#Remarks':
                 this.meta.remarks += `${metaData[1]};`;
                 count++;
-                break;
 
               default:
                 break;
@@ -318,9 +297,9 @@ export class Tovis {
         delete: '-',
         insert: '+',
       };
-      let fileName = ''
-      let prevGroup = 0
-      let prevPid = 0
+      let fileName: string = ''
+      let prevGroup: number = 1
+      let prevPid: number = 1
       for (const dseg of diff) {
         if (fileName !== dseg.file) {
           this.meta.files.push(dseg.file)
@@ -368,8 +347,8 @@ export class Tovis {
       } else {
         const rs = createReadStream(path);
         const lines = createInterface(rs);
-        let i = 0
-        let j = 0
+        let i: number = 0
+        let j: number = 0
         const sepMarkA = '_@@_';
         const sepMarkB = '_@λ_';
         const isBiLang = path.endsWith('.tsv');
@@ -401,7 +380,7 @@ export class Tovis {
   }
 
   private upsertBlocks(keyChara: string, index: number, contents: string): boolean {
-    let isValid = false;
+    let isValid: boolean = false;
     switch (keyChara) {
       // 原文
       case '@': {
@@ -460,7 +439,6 @@ export class Tovis {
             this.blocks[index - 1].u.push(used);
           }
         }
-        break;
       }
 
       // コメント
@@ -473,7 +451,7 @@ export class Tovis {
       }
 
       // 類似情報
-      case '%': {
+      case '^': {
         if (contents !== '') {
           if (this.blocks[index - 1].d.length === 0) {
             const refs: TovisRef[] = [];

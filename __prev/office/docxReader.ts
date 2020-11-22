@@ -23,7 +23,7 @@ export async function docxReader(docxFile: any, fileName: string, opt: ReadingOp
           const bodyCdsLen: number = bodyCds.length;
           for (let i = 0; i < bodyCdsLen; i++) {
             switch (bodyCds[String(i)].nodeName) {
-              case 'w:p': {
+              case 'w:p':
                 let paraTexts: string[] = [wordParaReder(bodyCds[String(i)], opt.wordRev)];
                 paraTexts = applySegRules(paraTexts, opt);
                 if (paraTexts.length !== 0) {
@@ -36,9 +36,8 @@ export async function docxReader(docxFile: any, fileName: string, opt: ReadingOp
                   wordContents.exts.push(paraContents);
                 }
                 break;
-              }
 
-              case 'w:tbl': {
+              case 'w:tbl':
                 let tblTexts: string[] = wordTableReader(bodyCds[String(i)], opt.wordRev);
                 tblTexts = applySegRules(tblTexts, opt);
                 if (tblTexts.length !== 0) {
@@ -51,7 +50,6 @@ export async function docxReader(docxFile: any, fileName: string, opt: ReadingOp
                   wordContents.exts.push(tblContents);
                 }
                 break;
-              }
 
               default:
                 break;
@@ -164,7 +162,7 @@ function wordRunReader(rNd: any, rev: boolean): string {
         textVal += wordTboxReader(rCds[String(i)], rev);
         break;
 
-      case 'w:pict': {
+      case 'w:pict':
         const pictCds = rCds[String(i)].childNodes !== undefined ? rCds[String(i)].childNodes : [];
         for (let j = 0; j < pictCds.length; j++) {
           if (pictCds[String(j)].nodeName !== 'v:shape') {
@@ -191,7 +189,6 @@ function wordRunReader(rNd: any, rev: boolean): string {
           }
         }
         break;
-      }
 
       default:
         break;
@@ -201,7 +198,7 @@ function wordRunReader(rNd: any, rev: boolean): string {
 }
 
 function wordTboxReader(shpNd: any, rev: boolean): string {
-  let textVal = '';
+  let textVal: string = '';
   const shpCds: any = shpNd.firstChild.firstChild.firstChild.childNodes !== undefined ? shpNd.firstChild.firstChild.firstChild.childNodes : [];
   const shpCdsLen: number = shpCds.length;
   let wpsNd: any;

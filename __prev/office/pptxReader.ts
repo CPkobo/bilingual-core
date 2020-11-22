@@ -111,7 +111,7 @@ async function slideReader(path: string, fileObj: any, opt: ReadingOption): Prom
         if (err) {
           console.log(err);
         } else {
-          const textInSlide: string[] = [];
+          let textInSlide: string[] = [];
           const pTree = root['p:sld']['p:cSld'][0]['p:spTree'][0] !== undefined ? root['p:sld']['p:cSld'][0]['p:spTree'][0] : {};
           const groups: any[] = pTree['p:grpSp'] !== undefined ? pTree['p:grpSp'] : [];
           const shapes: any[] = pTree['p:sp'] !== undefined ? pTree['p:sp'] : [];
@@ -225,7 +225,7 @@ async function noteReader(path: string, fileObj: any, opt: ReadingOption): Promi
         if (err) {
           console.log(err);
         } else {
-          const textInNote: string[] = [];
+          let textInNote: string[] = [];
           const pTree: any = root['p:notes']['p:cSld'][0]['p:spTree'][0] !== undefined ? root['p:notes']['p:cSld'][0]['p:spTree'][0] : {};
           const shapes: any[] = pTree['p:sp'] !== undefined ? pTree['p:sp'] : [];
           for (const shape of shapes) {

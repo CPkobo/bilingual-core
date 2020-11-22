@@ -6,7 +6,7 @@ const ex = 'NFKD'
 
 const f: OnSetString = (text: string, ex: any): string => {
   const normalizer = ['NFC', 'NFD', 'NFKC', 'NFKD']
-  let method = 'NFKD'
+  let method: string = 'NFKD'
   if (typeof (ex) === 'string') {
     if (normalizer.indexOf(ex) !== -1) {
       method = ex

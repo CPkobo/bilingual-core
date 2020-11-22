@@ -67,22 +67,6 @@ export function blobContentsReader(files: any, order: number[], opq?: OptionQue)
   });
 }
 
-export function splitSegmentation(text: string, delimiters: RegExp): string[] {
-  const t = text.replace(delimiters, '$1\n');
-  const ts: string[] = t.split('\n').filter((val) => {
-    return val !== '';
-  });
-
-  return ts;
-}
-
-export function regexExclusion(texts: string[], ex: RegExp): string[] {
-  const excluded: string[] = texts.filter((val: string) => {
-    return !ex.test(val);
-  });
-  return excluded;
-}
-
 export function applySegRules(textVal: string[], opt: ReadingOption): string[] {
   if (!opt.segmentation && !opt.exclusion) {
     return textVal;
@@ -110,6 +94,22 @@ export function applySegRules(textVal: string[], opt: ReadingOption): string[] {
     }
   });
   return applyedValue;
+}
+
+export function splitSegmentation(text: string, delimiters: RegExp): string[] {
+  const t = text.replace(delimiters, '$1\n');
+  const ts: string[] = t.split('\n').filter((val) => {
+    return val !== '';
+  });
+
+  return ts;
+}
+
+export function regexExclusion(texts: string[], ex: RegExp): string[] {
+  const excluded: string[] = texts.filter((val: string) => {
+    return !ex.test(val);
+  });
+  return excluded;
 }
 
 export function applyOpcodes(original: string, diffed: string, opcodes: Opcode[]): string {

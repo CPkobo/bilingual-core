@@ -8,13 +8,13 @@ export type OnSetString = (text: string, ex: any) => string;
 export type Triger = 'onSetSouce' | 'onSetMT' | 'onQA'
 
 export interface TovisPlugin {
-  name: string;
-  f: OnSetString;
-  ex: any;
+  name: string
+  f: OnSetString
+  ex: any
 }
 
 export interface TovisPluginExternal extends TovisPlugin {
-  triger: Triger | Triger[];
+  triger: Triger | Triger[]
 }
 
 export class MyPlugins {
@@ -51,10 +51,8 @@ export class MyPlugins {
             break;
           case 'onSetMT':
             this.onSetMT.push(myPlugin)
-            break;
           case 'onQA':
             this.onQA.push(myPlugin)
-            break;
           default:
             break;
         }

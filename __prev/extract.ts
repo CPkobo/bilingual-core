@@ -65,13 +65,11 @@ export class CatovisContext {
         this.tgt = JSON.parse(jsonStr);
         break;
 
-      case 'both': {
+      case 'both':
         const data: any = JSON.parse(jsonStr);
         this.src = data.src;
         this.tgt = data.tgt;
-        break;
-      }
-      
+
       default:
         break;
     }
@@ -138,7 +136,7 @@ export class CatovisContext {
             continue;
           }
           if (opt.withSeparator) {
-            let mark = '';
+            let mark: string = '';
             switch (text.type) {
               case 'Word-Paragraph':
                 mark = '_@λ_ PARAGRAPH _λ@_';
@@ -198,7 +196,7 @@ export class CatovisContext {
           sums.push(0);
           continue;
         }
-        let sum = 0;
+        let sum: number = 0;
         ext.value.map((val: string) => {
           if (unit === 'chara') {
             sum += val.replace(spaces, '').length;
@@ -215,7 +213,7 @@ export class CatovisContext {
   public simpleCalc(unit: 'chara' | 'word', opq?: OptionQue): string[] {
     const que = opq !== undefined ? opq : {};
     const opt = new ReadingOption(que);
-    let totalSum = 0;
+    let totalSum: number = 0;
     const unitStr = unit === 'chara' ? '文字数' : '単語数';
     const result: string[] = [`ファイル名\t${unitStr}`, ''];
     const spaces = new RegExp('\\s+', 'g');
@@ -224,7 +222,7 @@ export class CatovisContext {
       return [];
     } else {
       for (const con of this.src) {
-        let sum = 0;
+        let sum: number = 0;
         for (const text of con.exts) {
           if (!opt.excelReadHidden && !text.isActive) {
             continue;
@@ -395,8 +393,8 @@ export class CatovisContext {
     if (separation) {
       inSection.push(`_@λ_ ${mark} _λ@_\t_@λ_ ${mark} _λ@_`);
     }
-    const sLen = sVal.length;
-    const tLen = tVal.length;
+    let sLen = sVal.length;
+    let tLen = tVal.length;
     const larger = sLen >= tLen ? sLen : tLen;
     if (sLen > tLen) {
       const diff = sLen - tLen;
