@@ -348,10 +348,11 @@ export class Tovis {
             }),
           };
           block.d.push(refInfo);
-          this.blocks[sim.advPid - 1].d.push(refInfo);
+          this.blocks[sim.advPid].d.push(refInfo);
         }
         this.blocks.push(block);
       }
+      this.meta.groups.push([prevPid, diff.length - 1])
       resolve('DiffInfo successfully parsed into TOVIS');
     });
   }
