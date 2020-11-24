@@ -37,7 +37,8 @@ export interface TovisMeta {
   tgtLang: string;
   files: string[];
   tags: string[];
-  groups: number[][];
+  // groups: number[][];
+  groups: number[];
   remarks: string;
 }
 
@@ -164,10 +165,11 @@ export class Tovis {
       `#Tags: ${this.meta.tags.join(',')}`,
     ];
     const groupsStr: string[] = [];
-    for (const group of this.meta.groups) {
-      groupsStr.push(`${group[0]}-${group[1]}`);
-    }
-    tovisStr.push(`#Groups: ${groupsStr.join(',')}`);
+    // for (const group of this.meta.groups) {
+    //   groupsStr.push(`${group[0]}-${group[1]}`);
+    // }
+    // tovisStr.push(`#Groups: ${groupsStr.join(',')}`);
+    tovisStr.push(`#Groups: ${this.meta.groups.join(',')}`)
     if (this.meta.remarks !== '') {
       tovisStr.push(`#Remarks: ${this.meta.remarks}`);
     }
@@ -270,13 +272,16 @@ export class Tovis {
                 count++;
                 break;
               case '#Groups': {
-                  const byGroups = metaData[1].trim().split(',');
-                  for (const byGroup of byGroups) {
-                    const fromAndTo = byGroup.split('-');
-                    if (fromAndTo.length >= 2) {
-                      this.meta.groups.push([Number(fromAndTo[0]), Number(fromAndTo[1])]);
-                    }
-                  }
+                  // const byGroups = metaData[1].trim().split(',');
+                  // for (const byGroup of byGroups) {
+                  //   const fromAndTo = byGroup.split('-');
+                  //   if (fromAndTo.length >= 2) {
+                  //     this.meta.groups.push([Number(fromAndTo[0]), Number(fromAndTo[1])]);
+                  //   }
+                  // }
+                  this.meta.groups = metaData[1].trim().split(',').map(val => {
+                    return Number(val)
+                  })
                 count++;
                 break;
               }
@@ -319,16 +324,18 @@ export class Tovis {
         insert: '+',
       };
       let fileName = ''
-      let prevGroup = 0
-      let prevPid = 0
+      let prevGroup = -1
+      // let prevGroup = 0
+      // let prevPid = 0
       for (const dseg of diff) {
         if (fileName !== dseg.file) {
           this.meta.files.push(dseg.file)
           fileName = dseg.file
         }
         if (prevGroup !== dseg.gid) {
-          this.meta.groups.push([prevPid, dseg.pid - 1])
-          prevPid = dseg.pid
+          // this.meta.groups.push([prevPid, dseg.pid - 1])
+          this.meta.groups.push(dseg.pid)
+          // prevPid = dseg.pid
           prevGroup = dseg.gid
         }
         const block = this.createBlock();
@@ -352,7 +359,8 @@ export class Tovis {
         }
         this.blocks.push(block);
       }
-      this.meta.groups.push([prevPid, diff.length - 1])
+      // this.meta.groups.push([prevPid, diff.length - 1])
+      // this.meta.groups.push([prevPid, diff.length - 1])
       resolve('DiffInfo successfully parsed into TOVIS');
     });
   }
@@ -369,8 +377,9 @@ export class Tovis {
       } else {
         const rs = createReadStream(path);
         const lines = createInterface(rs);
-        let i = 0
-        let j = 0
+        let i = -1
+        // let i = 0
+        // let j = 0
         const sepMarkA = '_@@_';
         const sepMarkB = '_@λ_';
         const isBiLang = path.endsWith('.tsv');
@@ -382,8 +391,8 @@ export class Tovis {
               this.meta.files.push(fileName)
             }
           } else if (line.startsWith(sepMarkB)) {
-            this.meta.groups.push([i, j])
-            j = i
+            this.meta.groups.push(i)
+            // j = i
           } else if (line !== '') {
             i++;
             const st = isBiLang ? line.split('\t')[0] : line;
