@@ -1,107 +1,81 @@
 export class ReadingOption {
-  public name: string;
-  public segmentation: boolean;
-  public delimiters: string;
-  public excluding: boolean;
-  public exclusion: string;
-  public wordRev: boolean;
-  public excelReadHidden: boolean;
-  public excelReadFilled: boolean;
-  public pptNote: boolean;
-  public withSeparator: boolean;
+  public common: CommonOption;
+  public word: WordOption;
+  public excel: ExcelOption;
+  public ppt: PptOption;
 
   constructor(myOption: OptionQue) {
-    this.name =
-      myOption.name !== undefined && myOption.name !== ''
-        ? myOption.name : 'Result';
-    this.segmentation =
-      myOption.segmentation !== undefined
-        ? myOption.segmentation : true;
-    this.delimiters =
-      myOption.delimiters !== undefined && myOption.delimiters !== ''
-        ? myOption.delimiters : '(\\。|\\. |\\! |\\? |\\！|\\？)';
-    this.excluding =
-      myOption.excluding !== undefined
-        ? myOption.excluding : false;
-    this.exclusion =
-      myOption.exclusion !== undefined && myOption.exclusion !== ''
-        ? myOption.exclusion : '^[０-９0-9]+$';
-    this.wordRev =
-      myOption.wordRev !== undefined
-        ? myOption.wordRev : true;
-    this.excelReadHidden =
-      myOption.excelReadHidden !== undefined
-        ? myOption.excelReadHidden : false;
-    this.excelReadFilled =
-      myOption.excelReadFilled !== undefined
-        ? myOption.excelReadFilled : true;
-    this.pptNote =
-      myOption.pptNote !== undefined
-        ? myOption.pptNote : true;
-    this.withSeparator =
-      myOption.withSeparator !== undefined
-        ? myOption.withSeparator : true;
+    this.common = {
+      name: 'Result',
+      segmentation: true,
+      delimiters: '(\\。|\\. |\\! |\\? |\\！|\\？)',
+      excluding: false,
+      excludePattern: '^[０-９0-9]+$',
+      withSeparator: true,
+    }
+    this.word = {
+      afterRev: true
+    }
+    this.excel = {
+      readHiddenSheet: false,
+      readFilledCell: true
+    }
+    this.ppt = {
+      readNote: true
+    }
+    this.readOptionQue(myOption)
   }
 
   public readOptionQue(myOption: OptionQue) {
-    if (myOption.name !== undefined && myOption.name !== '') {
-      this.name = myOption.name;
+    if (myOption.common !== undefined) {
+      if (myOption.common.name !== undefined && myOption.common.name !== '') {
+          this.common.name = myOption.common.name;
+      }
+      if (myOption.common.segmentation !== undefined) {
+        this.common.segmentation = myOption.common.segmentation;
+      }
+      if (myOption.common.delimiters !== undefined && myOption.common.delimiters !== '') {
+        this.common.delimiters = myOption.common.delimiters;
+      }
+      if (myOption.common.excluding !== undefined) {
+        this.common.excluding = myOption.common.excluding;
+      }
+      if (myOption.common.excludePattern !== undefined && myOption.common.excludePattern !== '') {
+        this.common.excludePattern = myOption.common.excludePattern;
+      }
+      if (myOption.common.withSeparator !== undefined) {
+        this.common.withSeparator = myOption.common.withSeparator;
+      }
     }
-    if (myOption.segmentation !== undefined) {
-      this.segmentation = myOption.segmentation;
+    
+    if (myOption.word !== undefined) {
+      if (myOption.word.afterRev !== undefined) {
+        this.word.afterRev = myOption.word.afterRev;
+      }
     }
-    if (myOption.delimiters !== undefined && myOption.delimiters !== '') {
-      this.delimiters = myOption.delimiters;
+    
+    if (myOption.excel !== undefined) {
+      if (myOption.excel.readHiddenSheet !== undefined) {
+        this.excel.readHiddenSheet = myOption.excel.readHiddenSheet;
+      }
+      if (myOption.excel.readFilledCell !== undefined) {
+        this.excel.readFilledCell = myOption.excel.readFilledCell;
+      }
     }
-    if (myOption.excluding !== undefined) {
-      this.excluding = myOption.excluding;
-    }
-    if (myOption.exclusion !== undefined && myOption.exclusion !== '') {
-      this.exclusion = myOption.exclusion;
-    }
-    if (myOption.wordRev !== undefined) {
-      this.wordRev = myOption.wordRev;
-    }
-    if (myOption.excelReadHidden !== undefined) {
-      this.excelReadHidden = myOption.excelReadHidden;
-    }
-    if (myOption.excelReadFilled !== undefined) {
-      this.excelReadFilled = myOption.excelReadFilled;
-    }
-    if (myOption.pptNote !== undefined) {
-      this.pptNote = myOption.pptNote;
-    }
-    if (myOption.withSeparator !== undefined) {
-      this.withSeparator = myOption.withSeparator;
+    
+    if (myOption.ppt !== undefined) {
+      if (myOption.ppt.readNote !== undefined) {
+        this.ppt.readNote = myOption.ppt.readNote;
+      }
     }
   }
 
   public createOptionQue(): OptionQue {
     return {
-      name: this.name,
-      segmentation: this.segmentation,
-      delimiters: this.delimiters,
-      excluding: this.excluding,
-      exclusion: this.exclusion,
-      wordRev: this.wordRev,
-      excelReadHidden: this.excelReadHidden,
-      excelReadFilled: this.excelReadFilled,
-      pptNote: this.pptNote,
-      withSeparator: this.withSeparator,
+      common: this.common,
+      word: this.word,
+      excel: this.excel,
+      ppt: this.ppt
     };
   }
-
-}
-
-export interface OptionQue {
-  name?: string;
-  segmentation?: boolean;
-  delimiters?: string;
-  excluding?: boolean;
-  exclusion?: string;
-  wordRev?: boolean;
-  excelReadHidden?: boolean;
-  excelReadFilled?: boolean;
-  pptNote?: boolean;
-  withSeparator?: boolean;
 }

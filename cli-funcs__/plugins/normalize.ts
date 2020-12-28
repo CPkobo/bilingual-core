@@ -1,3 +1,5 @@
+import { OnSetString, Triger, TovisPluginExternal } from '../plugins'
+
 const name = 'normalize'
 const triger: Triger[] = ['onSetSouce', 'onSetMT']
 const ex = 'NFKD'
@@ -13,11 +15,11 @@ const f: OnSetString = (text: string, ex: any): string => {
   return text.normalize(ex)
 }
 
-export const plugin: TovisPluginExternal = {
+const plugin: TovisPluginExternal = {
   triger,
   name,
   f,
   ex
 }
 
-// module.exports = plugin
+module.exports = plugin

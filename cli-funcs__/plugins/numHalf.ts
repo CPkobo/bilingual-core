@@ -1,3 +1,5 @@
+import { OnSetString, Triger, TovisPluginExternal } from '../plugins'
+
 const name = 'numHalf'
 const triger: Triger = 'onSetSouce'
 const ex = null
@@ -8,11 +10,11 @@ const f: OnSetString = (text: string, ex: any): string => {
   })
 }
 
-export const plugin: TovisPluginExternal = {
+const plugin: TovisPluginExternal = {
   triger,
   name,
   f,
   ex,
 }
 
-// module.exports = plugin
+module.exports = plugin

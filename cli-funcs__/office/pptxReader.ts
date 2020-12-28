@@ -1,16 +1,18 @@
 const JSZip = require('jszip');
 import { parseString } from 'xml2js';
 
+import { ExtractedText, ExtractedContent, PPTSubInfoRel } from '../extract';
 import { ReadingOption } from '../option';
-import { applySegRules } from '../util';
+import { applySegRules, ReadFailure } from '../util';
 
 // PPTファイルを読み込むための関数
 export async function pptxReader(pptxFile: any, fileName: string, opt: ReadingOption): Promise<ExtractedContent> {
   return new Promise((resolve, reject) => {
-    const zip = new JSZip(); 
+    const zip = new JSZip();
     zip.loadAsync(pptxFile).then((inzip: any) => {
       const prs: Array<Promise<ExtractedText>> = [];
       const rels: PPTSubInfoRel[] = [];
+      // const slideNums = inzip.folder("ppt/slides/_rels/").file(/.rels/).length
       inzip.folder('ppt/slides/').forEach(async (path: string, file: any) => {
         if (!path.startsWith('_rels')) {
           prs.push(slideReader(path, file, opt));
@@ -20,7 +22,7 @@ export async function pptxReader(pptxFile: any, fileName: string, opt: ReadingOp
           }
         }
       });
-      if (opt.ppt.readNote) {
+      if (opt.pptNote) {
         inzip.folder('ppt/notesSlides/').forEach((path: string, file: any) => {
           if (!path.startsWith('_rels')) {
             prs.push(noteReader(path, file, opt));
@@ -125,6 +127,10 @@ async function slideReader(path: string, fileObj: any, opt: ReadingOption): Prom
             }
             const paras: any[] = shape['p:txBody'][0]['a:p'] !== undefined ? shape['p:txBody'][0]['a:p'] : [];
             for (const para of paras) {
+              // const runs = para['a:r'];
+              // if (runs === undefined) {
+              //   continue;
+              // } else {
               const runs: any = para['a:r'] !== undefined ? para['a:r'] : [];
               let textInPara = '';
               for (const run of runs) {
@@ -134,6 +140,7 @@ async function slideReader(path: string, fileObj: any, opt: ReadingOption): Prom
                 textInPara += run['a:t'];
               }
               textInSlide.push(textInPara.replace('\t', '\n'));
+              // }
             }
           }
           const gFrames: any[] = pTree['p:graphicFrame'] !== undefined ? pTree['p:graphicFrame'] : [];

@@ -1,11 +1,48 @@
+// Delete when Nuxt from here to:
+import { readFileSync } from 'fs'
+// END
+
 import { docxReader } from './office/docxReader';
 import { xlsxReader } from './office/xlsxReader';
 import { pptxReader } from './office/pptxReader';
-import { ReadingOption } from './option';
+import { ReadingOption, OptionQue } from './option';
+
+import { ExtractedContent } from './extract';
+import { Opcode } from './diff';
+
+export interface ReadFailure {
+  name: string;
+  detail: any;
+}
 
 export function cnm(data: any) {
   console.log(data);
 }
+
+// Delete when Nuxt from here to:
+export function pathContentsReader(paths: string[], opq?: OptionQue): Promise<ExtractedContent[]> {
+  const que = opq !== undefined ? opq : {};
+  const opt = new ReadingOption(que);
+  return new Promise((resolve, reject) => {
+    const prs: Array<Promise<any>> = [];
+    for (const path of paths) {
+      const read = readFileSync(path);
+      if (path.endsWith('.docx')) {
+        prs.push(docxReader(read, path, opt));
+      } else if (path.endsWith('.xlsx')) {
+        prs.push(xlsxReader(read, path, opt));
+      } else if (path.endsWith('.pptx')) {
+        prs.push(pptxReader(read, path, opt));
+      }
+    }
+    Promise.all(prs).then((res) => {
+      resolve(res);
+    }).catch((failure: ReadFailure) => {
+      reject(failure);
+    });
+  });
+}
+// END
 
 export function blobContentsReader(files: any, order: number[], opq?: OptionQue): Promise<ExtractedContent[]> {
   const que = opq !== undefined ? opq : {};
@@ -47,26 +84,26 @@ export function regexExclusion(texts: string[], ex: RegExp): string[] {
 }
 
 export function applySegRules(textVal: string[], opt: ReadingOption): string[] {
-  if (!opt.common.segmentation && !opt.common.excluding) {
+  if (!opt.segmentation && !opt.exclusion) {
     return textVal;
   }
   const applyedValue: string[] = [];
   let delim: RegExp;
-  if (opt.common.segmentation) {
-    delim = new RegExp(opt.common.delimiters || '', 'g');
+  if (opt.segmentation) {
+    delim = new RegExp(opt.delimiters, 'g');
   }
 
   let ex: RegExp;
-  if (opt.common.excluding) {
-    ex = new RegExp(opt.common.excludePattern || '');
+  if (opt.excluding) {
+    ex = new RegExp(opt.exclusion);
   }
 
   textVal.map((val: string) => {
     let newVal: string[] = [val];
-    if (opt.common.segmentation) {
+    if (opt.segmentation) {
       newVal = splitSegmentation(val, delim);
     }
-    if (opt.common.excluding) {
+    if (opt.excluding) {
       applyedValue.push(...regexExclusion(newVal, ex));
     } else {
       applyedValue.push(...newVal);

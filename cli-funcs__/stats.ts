@@ -1,3 +1,5 @@
+import { ExtractedText } from './extract';
+
 export class FileStats {
   public name: string;
   public format: 'docx' | 'xlsx' | 'pptx' | '';

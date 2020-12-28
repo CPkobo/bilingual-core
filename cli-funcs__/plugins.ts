@@ -4,6 +4,19 @@ import { statSync, readFileSync } from 'fs'
 // export type onSetMT = (text: string) => string;
 // export type onQA = (text: string) => string;
 
+export type OnSetString = (text: string, ex: any) => string;
+export type Triger = 'onSetSouce' | 'onSetMT' | 'onQA'
+
+export interface TovisPlugin {
+  name: string;
+  f: OnSetString;
+  ex: any;
+}
+
+export interface TovisPluginExternal extends TovisPlugin {
+  triger: Triger | Triger[];
+}
+
 export class MyPlugins {
   public onSetSouce: TovisPlugin[]
   public onSetMT: TovisPlugin[]

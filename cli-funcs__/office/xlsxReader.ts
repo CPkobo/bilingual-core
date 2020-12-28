@@ -1,8 +1,9 @@
 const JSZip = require('jszip');
 import { parseString } from 'xml2js';
 
+import { ExtractedText, ExtractedContent, ExcelSubInfoRel } from '../extract';
 import { ReadingOption } from '../option';
-import { applySegRules } from '../util';
+import { applySegRules, ReadFailure } from '../util';
 
 // Excelファイルを読み込むための関数
 export async function xlsxReader(xlsxFile: any, fileName: string, opt: ReadingOption): Promise<ExtractedContent> {
@@ -33,7 +34,7 @@ export async function xlsxReader(xlsxFile: any, fileName: string, opt: ReadingOp
                 }).join('');
               }
             });
-            const notHidden: boolean[] = await workbookRelReader(inzip, opt.excel.readHiddenSheet || false);
+            const notHidden: boolean[] = await workbookRelReader(inzip, opt.excelReadHidden);
             const filled: string[] = await styleRelReader(inzip, opt);
             xlsxContentsReader(inzip, shared, notHidden, filled, opt).then((datas: ExtractedText[]) => {
               const sortedDatas: ExtractedText[] = datas.sort((a: ExtractedText, b: ExtractedText): any => {
@@ -201,7 +202,7 @@ async function eachSheetReader(path: string, fileObj: any, shared: string[], fil
             }
             for (const col of row.c) {
               if (col.$.s !== undefined) {
-                if (!opt.excel.readFilledCell) {
+                if (!opt.excelReadFilled) {
                   if (filled[Number(col.$.s)] !== '0') {
                     continue;
                   }

@@ -1,7 +1,9 @@
 const JSZip = require('jszip');
 
+import { ExtractedText, ExtractedContent } from '../extract';
 import { ReadingOption } from '../option';
-import { applySegRules } from '../util';
+import { applySegRules, ReadFailure } from '../util';
+
 
 export async function docxReader(docxFile: any, fileName: string, opt: ReadingOption): Promise<ExtractedContent> {
   return new Promise((resolve, reject) => {
@@ -22,7 +24,7 @@ export async function docxReader(docxFile: any, fileName: string, opt: ReadingOp
           for (let i = 0; i < bodyCdsLen; i++) {
             switch (bodyCds[String(i)].nodeName) {
               case 'w:p': {
-                let paraTexts: string[] = [wordParaReder(bodyCds[String(i)], opt.word.afterRev || true)];
+                let paraTexts: string[] = [wordParaReder(bodyCds[String(i)], opt.wordRev)];
                 paraTexts = applySegRules(paraTexts, opt);
                 if (paraTexts.length !== 0) {
                   const paraContents: ExtractedText = {
@@ -37,7 +39,7 @@ export async function docxReader(docxFile: any, fileName: string, opt: ReadingOp
               }
 
               case 'w:tbl': {
-                let tblTexts: string[] = wordTableReader(bodyCds[String(i)], opt.word.afterRev || true);
+                let tblTexts: string[] = wordTableReader(bodyCds[String(i)], opt.wordRev);
                 tblTexts = applySegRules(tblTexts, opt);
                 if (tblTexts.length !== 0) {
                   const tblContents: ExtractedText = {

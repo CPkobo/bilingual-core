@@ -1,15 +1,13 @@
 import { readFileSync, readdirSync, statSync, writeFileSync } from 'fs';
 
-import {
-  ExtractedContent, ExtractedText,
-  CatovisContext
-} from './cli-funcs/extract';
-import { ReadingOption, OptionQue } from './cli-funcs/option';
-import { DiffInfo, DiffSeg } from './cli-funcs/diff';
+import { CatovisContext } from './cli-funcs/extract';
+import { ReadingOption } from './cli-funcs/option';
+import { DiffInfo } from './cli-funcs/diff';
 import { FileStats } from './cli-funcs/stats';
 import { Tovis } from './cli-funcs/tovis';
 
-import { cnm, pathContentsReader, ReadFailure } from './cli-funcs/util';
+// import { cnm, pathContentsReader, ReadFailure } from './cli-funcs/util';
+import { pathContentsReader } from './cli-funcs/util-sv'
 
 const modeChoices = ['EXTRACT', 'ALIGN', 'COUNT', 'DIFF', 'TOVIS'];
 
@@ -25,12 +23,12 @@ class CLIParams {
   public oFile: string;
 
   public excluding: boolean;
-  public exclusion: string;
+  public excludePattern: string;
   public wordRev: boolean;
   public withSeparator: boolean;
-  public pptNote: boolean;
-  public excelReadHidden: boolean;
-  public excelReadFilled: boolean;
+  public readNote: boolean;
+  public readHiddenSheet: boolean;
+  public readFilledCell: boolean;
 
   constructor(args: any) {
     this.sFiles = [];
@@ -66,13 +64,13 @@ class CLIParams {
       this.oMode = 'console';
     }
 
-    this.excluding = args.exclusion === undefined;
-    this.exclusion = args.exclusion !== undefined ? args.exclusion : '';
+    this.excluding = args.excludePattern === undefined;
+    this.excludePattern = args.excludePattern !== undefined ? args.excludePattern : '';
     this.wordRev = true;
     this.withSeparator = true;
-    this.pptNote = true;
-    this.excelReadHidden = true;
-    this.excelReadFilled = true;
+    this.readNote = true;
+    this.readHiddenSheet = true;
+    this.readFilledCell = true;
 
     const others: string[] = args.others !== undefined ? args.others.split(',') : [];
     for (let other of others) {
@@ -89,17 +87,17 @@ class CLIParams {
 
         case 'ppt-note':
         case 'note':
-          this.pptNote = false;
+          this.readNote = false;
           break;
 
         case 'excel-hidden-sheet':
         case 'hide':
-          this.excelReadHidden = false;
+          this.readHiddenSheet = false;
           break;
 
         case 'excel-filled-cell':
         case 'filled':
-          this.excelReadFilled = false;
+          this.readFilledCell = false;
           break;
 
         case 'debug':
@@ -114,23 +112,31 @@ class CLIParams {
 
   public exportAsOptionQue(): OptionQue {
     return {
-      name: 'via-cli',
-      withSeparator: this.withSeparator,
-      excluding: this.excluding,
-      exclusion: this.exclusion,
-      segmentation: true,
-      delimiters: '(\\。|\\. |\\! |\\? |\\！|\\？)',
-      wordRev: this.wordRev,
-      excelReadHidden: this.excelReadHidden,
-      excelReadFilled: this.excelReadFilled,
-      pptNote: this.pptNote,
+      common: {
+        name: 'via-cli',
+        withSeparator: this.withSeparator,
+        excluding: this.excluding,
+        excludePattern: this.excludePattern,
+        segmentation: true,
+        delimiters: '(\\。|\\. |\\! |\\? |\\！|\\？)',
+      },
+      word: {
+        afterRev: this.wordRev,
+      },
+      excel: {
+        readHiddenSheet: this.readHiddenSheet,
+        readFilledCell: this.readFilledCell,
+      },
+      ppt: {
+        readNote: this.readNote,
+      }
     };
   }
 
   public updateFromDialog(ans: any): void {
     this.mode = ans.mode;
-    this.excluding = ans.exclusion !== '';
-    this.exclusion = ans.exclusion;
+    this.excluding = ans.excludePattern !== '';
+    this.excludePattern = ans.excludePattern;
     this.withSeparator = ans.withSeparator;
     this.source = ans.source !== '' ? ans.source : './';
     if (ans.target !== undefined) {
@@ -228,15 +234,15 @@ class CLIParams {
           break;
 
         case 'PPT-Note':
-          this.pptNote = false;
+          this.readNote = false;
           break;
 
         case 'Excel-Hidden-Sheet':
-          this.excelReadHidden = false;
+          this.readHiddenSheet = false;
           break;
 
         case 'Excel-Filled-Cell':
-          this.excelReadFilled = false;
+          this.readFilledCell = false;
           break;
 
         case 'DEBUG':
@@ -252,7 +258,7 @@ class CLIParams {
   public executeByParams(): void {
     const err = this.validate();
     if (err !== '') {
-      cnm(`Validation Error: ${err}`);
+      console.log(`Validation Error: ${err}`);
       return;
     }
     // cnm(JSON.stringify(this, null, 2))
@@ -489,7 +495,7 @@ function inquirerDialog(sourceFiles?: string) {
       },
     },
     {
-      name: 'exclusion',
+      name: 'excludePattern',
       message: 'Input RegExp string for excluding from result.',
     },
     {
@@ -523,7 +529,7 @@ program
   .option('-t, --target <item>', 'Target input file(s)/folder(s) with comma separated.')
   .option('-i, --input <item>', 'A txt file which lists the input file. Currently not provided yet')
   .option('-o, --output <item>', 'Designate output file name with extension. Format can be selected from json, txt or tsv. Use standard output when blank')
-  .option('-e, --exclusion <item>', 'RegExp string for excluding from result. The expression "^" and "$" will be automaticaly added.')
+  .option('-e, --excludePattern <item>', 'RegExp string for excluding from result. The expression "^" and "$" will be automaticaly added.')
   .option('-w, --withSeparator', 'Use separation marks in out file. Default value is "true"', true)
   .option('--others <item>',
     'Designate "Without-Separator(or wosep) | Word-Before-Rev(or norev) |PPT-Note(or note) | Excel-Hidden-Sheet(or hide) | Excel-Filled-Cell(or filled) | DEBUG". Multiple selection with comma.');
