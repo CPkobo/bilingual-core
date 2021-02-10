@@ -19,14 +19,14 @@ export async function xlsxReader(xlsxFile: any, fileName: string, opt: ReadingOp
               if (val.t !== undefined) {
                 // return val.t.join('')
                 if (val.t[0].$ !== undefined) {
-                  return val.t[0]._ !== undefined ? val.t[0]._ : ' ';
+                  return val.t[0]._ || ' ';
                 } else {
                   return val.t.join('');
                 }
               } else if (val.r !== undefined) {
                 return val.r.map((rVal: any) => {
                   if (rVal.t[0].$ !== undefined) {
-                    return rVal.t[0]._ !== undefined ? rVal.t[0]._ : ' ';
+                    return rVal.t[0]._ || ' ';
                   } else {
                     return rVal.t.join('');
                   }
@@ -105,11 +105,11 @@ async function styleRelReader(zipOjt: any, opt: ReadingOption): Promise<string[]
           if (myStyle === undefined) {
             reject('styles.xml not found');
           }
-          const xfs: any = myStyle.cellXfs !== undefined ? myStyle.cellXfs : undefined;
+          const xfs: any = myStyle.cellXfs || undefined;
           if (xfs === undefined || xfs[0] === undefined) {
             resolve(['0']);
           }
-          const xfNds: any[] = xfs[0].xf !== undefined ? xfs[0].xf : [];
+          const xfNds: any[] = xfs[0].xf || [];
           for (let i = 0; i < xfNds.length; i++) {
             filled.push(xfNds[i].$.fillId);
           }
@@ -193,7 +193,7 @@ async function eachSheetReader(path: string, fileObj: any, shared: string[], fil
         if (err) {
           console.log(err);
         } else {
-          const rows: any = root.worksheet.sheetData[0].row !== undefined ? root.worksheet.sheetData[0].row : [];
+          const rows: any = root.worksheet.sheetData[0].row || [];
           const textInSheet: string[] = [];
           for (const row of rows) {
             if (row.c === undefined) {
@@ -232,7 +232,7 @@ async function eachDrawingReader(path: string, fileObj: any, opt: ReadingOption)
         if (err) {
           console.log(err);
         } else {
-          const shapes: any = root['xdr:wsDr']['xdr:twoCellAnchor'] !== undefined ? root['xdr:wsDr']['xdr:twoCellAnchor'] : [];
+          const shapes: any = root['xdr:wsDr']['xdr:twoCellAnchor'] || [];
           const drawingText: string[] = [];
           for (const shape of shapes) {
             if (shape['xdr:sp'] === undefined) {
@@ -241,7 +241,7 @@ async function eachDrawingReader(path: string, fileObj: any, opt: ReadingOption)
             if (shape['xdr:sp'][0]['xdr:txBody'] === undefined) {
               continue;
             }
-            const shapePara = shape['xdr:sp'][0]['xdr:txBody'][0]['a:p'] !== undefined ? shape['xdr:sp'][0]['xdr:txBody'][0]['a:p'] : [];
+            const shapePara = shape['xdr:sp'][0]['xdr:txBody'][0]['a:p'] || [];
             for (const para of shapePara) {
               if (para['a:r'] === undefined) {
                 continue;

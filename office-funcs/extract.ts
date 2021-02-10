@@ -8,36 +8,11 @@
 // import JSZip from 'jszip'
 const JSZip = require('jszip');
 
-import { ReadingOption, OptionQue } from './option';
+import { ReadingOption } from './option';
 import { FileStats } from './stats';
 import { cnm } from './util';
 
-export interface ExtractedContent {
-  name: string;
-  format: 'docx' | 'xlsx' | 'pptx';
-  exts: ExtractedText[];
-}
-
-export interface ExtractedText {
-  type: 'Word-Paragraph' | 'Word-Table' | 'Excel-Sheet' | 'Excel-Shape' | 'PPT-Slide' | 'PPT-Note' | 'PPT-Diagram' | 'PPT-Chart';
-  position: number;
-  isActive: boolean;
-  value: string[];
-}
-
-export interface ExcelSubInfoRel {
-  main: string;
-  sub: string;
-}
-
-export interface PPTSubInfoRel {
-  main: string;
-  note: string;
-  dgm: string;
-  chart: string;
-}
-
-export class CatovisContext {
+export class ExtractContext {
   private src: ExtractedContent[] | null;
   private tgt: ExtractedContent[] | null;
 
@@ -130,14 +105,14 @@ export class CatovisContext {
       }
       const result: string[] = [];
       for (const file of target) {
-        if (opt.withSeparator) {
+        if (opt.common.withSeparator) {
           result.push(file.name);
         }
         for (const text of file.exts) {
-          if (!opt.excelReadHidden || !text.isActive) {
+          if (!text.isActive) {
             continue;
           }
-          if (opt.withSeparator) {
+          if (opt.common.withSeparator) {
             let mark = '';
             switch (text.type) {
               case 'Word-Paragraph':
@@ -194,7 +169,7 @@ export class CatovisContext {
       const spaces = new RegExp('\\s+', 'g');
       const marks = new RegExp('(\\,|\\.|:|;|\\!|\\?|\\s)+', 'g');
       for (const ext of this.src[fx].exts) {
-        if (!opt.excelReadHidden || !ext.isActive) {
+        if (!opt.excel.readHiddenSheet || !ext.isActive) {
           sums.push(0);
           continue;
         }
@@ -226,7 +201,7 @@ export class CatovisContext {
       for (const con of this.src) {
         let sum = 0;
         for (const text of con.exts) {
-          if (!opt.excelReadHidden && !text.isActive) {
+          if (!opt.excel.readHiddenSheet && !text.isActive) {
             continue;
           }
           text.value.map((val: string) => {
@@ -256,11 +231,15 @@ export class CatovisContext {
       } else {
         const len = this.src.length;
         const aligned: string[] = [];
+        let toSep = false;
+        if (opt.common.withSeparator !== undefined) {
+          toSep = opt.common.withSeparator
+        }
         for (let i = 0; i < len; i++) {
           const sf = this.src[i];
           const tf = this.tgt[i];
           const inFile: string[] = [];
-          if (opt.withSeparator) {
+          if (toSep) {
             inFile.push(`_@@_ ${sf.name}\t_@@_ ${tf.name}`);
           }
           const type = sf.format;
@@ -269,7 +248,7 @@ export class CatovisContext {
               const spfs: ExtractedText[] = [];
               const stfs: ExtractedText[] = [];
               for (const et of sf.exts) {
-                if (!opt.excelReadHidden && !et.isActive) {
+                if (!opt.excel.readHiddenSheet && !et.isActive) {
                   continue;
                 }
                 if (et.type === 'Word-Paragraph') {
@@ -282,7 +261,7 @@ export class CatovisContext {
               const tpfs: ExtractedText[] = [];
               const ttfs: ExtractedText[] = [];
               for (const et of tf.exts) {
-                if (!opt.excelReadHidden && !et.isActive) {
+                if (!opt.excel.readHiddenSheet && !et.isActive) {
                   continue;
                 }
                 if (et.type === 'Word-Paragraph') {
@@ -298,7 +277,7 @@ export class CatovisContext {
               for (let j = 0; j < plarger; j++) {
                 const sv = spfs[j] !== undefined ? spfs[j].value.slice() : [''];
                 const tv = tpfs[j] !== undefined ? tpfs[j].value.slice() : [''];
-                inFile.push(...this.segPairing(sv, tv, 'PARAGRAPH', opt.withSeparator));
+                inFile.push(...this.segPairing(sv, tv, 'PARAGRAPH', toSep));
               }
 
               const stfNum = stfs.length;
@@ -307,7 +286,7 @@ export class CatovisContext {
               for (let k = 0; k < tlarger; k++) {
                 const sv = stfs[k] !== undefined ? stfs[k].value.slice() : [''];
                 const tv = ttfs[k] !== undefined ? ttfs[k].value.slice() : [''];
-                inFile.push(...this.segPairing(sv, tv, 'TABLE', opt.withSeparator));
+                inFile.push(...this.segPairing(sv, tv, 'TABLE', toSep));
               }
               inFile.push('_@@_ EOF\t_@@_ EOF');
               aligned.push(...inFile);
@@ -323,12 +302,12 @@ export class CatovisContext {
                 k++;
                 const sv = sf.exts[j] !== undefined ? sf.exts[j].value.slice() : [''];
                 const tv = tf.exts[j] !== undefined ? tf.exts[j].value.slice() : [''];
-                inFile.push(...this.segPairing(sv, tv, `SHEET${k}`, opt.withSeparator));
+                inFile.push(...this.segPairing(sv, tv, `SHEET${k}`, toSep));
                 if (sf.exts[j + 1] !== undefined && tf.exts[j + 1] !== undefined) {
                   if (sf.exts[j + 1].type === 'Excel-Shape' || tf.exts[j + 1].type === 'Excel-Shape') {
                     const sv = sf.exts[j + 1].type === 'Excel-Shape' ? sf.exts[j + 1].value.slice() : [''];
                     const tv = tf.exts[j + 1].type === 'Excel-Shape' ? tf.exts[j + 1].value.slice() : [''];
-                    inFile.push(...this.segPairing(sv, tv, `SHEET${k}-shape`, opt.withSeparator));
+                    inFile.push(...this.segPairing(sv, tv, `SHEET${k}-shape`, toSep));
                     j++;
                   }
                 }
@@ -347,12 +326,12 @@ export class CatovisContext {
                 k++;
                 const sv = sf.exts[j] !== undefined ? sf.exts[j].value.slice() : [''];
                 const tv = tf.exts[j] !== undefined ? tf.exts[j].value.slice() : [''];
-                inFile.push(...this.segPairing(sv, tv, `SLIDE${k}`, opt.withSeparator));
+                inFile.push(...this.segPairing(sv, tv, `SLIDE${k}`, toSep));
                 if (sf.exts[j + 1] !== undefined && tf.exts[j + 1] !== undefined) {
                   if (sf.exts[j + 1].type === 'PPT-Note' || tf.exts[j + 1].type === 'PPT-Note') {
                     const sv = sf.exts[j + 1].type === 'PPT-Note' ? sf.exts[j + 1].value.slice() : [''];
                     const tv = tf.exts[j + 1].type === 'PPT-Note' ? tf.exts[j + 1].value.slice() : [''];
-                    inFile.push(...this.segPairing(sv, tv, `SLIDE${k}-note`, opt.withSeparator));
+                    inFile.push(...this.segPairing(sv, tv, `SLIDE${k}-note`, toSep));
                     j++;
                   }
                 }

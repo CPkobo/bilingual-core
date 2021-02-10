@@ -1,5 +1,5 @@
 import { DiffInfoBrowser } from './diff-brs';
-import { CatovisContext } from './extract';
+import { ExtractContext } from './extract';
 import { MyPlugins } from './plugins'
 import { cnm } from './util';
 
@@ -27,9 +27,9 @@ export class TovisBrowser {
     this.lineHead = new RegExp('^(@|λ|_|%|\\!)+:(\\d+)}\\s?');
   }
 
-  public parseFromObj(data: CatovisContext | DiffInfoBrowser): Promise<ParseResult> {
+  public parseFromObj(data: ExtractContext | DiffInfoBrowser): Promise<ParseResult> {
     return new Promise((resolve, reject) => {
-      if (data instanceof CatovisContext) {
+      if (data instanceof ExtractContext) {
         const diff = new DiffInfoBrowser()
         const srcContent = data.getRawContent('src')
         if (srcContent !== null) {

@@ -1,0 +1,898 @@
+_@@_ ./target/Q1A(R2)-en.docx	_@@_ ./target/Q1A(R2)-cn.docx
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+ STABILITY TESTING OF NEW DRUG SUBSTANCES AND PRODUCTS 	1．前言 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+1. 	1.1 指导原则的目的 
+INTRODUCTION  	
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+1.1. 	本指导原则是 ICH Q1A 指导原则的修订版，它规定了在欧盟、日本和美国三个地区注册申请新原料药或制剂所需的一整套稳定性资料的要求，它并不适用于在世界其他国家和地区注册或出口至世界其他国家的新原料药和制剂。
+Objectives of the Guideline 	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+The following guideline is a revised version of the ICH Q1A guideline and defines the stability data package for a new drug substance or drug product that is sufficient for a registration application within the three regions of the EC, Japan, and the United States. 	本指导原则旨在列举新原料药及制剂稳定性试验的主要研究内容，它对需基于特定科学考虑和具有特殊性的药物而引起的实际情况的多变性保留了充分的灵活性。
+It does not seek necessarily to cover the testing for registration in or export to other areas of the world. 	当有足够的科学依据时，也可使用其他方法。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+The guideline seeks to exemplify the core stability data package for new drug substances and products, but leaves sufficient flexibility to encompass the variety of different practical situations that may be encountered due to specific scientific considerations and characteristics of the materials being evaluated. 	1.2 指导原则的范围 
+Alternative approaches can be used when there are scientifically justifiable reasons. 	
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+1.2. 	本指导原则主要阐述新分子实体及其制剂注册申请时要提交的稳定性资料，目前尚不包括简略申请、变更申请及临床试验申请等。
+Scope of the Guideline 	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+The guideline addresses the information to be submitted in registration applications for new molecular entities and associated drug products. 	本指南未涵盖密闭容器中特定剂型的取样和测试的具体细节。
+This guideline does not currently seek to cover the information to be submitted for abbreviated or abridged applications, variations, clinical trial applications, etc. 	新剂型和生物技术/生物制品的具体指导原则，分别见 ICH 
+ 	
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Specific details of the sampling and testing for particular dosage forms in their proposed container closures are not covered in this guideline. 	Q1C 和 Q5C。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Further guidance on new dosage forms and on biotechnological/biological products can be found in ICH guidelines Q1C and Q5C, respectively. 	1.3 一般原则 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+1.3. 	稳定性试验的目的是提供原料药或制剂在各种环境因素如温度、湿度和光等条件的影响下，其质量随时间的变化情况，并由此确定原料药的复检期、制剂的货架期和建议的贮藏条件。
+General Principles 	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+The purpose of stability testing is to provide evidence on how the quality of a drug substance or drug product varies with time under the influence of a variety of environmental factors such as temperature, humidity, and light, and to establish a retest period for the drug substance or a shelf life for the drug product and recommended storage conditions. 	本指导原则是根据欧盟、日本和美国的气候条件来选择试验条件的。
+	世界上任何地区的平均动力学温度可从气候资料获得，可分成Ⅰ~Ⅳ四个气候带。
+	本指导原则仅对气候带Ⅰ和Ⅱ进行阐述。
+	已达成以下共识：即对于欧盟、日本和美国任何一方提供的稳定性资料，只要其符合本指导原则的要求，且其标签符合国家/地区的规定，则该资料可被其他两方接受。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+The choice of test conditions defined in this guideline is based on an analysis of the effects of climatic conditions in the three regions of the EC, Japan and the United States. 	2．指导原则 
+The mean kinetic temperature in any part of the world can be derived from climatic data, and the world can be divided into four climatic zones, I-IV. 	
+This guideline addresses climatic zones I and II. 	
+The principle has been established that stability information generated in any one of the three regions of the EC, Japan and the United States would be mutually acceptable to the other two regions, provided the information is consistent with this guideline and the labeling is in accord with national/regional requirements. 	
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+2. 	2.1 原料药 
+GUIDELINES 	
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+2.1. 	2.1.1 总则 
+Drug Substance 	
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+2.1.1. 	原料药稳定性研究是系统性的稳定性评价内容的一个组成部分。
+General 	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Information on the stability of the drug substance is an integral part of the systematic approach to stability evaluation. 	2.1.2 强力试验 
+ 	
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+2.1.2. 	原料药的强力试验有助于确定可能的降解产物，而这些降解产物又可帮助了解降解途径和分子内在的稳定性，并论证使用的分析方法是否能反映产品的稳定性。
+Stress Testing 	强力试验的类型将取决于各种原料药的性质及其所包含的制剂类型。
+	强力试验通常仅需对一批原料药进行试验，它包括温度（高于加速试验温度 10℃，如 50℃、60℃等）、湿度（如 RH 75%或更大）、氧化、光照对原料药的影响；该试验也应评估原料药在溶液或混悬液状态时，在较宽 pH 值范围内对水解的敏感程度。
+	光稳定性试验是强力试验的一部分，关于它的标准条件在 ICH Q1B 中讲述。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Stress testing of the drug substance can help identify the likely degradation products, which can in turn help establish the degradation pathways and the intrinsic stability of the molecule and validate the stability indicating power of the analytical procedures used. 	在强力条件下检查降解产物，有助于了解降解途经和开发并验证所使用的分析方法的有效性。
+The nature of the stress testing will depend on the individual drug substance and the type of drug product involved. 	但是，如果已经证明强力试验条件下的某些降解产物不会在加速或长期放置条件下形成，则可不必对该降解产物进行专门检查。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Stress testing is likely to be carried out on a single batch of the drug substance. 	这些研究的结果将成为向监管机构提供的资料的组成部分。
+ It should include the effect of temperatures (in 10°C increments (e.g., 50°C, 60°C, etc.) above that for accelerated testing), humidity (e.g., 75% RH or greater) where appropriate, oxidation, and photolysis on the drug substance. 	 
+ The testing should also evaluate the susceptibility of the drug substance to hydrolysis across a wide range of pH values when in solution or suspension. 	
+ Photostability testing should be an integral part of stress testing. 	
+The standard conditions for photostability testing are described in ICH Q1B. 	
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Examining degradation products under stress conditions is useful in establishing degradation pathways and developing and validating suitable analytical procedures. 	2.1.3  批次的选择 
+ However, it may not be necessary to examine specifically for certain degradation products if it has been demonstrated that they are not formed under accelerated or long term storage conditions. 	
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Results from these studies will form an integral part of the information provided to regulatory authorities. 	至少应提供三个注册批原料药的正式稳定性研究数据。
+	这三批的批量至少应达到中试规模，其合成路线应与最终生产工艺相同，并应模拟最终生产工艺进行生产。
+	用于正式稳定性研究的各批次的样品质量应能代表规模化生产时的产品的质量。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+2.1.3. 	还可提供其他支持性资料。
+Selection of Batches 	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Data from formal stability studies should be provided on at least three primary batches of the drug substance. 	2.1.4 容器密封系统 
+The batches should be manufactured to a minimum of pilot scale by the same synthetic route as, and using a method of manufacture and procedure that simulates the final process to be used for, production batches. 	
+ The overall quality of the batches of drug substance placed on formal stability studies should be representative of the quality of the material to be made on a production scale. 	
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Other supporting data can be provided. 	进行稳定性研究的原料药应放置在与所建议的贮藏和销售相同
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+2.1.4. 	的或模拟的容器密封系统中。
+Container Closure System 	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+The stability studies should be conducted on the drug substance packaged in a container closure system that is the same as or simulates the packaging proposed for storage and distribution. 	2.1.5 质量标准 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+2.1.5. 	质量标准是一系列的试验、参考分析方法和建议认可的限度要求，在 ICH 的 Q6A 和 Q6B 中阐述。
+Specification 	此外，对原料药降解产物的控制要求在 Q3A 中阐述。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Specification, which is a list of tests, reference to analytical procedures, and proposed acceptance criteria, is addressed in ICH Q6A and Q6B. 	稳定性研究应检验那些在贮藏期间易发生变化、可能影响其质量、安全性和/或有效性的项目。
+ In addition, specification for degradation products in a drug substance is discussed in Q3A. 	检验项目应包括物理、化学、生物和微生物特性。
+	应采用经验证能指示稳定性的分析方法。
+	稳定性研究是否需重复及重复程度取决于验证研究的结果。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Stability studies should include testing of those attributes of the drug substance that are susceptible to change during storage and are likely to influence quality, safety, and/or efficacy. 	2.1.6 试验频率 
+The testing should cover, as appropriate, the physical, chemical, biological, and microbiological attributes. 	
+Validated stability-indicating analytical procedures should be applied. 	
+Whether and to what extent replication should be performed will depend on the results from validation studies. 	
+ 	
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+2.1.6. 	对于长期试验，试验的频率应足以确定原料药的稳定性状况。
+Testing Frequency 	对建议复检期至少为 12 个月的原料药，在长期放置条件下的试验频率一般为：第一年每 3 个月一次，第二年每 6 个月一次，以后每年一次，直到建议的复检期。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+For long term studies, frequency of testing should be sufficient to establish the stability profile of the drug substance. 	在加速试验放置条件下为期六个月的研究中，至少进行包括初次和末次的 3 个时间点（如 0、3、6 月）的试验。
+For drug substances with a proposed re-test period of at least 12 months, the frequency of testing at the long term storage condition should normally be every 3 months over the first year, every 6 months over the second year, and annually thereafter through the proposed re-test period. 	根据研究开发的经验，预计加速试验结果可能会接近显著变化限度，则应在最后一个时间点增加样本数或在研究设计中增加第 4 个时间点。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+At the accelerated storage condition, a minimum of three time points, including the initial and final time points (e.g., 0, 3, and 6 months), from a 6-month study is recommended. 	当加速试验结果产生了显著变化，则应进行中间放置条件试验。
+Where an expectation (based on development experience) exists that results from accelerated studies are likely to approach significant change criteria, increased testing should be conducted either by adding samples at the final time point or by including a fourth time point in the study design. 	建议进行为期 12 个月的研究，其中至少包括初次和末次的四个时间点（如 0、6、9、12 个月）的试验。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+When testing at the intermediate storage condition is called for as a result of significant change at the accelerated storage condition, a minimum of four time points, including the initial and final time points (e.g., 0, 6, 9, 12 months), from a 12month study is recommended. 	2.1.7 放置条件 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+2.1.7. 	通常，原料药应在一定的放置条件下（在适当的范围内）进行考察，以考察其热稳定性，必要时也考察其对湿度的敏感性。
+Storage Conditions 	选择的放置条件和研究时间的长短要充分考虑到药物的贮藏、运输及其使用的整个过程。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+In general, a drug substance should be evaluated under storage conditions (with appropriate tolerances) that test its thermal stability and, if applicable, its sensitivity to moisture. 	注册申报时，长期试验应至少包括三个批次至少 12 个月的试验，并应继续考察足够的时间以涵盖建议的复检期。
+ The storage conditions and the lengths of studies chosen should be sufficient to cover storage, shipment, and subsequent use. 	当管理当局要求时，在注册申请评价期间积累的其他资料也应呈报。
+	从加速试验和必要时进行的中间试验放置条件下得到的数据可用于评价短期偏离标签上所建议的贮藏条件的影响（如在运输途中可能发生的情况）。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+The long term testing should cover a minimum of 12 months’ duration on at least three primary batches at the time of submission and should be continued for a period of time sufficient to cover the proposed re-test period. 	原料药长期试验、加速试验及必要时的中间试验放置条件在下节中详细列出，除另有规定外，原料药应采用下述“一般情况”的放置条件，如果合理，也可使用其他替代的放置条件。
+Additional data accumulated during the assessment period of the registration application should be submitted to the authorities if requested. 	 
+Data from the accelerated storage condition and, if appropriate, from the intermediate storage condition can be used to evaluate the effect of short term excursions outside the label storage conditions (such as might occur during shipping). 	
+ 	
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Long term, accelerated, and, where appropriate, intermediate storage conditions for drug substances are detailed in the sections below. 	2.1.7.1 一般情况 
+The general case applies if the drug substance is not specifically covered by a subsequent section. 	
+ Alternative storage conditions can be used if justified. 	
+ 	
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+2.1.7.1. 	★ 长期试验在 25℃±2℃/60%RH±5%RH 还是在 30℃±2℃
+General case  	
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+*It is up to the applicant to decide whether long term stability studies are performed at 25 ± 2°C/60% RH ± 5% RH or 30°C ± 2°C/65% RH ± 5% RH. 	/65%RH±5%RH 条件下进行，由申请者决定。
+ 	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+**If 30°C ± 2°C/65% RH ± 5% RH is the long-term condition, there is no intermediate condition. 	★★ 如果把 30℃±2℃/65%RH±5%RH 作为长期试验条件，则
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+ 	无中间试验条件。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+If long-term studies are conducted at 25°C ± 2°C/60% RH ± 5% RH and  “significant change” occurs at any time during 6 months’ testing at the accelerated storage condition, additional testing at the intermediate storage condition should be conducted and evaluated against significant change criteria. 	 
+Testing at the intermediate storage condition should include all tests, unless otherwise justified. 	
+The initial application should include a minimum of 6 months’ data from a 12-month study at the intermediate storage condition. 	
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+“Significant change” for a drug substance is defined as failure to meet its specification. 	如果在 25℃±2℃/60%RH±5%RH 条件下进行长期试验，而在加速放置条件下的 6 个月期间的任何时间点发生“显著变化”，则应增加中间放置条件试验，并对显著变化的限度标准进行评价。
+2.1.7.2. 	除非另有规定，中间试验应包括所有试验项目。
+Drug substances intended for storage in a refrigerator 	初次申报应包括在中间试验条件下进行的 12 个月研究中的至少 6 个月的数据。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+ 	原料药“显著变化”即指不符合规定。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Data from refrigerated storage should be assessed according to the evaluation section of this guideline, except where explicitly noted below. 	2.1.7.2 拟冷藏的原料药 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+If significant change occurs between 3 and 6 months’ testing at the accelerated storage condition, the proposed re-test period should be based on the real time data available at the long term storage condition. 	除以下情况外，应根据本指导原则评价冷藏条件下的稳定性试验数据。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+If significant change occurs within the first 3 months’ testing at the accelerated storage condition, a discussion should be provided to address the effect of short term excursions outside the label storage condition, e.g., during shipping or handling. 	在加速试验条件下，如果在 3 个月到 6 个月之间出现了显著变化，则应根据在长期试验条件下实际时间的数据来确定建议的复检期。
+This discussion can be supported, if appropriate, by further testing on a single batch of the drug substance for a period shorter than 3 months but with more frequent testing than usual. 	 
+It is considered unnecessary to continue to test a drug substance through 6 months when a significant change has occurred within the first 3 months. 	
+2.1.7.3. 	
+Drug substances intended for storage in a freezer 	
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+ 	在加速试验条件下，如果在前 3 个月内产生显著变化，则应讨论短期偏离标签上贮藏条件（如在运输途中或搬运中）对药物的影响。
+	必要时，可对一批原料药进行少于 3 个月但取样更频繁的试验来论证。
+	如果前 3 个月已产生显著变化，就不必再继续进行 6 个月的试验了。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+For drug substances intended for storage in a freezer, the re-test period should be based on the real time data obtained at the long term storage condition. 	2.1.7.3 拟冷冻贮藏的原料药 
+In the absence of an accelerated storage condition for drug substances intended to be stored in a freezer, testing on a single batch at an elevated temperature (e.g., 5°C ± 3°C or 25°C ± 2°C) for an appropriate time period should be conducted to address the effect of short term excursions outside the proposed label storage condition, e.g., during shipping or handling. 	
+ 	
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+2.1.7.4. 	对于拟冷冻贮藏的原料药，应根据在长期试验放置条件下实际时间的数据来确定复检期。
+Drug substances intended for storage below -20°C  	虽然没有加速试验放置条件，但应取一批样品，在略高的温度（如：5℃±3℃或 25℃±2℃）下放置适当的时间进行试验，以了解短期偏离标签上的所建议的贮藏条件（如在运输或搬运时）对药物的影响。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Drug substances intended for storage below -20°C should be treated on a case-by-case basis. 	2.1.7.4 拟在-20℃以下贮藏的原料药 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+2.1.8. 	拟在-20℃以下贮藏的原料药应酌情处理。
+Stability Commitment 	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+When available long term stability data on primary batches do not cover the proposed re-test period granted at the time of approval, a commitment should be made to continue the stability studies post approval in order to firmly establish the re-test period. 	2.1.8 稳定性研究承诺 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Where the submission includes long term stability data on three production batches covering the proposed re-test period, a post approval commitment is considered unnecessary. 	当注册批次的长期稳定性数据在批准时还无法涵盖所建议的复检期时，应承诺在批准后继续进行稳定性研究，以建立确切的复检期。
+Otherwise, one of the following commitments should be made: 	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+If the submission includes data from stability studies on at least three production batches, a commitment should be made to continue these studies through the proposed re-test period. 	当申报的三批生产批次的长期稳定性数据已涵盖了所建议的复检期，则认为不需进行批准后的承诺。
+	否则，有下列情况之一的也应承诺： 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+If the submission includes data from stability studies on fewer than three production batches, a commitment should be made to continue these studies through the proposed re-test period and to place additional production batches, to a total of at least three, on long term stability studies through the proposed retest period. 	如果递交资料包含了至少三批生产批次的稳定性研究数据但
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+If the submission does not include stability data on production batches, a commitment should be made to place the first three production batches on long term stability studies through the proposed re-test period. 	未至复验日期，应承诺继续这些研究直到建议的复验日期。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+The stability protocol used for long term studies for the stability commitment should be the same as that for the primary batches, unless otherwise scientifically justified. 	如果递交资料包含的生产批次的稳定性研究数据少于三批，应承诺继续进行这些长期稳定性研究直到建议的复验日期，并补充生产规模的批次至少到三批，进行直到所建议的复检期的长期稳定性研究。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+2.1.9. 	如果递交的资料不包含生产批次稳定性数据，则应承诺对生产规模生产的前三批样品进行长期稳定性研究，直到所建议的复验日期。
+Evaluation 	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+The purpose of the stability study is to establish, based on testing a minimum of three batches of the drug substance and evaluating the stability information (including, as appropriate, results of the physical, chemical, biological, and microbiological tests), a re-test period applicable to all future batches of the drug substance manufactured under similar circumstances. 	除非另有充分的科学依据，用于研究承诺批次的长期稳定性研究方案应与研究注册批次的方案相同。
+The degree of variability of individual batches affects the confidence that a future production batch will remain within specification throughout the assigned re-test period. 	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+The data may show so little degradation and so little variability that it is apparent from looking at the data that the requested re-test period will be granted. 	2.1.9 评价 
+Under these circumstances, it is normally unnecessary to go through the formal statistical analysis; providing a justification for the omission should be sufficient. 	
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+An approach for analyzing the data on a quantitative attribute that is expected to change with time is to determine the time at which the 95% one-sided confidence limit for the mean curve intersects the acceptance criterion. 	稳定性研究的目的是通过对至少三批原料药的试验和对稳定性资料（包括物理、化学、生物和微生物等试验结果）的评价，建立适合将来所有在相似条件下生产出来的原料药的复检期。
+If analysis shows that the batch-to-batch variability is small, it is advantageous to combine the data into one overall estimate. 	批次间变异的程度将会影响将来生产的产品在复验日期内质量符合标准的可靠程度。
+This can be done by first applying appropriate statistical tests (e.g., p values for level of significance of rejection of more than 0.25) to the slopes of the regression lines and zero time intercepts for the individual batches. 	 
+If it is inappropriate to combine data from several batches, the overall re-test period should be based on the minimum time a batch can be expected to remain within acceptance criteria. 	
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+The nature of any degradation relationship will determine whether the data should be transformed for linear regression analysis. 	有时数据表明降解和变异非常小，则从数据上就可以明显看出所申请的复检期是合理的，这时通常不必进行正式的统计分析，只要提供省略的理由即可。
+Usually the relationship can be represented by a linear, quadratic, or cubic function on an arithmetic or logarithmic scale. 	 
+Statistical methods should be employed to test the goodness of fit of the data on all batches and combined batches (where appropriate) to the assumed degradation line or curve. 	
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Limited extrapolation of the real time data from the long term storage condition beyond the observed range to extend the re-test period can be undertaken at approval time, if justified. 	分析那些可能会随时间变化的定量参数的一个方法是：将平均曲线的 95%单侧置信限与认可标准的相交点所对应的时间点作为复检期。
+This justification should be based on what is known about the mechanism of degradation, the results of testing under accelerated conditions, the goodness of fit of any mathematical model, batch size, existence of supporting stability data, etc. 	如果分析表明批间变异较小，最好将数据合并进行整体评估。
+However, this extrapolation assumes that the same degradation relationship will continue to apply beyond the observed data. 	具体做法是：先对每批样品的回归曲线的斜率和截距进行统计检验（如 P 值＞0.25 表示无显著性差异）。
+	如果不能合并，总的复检期可以根据其中复检期最短的批次时间来定。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Any evaluation should cover not only the assay, but also the levels of degradation products and other appropriate attributes. 	降解关系的性质将决定是否可将数据转换为线性回归分析。
+	通常这种关系可表示为算术或对数的一次、二次或三次函数关系。
+	各批次及合并批次（适当时）的数据与假定降解直线或曲线拟合程度的好坏，应该用统计方法进行检验。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+2.1.10. 	如果合理，在报批阶段，可依据长期贮藏条件下获得的实测数据，有限外推得到超出观察时间范围外的复检期。
+Statements/Labeling 	其合理性应基于已知的降解机制、加速试验的结果、数学模型的良好的拟合度、批次规模及所获得的支持性的稳定性数据等。
+	然而，外推法的应用建立在确信“在观察范围外也存在着相同的降解关系”的基础上的。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+A storage statement should be established for the labeling in accordance with relevant national/regional requirements. 	任何评价不仅应考虑含量，还应考虑降解产物的量和其他有关的属性。
+The statement should be based on the stability evaluation of the drug substance. 	 
+Where applicable, specific instructions should be provided, particularly for drug substances that cannot tolerate freezing. 	
+Terms such as “ambient conditions” or “room temperature” should be avoided. 	
+ 	
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+A re-test period should be derived from the stability information, and a retest date should be displayed on the container label if appropriate. 	2.1.10 说明/标签 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+2.2. 	应按照相应的国家/地区的要求，在标签上说明贮藏条件。
+Drug Product 	该说明应建立在原料药稳定性评价的基础上。
+	必要时，应有特殊说明，尤其是对不能冷冻的原料药。
+	应避免使用如“环境条件”或“室温”这一类术语。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+2.2.1. 	从稳定性资料中可得出复验日期，如必要，应在容器的标签上
+General 	
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+The design of the formal stability studies for the drug product should be based on knowledge of the behavior and properties of the drug substance and from stability studies on the drug substance and on experience gained from clinical formulation studies. 	注明复验日期。
+The likely changes on storage and the rationale for the selection of attributes to be tested in the formal stability studies should be stated. 	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+2.2.2. 	2.2 制剂 
+Photostability Testing 	
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Photostability testing should be conducted on at least one primary batch of the drug product if appropriate. 	2.2.1 总则 
+The standard conditions for photostability testing are described in ICH Q1B. 	
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+2.2.3. 	制剂正式稳定性研究的设计应根据对原料药性质和特点的了解、原料药的稳定性试验和从临床处方研究中获得的结果而定。
+Selection of Batches 	应说明在贮藏时可能产生的变化和在正式稳定性试验中试验项目的选择原则。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Data from stability studies should be provided on at least three primary batches of the drug product. 	2.2.2 光稳定性试验 
+ The primary batches should be of the same formulation and packaged in the same container closure system as proposed for marketing. 	
+The manufacturing process used for primary batches should simulate that to be applied to production batches and should provide product of the same quality and meeting the same specification as that intended for marketing. 	
+Two of the three batches should be at least pilot scale batches and the third one can be smaller, if justified. 	
+Where possible, batches of the drug product should be manufactured by using different batches of the drug substance. 	
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Stability studies should be performed on each individual strength and container size of the drug product unless bracketing or matrixing is applied. 	如必要，至少应用一批注册批样品进行光稳定性试验，其标准条件在 ICH Q1B 项下有专述。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Other supporting data can be provided. 	2.2.3 批次的选择 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+2.2.4. 	应提供至少三个批次样品的稳定性资料，注册批次的处方和容器密封系统应与拟上市产品相同，其生产工艺应模拟上市产品的生产工艺，其质量应与拟上市产品相同，符合相同的质量标准。
+Container Closure System  	如证明合理，其中两批必须至少在中试规模下生产，另一批可在较小规模下生产。
+	可能的话，生产不同批次的制剂应采用不同批号的原料。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Stability testing should be conducted on the dosage form packaged in the container closure system proposed for marketing (including, as appropriate, any secondary packaging and container label). 	制剂的每一种规格和包装规格都应进行稳定性研究，除非应用了括号法和矩阵化设计。
+Any available studies carried out on the drug product outside its immediate container or in other packaging materials can form a useful part of the stress testing of the dosage form or can be considered as supporting information, respectively. 	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+2.2.5. 	可提供其他支持性的资料。
+Specification  	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Specification, which is a list of tests, reference to analytical procedures, and proposed acceptance criteria, including the concept of different acceptance criteria for release and shelf life specifications, is addressed in ICH Q6A and Q6B. 	2.2.4 容器密封系统 
+ In addition, specification for degradation products in a drug product is addressed in Q3B. 	
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Stability studies should include testing of those attributes of the drug product that are susceptible to change during storage and are likely to influence quality, safety, and/or efficacy. 	应对采用拟上市容器密封系统（必要时，包括次级包装和容器上的标签）包装的制剂进行稳定性试验。
+The testing should cover, as appropriate, the physical, chemical, biological, and microbiological attributes, preservative content (e.g., antioxidant, antimicrobial preservative), and functionality tests (e.g., for a dose delivery system). 	除去内包装的制剂或装在其他包装材料中的制剂所进行的稳定性研究，可以作为制剂强力试验的一部分或其它支持性资料。
+Analytical procedures should be fully validated and stability indicating. 	 
+Whether and to what extent replication should be performed will depend on the results of validation studies. 	
+ 	
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Shelf life acceptance criteria should be derived from consideration of all available stability information. 	2.2.5 质量标准 
+It may be appropriate to have justifiable differences between the shelf life and release acceptance criteria based on the stability evaluation and the changes observed on storage. 	
+Any differences between the release and shelf life acceptance criteria for antimicrobial preservative content should be supported by a validated correlation of chemical content and preservative effectiveness demonstrated during drug development on the product in its final formulation (except for preservative concentration) intended for marketing. 	
+ A single primary stability batch of the drug product should be tested for antimicrobial preservative effectiveness (in addition to preservative content) at the proposed shelf life for verification purposes, regardless of whether there is a difference between the release and shelf life acceptance criteria for preservative content. 	
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+2.2.6. 	质量标准即一系列的试验、参考分析方法和建议认可的限度要求，包括两种：放行标准和货架期标准，在 ICH 的 Q6A 和 Q6B 中阐述。
+Testing Frequency 	此外，制剂中降解产物的控制要求在 Q3B 中阐述。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+For long term studies, frequency of testing should be sufficient to establish the stability profile of the drug product. 	稳定性研究应检验那些在贮藏期间易变化的、可能影响质量、安全性和/或有效性的项目。
+For products with a proposed shelf life of at least 12 months, the frequency of testing at the long term storage condition should normally be every 3 months over the first year, every 6 months over the second year, and annually thereafter through the proposed shelf life. 	检验应包括适当的物理、化学、生物、微生物学特性、保护剂含量（如：抗氧剂、抑菌剂）和功能性测试（如定量给药系统）。
+	应采用充分验证的、能指示稳定性的分析方法。
+	稳定性研究是否需重复及重复程度将取决于验证研究的结果。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+At the accelerated storage condition, a minimum of three time points, including the initial and final time points (e.g., 0, 3, and 6 months), from a 6-month study is recommended. 	根据所有稳定性资料来制定货架期标准。
+Where an expectation (based on development experience) exists that results from accelerated testing are likely to approach significant change criteria, increased testing should be conducted either by adding samples at the final time point or by including a fourth time point in the study design. 	根据稳定性结果和贮藏期观察到的变化，允许货贺期标准和放行标准存在差异。
+	放行标准和货架期标准中抑菌剂含量限度的任何不同，都应该在药物研发阶段中，对拟上市的最终处方（除保护剂含量外）中化合物含量与保护剂有效性之间的相互关系进行验证，以支持这两种标准中限度的制定。
+	不管放行标准和货架期标准中保护剂含量限度是否不同，都需取一批进行稳定性试验的申报制剂，在建议的货架期测定和证实抑菌剂的有效性（除测定抑菌剂含量外）。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+When testing at the intermediate storage condition is called for as a result of significant change at the accelerated storage condition, a minimum of four time points, including the initial and final time points (e.g., 0, 6, 9, 12 months), from a 12month study is recommended. 	2.2.6 试验频率 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Reduced designs, i.e., matrixing or bracketing, where the testing frequency is reduced or certain factor combinations are not tested at all, can be applied, if justified. 	对长期稳定性研究，应有足够的试验频率，以了解制剂稳定性的总体情况。
+ 	对于建议货架期至少为 12 个月的制剂，在长期试验放置条件下的试验频率一般为第一年每 3 个月 1 次，第二年每 6 个月 1 次，以后每年一次，直到建议的货架期期满。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+2.2.7. 	在加速试验放置条件下，为期 6 个月的研究中至少进行包括初次和末次的 3 个时间点（如：0、3、6 月）的试验。
+Storage Conditions 	根据开发研究的经验，预计加速试验结果可能会接近显著变化的限度，就应在最后一次时间点增加样本数或在研究设计中增加第 4 个时间点。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+In general, a drug product should be evaluated under storage conditions (with appropriate tolerances) that test its thermal stability and, if applicable, its sensitivity to moisture or potential for solvent loss. 	如果在加速试验放置条件下产生显著变化，则要增加中间放置条件试验。
+The storage conditions and the lengths of studies chosen should be sufficient to cover storage, shipment, and subsequent use. 	建议进行为期 12 个月的研究，其中至少进行包括初次和末次的 4 个时间点（如：0、6、9、12 月）的试验。
+ 	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Stability testing of the drug product after constitution or dilution, if applicable, should be conducted to provide information for the labeling on the preparation, storage condition, and in-use period of the constituted or diluted product. 	合理的情况下，可采用减少试验次数的设计，如：采用矩阵设计或括号法，试验次数可减少或不对某些因素的组合进行试验。
+This testing should be performed on the constituted or diluted product through the proposed in-use period on primary batches as part of the formal stability studies at initial and final time points and, if full shelf life long term data will not be available before submission, at 12 months or the last time point for which data will be available. 	 
+ In general, this testing need not be repeated on commitment batches. 	
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+The long term testing should cover a minimum of 12 months’ duration on at least three primary batches at the time of submission and should be continued for a period of time sufficient to cover the proposed shelf life. 	2.2.7 放置条件 
+Additional data accumulated during the assessment period of the registration application should be submitted to the authorities if requested. 	
+Data from the accelerated storage condition and, if appropriate, from the intermediate storage condition can be used to evaluate the effect of short term excursions outside the label storage conditions (such as might occur during shipping). 	
+ 	
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Long term, accelerated, and, where appropriate, intermediate storage conditions for drug products are detailed in the sections below. 	通常，制剂应在一定的放置条件下（在适当的范围内）进行考察，以考察其热稳定性，必要时考察其对湿度的敏感性或潜在的溶剂损失。
+ The general case applies if the drug product is not specifically covered by a subsequent section. 	选择的放置条件和研究时间长短应充分考虑贮藏、运输和使用的整个过程。
+ Alternative storage conditions can be used, if justified. 	必要时，对配制或稀释后使用的制剂应进行稳定性试验，可为标签上的配制、贮藏条件和配制或稀释后的使用期限提供依据。
+	应在稳定性初始时间点和末期对配制和稀释后的产品进行使用中的稳定性试验，作为正式稳定性试验的一部分。
+	如果申报时不能提供整个货架期试验数据，应提供第 12 个月或最近一次测定的稳定性数据。
+	通常，对承诺的批次不必重复这项试验。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+2.2.7.1. 	申报时的长期试验应至少包括三个批次的至少连续 12 个月的试验，并应继续试验至足以涵盖建议的货架期。
+General case 	注册申报考察期间积累的其他数据，如有关管理当局需要，也要呈报。
+	由加速试验和中间试验放置条件所得到的数据，可用于评价短期偏离标签贮藏条件的影响（如运输途中可能发生的情况）。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+*It is up to the applicant to decide whether long term stability studies are performed at 25 ± 2°C/60% RH ± 5% RH or 30°C ± 2°C/65% RH ± 5% RH. 	制剂长期试验、加速试验及必要时中间试验的放置条件在下节详述，除另有规定外，可采用下节所述的“一般情况”的放置条件。
+ 	
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+**If 30°C ± 2°C/65% RH ± 5% RH is the long-term condition, there is no intermediate condition. 	如果合理，可以使用替代的放置条件。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+ 	2.2.7.1 一般情况 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+If long-term studies are conducted at 25°C ± 2°C/60% RH ± 5% RH and  “significant change” occurs at any time during 6 months’ testing at the accelerated storage condition, additional testing at the intermediate storage condition should be conducted and evaluated against significant change criteria. 	长期稳定性研究在 25℃±2℃/60%RH±5%RH 或 30℃±2℃
+The initial application should include a minimum of 6 months’ data from a 12-month study at the intermediate storage condition. 	
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+In general, “significant change” for a drug product is defined as: 	/65%RH±5%RH 条件下进行，由申请人决定。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+A 5% change in assay from its initial value; or failure to meet the acceptance criteria for potency when using biological or immunological procedures;  	★ 如果把 30℃±2℃/65%RH±5%RH 作为长期试验条件，则无中间试验条件。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Any degradation product’s exceeding its acceptance criterion;  	如果在 25℃±2℃/60%RH±5%RH 条件下进行长期试验，而在加速放置条件下的 6 个月期间的任何时间点发生“显著变化”，则增加中间放置条件试验，并对显著性变化的情况进行评价。
+	初次申报应包括在中间放置条件下进行 12 个月研究中的至少 6 个月数据。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Failure to meet the acceptance criteria for appearance, physical attributes, and functionality test (e.g., color, phase separation, resuspendibility, caking, hardness, dose delivery per actuation); however, some changes in physical attributes (e.g., softening of suppositories, melting of creams) may be expected under accelerated conditions;  	通常制剂的“显著性变化”定义为： 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+and, as appropriate for the dosage form: 	1.含量与初始值相差 5%；或采用生物或免疫法测定时效价不符合规定； 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Failure to meet the acceptance criterion for pH; or 	2.任何降解产物超过标准限度要求； 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Failure to meet the acceptance criteria for dissolution for 12 dosage units. 	3.外观、物理常数、功能试验（如颜色、相分离、再分散性、粘结、硬度、每揿剂量）不符合标准要求。
+	然而，一些物理性能（如：栓剂的变软、霜剂的熔化）的变化可预料到会在加速试验条件下出现；另外，对于某些剂型： 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+2.2.7.2. 	4.pH值不符合规定； 
+Drug products packaged in impermeable containers 	
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Sensitivity to moisture or potential for solvent loss is not a concern for drug products packaged in impermeable containers that provide a permanent barrier to passage of moisture or solvent. 	5.12 个剂量单位的溶出度不符合标准的规定。
+Thus, stability studies for products stored in impermeable containers can be conducted under any controlled or ambient humidity condition. 	 
+ 	
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+2.2.7.3. 	2.2.7.2 包装在非渗透容器中的制剂 
+Drug products packaged in semi-permeable containers 	
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Aqueous-based products packaged in semi-permeable containers should be evaluated for potential water loss in addition to physical, chemical, biological, and microbiological stability. 	对包装在非渗透容器中的药物制剂可不考虑药物的湿敏感性或可能的溶剂损失，因为这种容器具有防止潮湿和溶剂通过的永久屏障。
+This evaluation can be carried out under conditions of low relative humidity, as discussed below. 	因此，包装在非渗透容器中的制剂稳定性研究可在任何湿度下进行。
+Ultimately, it should be demonstrated that aqueous-based drug products stored in semi-permeable containers can withstand low relative humidity environments. 	 
+ 	
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Other comparable approaches can be developed and reported for non-aqueous, solvent-based products. 	2.2.7.3 包装在半渗透容器中的制剂 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+ 	包装在半渗透容器中的水溶液制剂，除物理、化学、生物和微生物稳定性考察外，应考察潜在的失水性。
+	这种考察可在如下所述的低相对湿度条件下进行，以证明其可以放在低相对湿度的环境中。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+*It is up to the applicant to decide whether long term stability studies are performed at 25 ± 2°C/40% RH ± 5% RH or 30°C ± 2°C/35% RH ± 5% RH. 	对于非水性溶媒的药物，可建立其他可比较的方法并报告。
+ 	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+**If 30°C ± 2°C/35% RH ± 5% RH is the long-term condition, there is no intermediate condition. 	★ 长期试验在 25℃±2℃/40%RH±5%RH 还是在 30℃±2℃
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+ 	/35%RH±5%RH 条件下进行，由申请者决定。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+For long-term studies conducted at 25°C ± 2°C/40% RH ± 5% RH, additional testing at the intermediate storage condition should be performed as described under the general case to evaluate the temperature effect at 30°C if  significant change other than water loss occurs during the 6 months’ testing at the accelerated storage condition. 	★★ 如果把 30℃±2℃/35%RH±5%RH 作为长期试验条件，则无
+A significant change in water loss alone at the accelerated storage condition does not necessitate testing at the intermediate storage condition. 	
+However, data should be provided to demonstrate that the drug product will not have significant water loss throughout the proposed shelf life if stored at 25°C and the reference relative humidity of 40% RH. 	
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+A 5% loss in water from its initial value is considered a significant change for a product packaged in a semi-permeable container after an equivalent of 3 months’ storage at 40°C/NMT 25% RH. 	中间试验条件。
+ However, for small containers (1 mL or less) or unitdose products, a water loss of 5% or more after an equivalent of 3 months’ storage at 40°C/NMT 25% RH may be appropriate, if justified. 	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+An alternative approach to studying at the reference relative humidity as recommended in the table above (for either long term or accelerated testing) is performing the stability studies under higher relative humidity and deriving the water loss at the reference relative humidity through calculation. 	 
+This can be achieved by experimentally determining the permeation coefficient for the container closure system or, as shown in the example below, using the calculated ratio of water loss rates between the two humidity conditions at the same temperature. 	
+The permeation coefficient for a container closure system can be experimentally determined by using the worst case scenario (e.g., the most diluted of a series of concentrations) for the proposed drug product. 	
+ 	
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Example of an approach for determining water loss: 	如果在 25℃±2℃/40%RH±5%RH 条件下进行长期试验，而在加速放置条件下的 6 个月期间的任何时间点发生除失水外的显著变化，应增加按“一般情况”下所述的中间试验，以考察 30℃时温度的影响。
+	在加速试验放置条件下，仅失水一项发生显著性变化，不必进行中间试验。
+	然而，应有数据证明制剂在建议的货架期贮藏在
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+For a product in a given container closure system, container size, and fill, an appropriate approach for deriving the water loss rate at the reference relative humidity is to multiply the water loss rate measured at an alternative relative humidity at the same temperature by a water loss rate ratio shown in the table below. 	25℃，40%RH 时无明显失水。
+A linear water loss rate at the alternative relative humidity over the storage period should be demonstrated. 	 
+ 	
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+For example, at a given temperature, e.g., 40°C, the calculated water loss rate during storage at NMT 25% RH is the water loss rate measured at 75% RH multiplied by 3.0, the corresponding water loss rate ratio. 	包装在半渗透容器中的制剂，在 40℃、不超过 25%RH 的条件下放置 3 个月，失水量与原始值相差 5%，可认为有显著性变化。
+	但是，对于小容器（≤1ml）或单剂量包装容器，只要说明理由，
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+ 	40℃不超过 25%RH 放置 3 个月失水 5%或以上是可以接受的。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Valid water loss rate ratios at relative humidity conditions other than those shown in the table above can also be used. 	可用另一种方法来进行上表推荐的参比相对湿度条件下的研究（无论是长期还是加速试验），即在高湿情况下进行稳定性研究，然后通过计算得出参比相对湿度时的失水率。
+ 	具体方法是通过实验测定容器密封系统的渗透因子，或如下例所示，利用计算得到的同一温度下不同湿度的失水率之比得出。
+	一个容器密封系统的渗透因子可以用拟包装的制剂在最差的情况下（如：系列浓度中最稀的一种）经实验测定而得。
+	测定失水的例子： 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+ 	对于包装在一定容器密封系统、一定大小尺寸、一定装量的制剂，计算其在参比相对湿度下的失水率的方法，是用在相同温度下和实测相对湿度下测得的失水率与下表中的失水率之比相乘。
+	但应证明在贮藏过程中，实测时的相对湿度与失水率之间呈线性关系。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+2.2.7.4. 	例如，在温度 40℃下，计算放置在不超过 25%RH 时的失水率，就是将 75%RH 时测得的失水率乘以 3（相应的失水率之比）。
+Drug products intended for storage in a refrigerator 	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+ 	除表中所列之外，其他相对湿度条件下有充分根据的失水率之比也可采用。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+If the drug product is packaged in a semi-permeable container, appropriate information should be provided to assess the extent of water loss. 	2.2.7.4 拟冷藏的制剂 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Data from refrigerated storage should be assessed according to the evaluation section of this guideline, except where explicitly noted below. 	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+If significant change occurs between 3 and 6 months’ testing at the accelerated storage condition, the proposed shelf life should be based on the real time data available from the long term storage condition. 	如果制剂包装在半渗透容器中，应提供适当的信息以考察失水程度。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+If significant change occurs within the first 3 months’ testing at the accelerated storage condition, a discussion should be provided to address the effect of short term excursions outside the label storage condition, e.g., during shipment and handling. 	除以下情况外，应根据本指导原则评价部分考察冷藏条件下的稳定性实验数据。
+This discussion can be supported, if appropriate, by further testing on a single batch of the drug product for a period shorter than 3 months but with more frequent testing than usual. 	 
+It is considered unnecessary to continue to test a product through 6 months when a significant change has occurred within the first 3 months. 	
+2.2.7.5. 	
+Drug products intended for storage in a freezer 	
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+ 	如果加速试验 3 至 6 个月期间发生显著变化，建议的货架期应根据长期试验中实际时间的数据而定。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+For drug products intended for storage in a freezer, the shelf life should be based on the real time data obtained at the long term storage condition. 	如果加速试验前三个月发生显著性变化，应讨论短期偏离标签上的贮藏条件（如在运输途中或搬运中）对药物的影响。
+In the absence of an accelerated storage condition for drug products intended to be stored in a freezer, testing on a single batch at an elevated temperature (e.g., 5°C ± 3°C or 25°C ± 2°C) for an appropriate time period should be conducted to address the effect of short term excursions outside the proposed label storage condition. 	必要时可对一批制剂进行少于 3 个月但更频繁的测试来进行验证。
+	如果前 3 个月已发生了显著变化，就不必继续进行 6 个月的试验。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+2.2.7.6. 	2.2.7.5 拟冷冻贮藏的制剂 
+Drug products intended for storage below -20°C  	
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Drug products intended for storage below -20°C should be treated on a case-by-case basis. 	对拟冷冻贮藏的制剂，货架期应根据长期试验放置条件下实际时间的数据而定。
+	虽然没有加速试验放置条件，但应对一批样品在略高的温度下（如：5℃±3℃或 25℃±2℃）放置适当时间进行考察，以了解短期偏离标签贮藏条件对该制剂的影响。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+2.2.8. 	2.2.7.6 拟在-20℃以下贮藏的制剂 
+Stability Commitment 	
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+When available long term stability data on primary batches do not cover the proposed shelf life granted at the time of approval, a commitment should be made to continue the stability studies post approval in order to firmly establish the shelf life. 	对于拟在-20℃以下贮藏的制剂应酌情处理。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Where the submission includes long term stability data from three production batches covering the proposed shelf life, a post approval commitment is considered unnecessary. 	2.2.8 稳定性研究承诺 
+Otherwise, one of the following commitments should be made: 	
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+If the submission includes data from stability studies on at least three production batches, a commitment should be made to continue the long term studies through the proposed shelf life and the accelerated studies for 6 months. 	当注册批次的长期稳定性数据在批准时还无法涵盖所建议的货架期时，应承诺在批准后继续进行稳定性研究，以建立确切的货架期。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+If the submission includes data from stability studies on fewer than three production batches, a commitment should be made to continue the long term studies through the proposed shelf life and the accelerated studies for 6 months, and to place additional production batches, to a total of at least three, on long term stability studies through the proposed shelf life and on accelerated studies for 6 months. 	当申报的三批生产批次长期稳定性数据已涵盖了所建议的货架期，则认为不需进行批准后的承诺。
+	否则，有下列情况之一的也应承诺： 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+If the submission does not include stability data on production batches, a commitment should be made to place the first three production batches on long term stability studies through the proposed shelf life and on accelerated studies for 6 months. 	1．如果递交资料包含了至少三批生产规模批次的稳定性研究数据但未至货架期，应承诺继续这些研究直到建议的货架期和进行六个月的加速试验。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+The stability protocol used for studies on commitment batches should be the same as that for the primary batches, unless otherwise scientifically justified. 	2．如果递交的稳定性研究数据资料包含的生产批次少于三批，应承诺继续进行这些长期稳定性研究直到建议的货架期和进行六个月的加速试验，并补充试验的批次到至少三批，进行直到所建议的货架期的长期稳定性试验和进行六个月的加速试验。
+	 3．如果递交的资料不包含生产批次稳定性数据，则应承诺对生产规模生产的前三批进行长期稳定性研究直到所建议的货架期和进行六个月的加速试验。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Where intermediate testing is called for by a significant change at the accelerated storage condition for the primary batches, testing on the commitment batches can be conducted at either the intermediate or the accelerated storage condition. 	除非有其他的科学依据，用于研究承诺批次的长期稳定性研究方案应与研究注册批次的方案相同。
+However, if significant change occurs at the accelerated storage condition on the commitment batches, testing at the intermediate storage condition should also be conducted. 	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+2.2.9. 	当注册批次的加速试验有显著变化而需进行中间试验时，承诺批次可进行中间试验，也可进行加速试验。
+Evaluation 	然而，如果承诺批次的加速试验有显著性变化，也要进行中间试验。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+A systematic approach should be adopted in the presentation and evaluation of the stability information, which should include, as appropriate, results from the physical, chemical, biological, and microbiological tests, including particular attributes of the dosage form (for example, dissolution rate for solid oral dosage forms). 	2.2.9 评价 
+ 	
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+The purpose of the stability study is to establish, based on testing a minimum of three batches of the drug product, a shelf life and label storage instructions applicable to all future batches of the drug product manufactured and packaged under similar circumstances. 	申报时应采用系统评估方法来评价稳定性资料，包括物理、化学、生物和微生物测定等的结果，以及制剂的特殊性能指标（如：固体口服制剂的溶出度）。
+The degree of variability of individual batches affects the confidence that a future production batch will remain within specification throughout its shelf life. 	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Where the data show so little degradation and so little variability that it is apparent from looking at the data that the requested shelf life will be granted, it is normally unnecessary to go through the formal statistical analysis; providing a justification for the omission should be sufficient. 	稳定性研究的目的是根据至少三批制剂的测定结果，确定将来所有在相似条件下生产和包装的制剂的货架期和标签上的贮藏条件。
+	批次间变异的程度有可能产生产品质量的差异，但产品在货架期内应符合质量标准的要求。
+	有时数据表明降解和变异非常小，以至于从数据上就可以明显看出所申请的货架期是合理的，这时通常不必进行正式的统计分析，只要提供省略的理由即可。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+An approach for analyzing data of a quantitative attribute that is expected to change with time is to determine the time at which the 95 one-sided confidence limit for the mean curve intersects the acceptance criterion. 	分析那些可能会随时间变化的定量参数的一个方法是：将平均曲线的 95%单侧置信限与认可标准的相交点所对应的时间点作为货架期。
+If analysis shows that the batch-tobatch variability is small, it is advantageous to combine the data into one overall estimate. 	如果分析表明批间变异较小，最好将数据合并进行整体评估。
+This can be done by first applying appropriate statistical tests (e.g., p values for level of significance of rejection of more than 0.25) to the slopes of the regression lines and zero time intercepts for the individual batches. 	具体做法是：先对每批样品的回归曲线的斜率和截距进行统计检验（如 P 值＞0.25 表示无显著性差异）。
+If it is inappropriate to combine data from several batches, the overall shelf life should be based on the minimum time a batch can be expected to remain within acceptance criteria. 	如果不能合并，总的货架期可以根据其中那批货架寿命最短的时间来定。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+The nature of the degradation relationship will determine whether the data should be transformed for linear regression analysis. 	降解关系的性质将决定是否可将数据转换为线性回归分析。
+Usually the relationship can be represented by a linear, quadratic, or cubic function on an arithmetic or logarithmic scale. 	通常这种关系可表示为算术或对数的一次、二次或三次函数关系。
+Statistical methods should be employed to test the goodness of fit on all batches and combined batches (where appropriate) to the assumed degradation line or curve. 	各批次及合并批次（如有必要）的数据与假定降解直线或曲线拟合程度的好坏，应该用统计方法进行检验。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Limited extrapolation of the real time data from the long term storage condition beyond the observed range to extend the shelf life can be undertaken at approval time, if justified. 	如果合理，在报批阶段，可依据长期贮藏条件下获得的实测数据，有限外推得到超出观察时间范围外的货架期。
+This justification should be based on what is known about the mechanisms of degradation, the results of testing under accelerated conditions, the goodness of fit of any mathematical model, batch size, existence of supporting stability data, etc. 	其合理性应基于已知的降解机制、加速试验的结果、数学模型的良好的拟合度、批次规模、稳定性数据的支持程度等。
+However, this extrapolation assumes that the same degradation relationship will continue to apply beyond the observed data. 	然而，外推法的应用是建立在确信“在观察范围外也存在着相同的降解关系”的基础上的。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Any evaluation should consider not only the assay but also the degradation products and other appropriate attributes. 	任何评价不仅要考虑含量，还要考虑降解产物和其他有关的性能指标。
+Where appropriate, attention should be paid to reviewing the adequacy of the mass balance and different stability and degradation performance. 	如有必要，应注意考察质量平衡情况和不同的稳定性及降解特性。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+2.2.10. 	2.2.10 说明/标签 
+Statements/Labeling 	
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+A storage statement should be established for the labeling in accordance with relevant national/regional requirements. 	应按照相应的国家/地区的要求，在标签上说明贮藏条件。
+The statement should be based on the stability evaluation of the drug product. 	该说明应建立在制剂稳定性研究的基础上。
+Where applicable, specific instruction should be provided, particularly for drug products that cannot tolerate freezing. 	必要时，应有特殊说明，尤其是对不能冷冻的制剂。
+Terms such as “ambient conditions” or “room temperature” should be avoided. 	应避免使用如“环境条件”或“室温”这一类术语。
+	标签上的贮藏条件直接反映制剂稳定性。
+	失效日期应标在容器标签上。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+There should be a direct link between the label storage statement and the demonstrated stability of the drug product. 	3．术语 
+ An expiration date should be displayed on the container label. 	
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+3. 	下面的术语是为便于理解本指导原则而提供的。
+GLOSSARY  	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+The following definitions are provided to facilitate interpretation of the guideline. 	加速试验（Accelerated Testing） 
+ 	
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Accelerated testing 	加速试验是通过使用超常的贮藏条件来加速原料药或制剂的化学降解或物理变化。
+	它是正式的稳定性研究的一部分。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Studies designed to increase the rate of chemical degradation or physical change of a drug substance or drug product by using exaggerated storage conditions as part of the formal stability studies. 	除了长期稳定性研究外，从这些研究中得到的数据也可以评估在非加速条件下更长时间内的化学变化以及评价在短期偏离标签上所注明的贮藏条件，如运输过程中可能遇到的情况时的影响，加速试验研究的结果有时不能预示物理变化。
+Data from these studies, in addition to long term stability studies, can be used to assess longer term chemical effects at non-accelerated conditions and to evaluate the effect of short term excursions outside the label storage conditions such as might occur during shipping. 	 
+Results from accelerated testing studies are not always predictive of physical changes. 	
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Bracketing 	括号法（Bracketing） 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+The design of a stability schedule such that only samples on the extremes of certain design factors, e.g., strength, package size, are tested at all time points as in a full design. 	这是一种稳定性试验方案的简化设计方法，它仅针对某些设计因素（如：规格、包装）极端点的样品进行考察，与完整稳定性试验设计一样，需对所用试验点进行考察。
+The design assumes that the stability of any intermediate levels is represented by the stability of the extremes tested. 	这种设计假定中间条件下样品的稳定性可用这些极端条件下样品的稳定性来代表。
+Where a range of strengths is to be tested, bracketing is applicable if the strengths are identical or very closely related in composition (e.g., for a tablet range made with different compression weights of a similar basic granulation, or a capsule range made by filling different plug fill weights of the same basic composition into different size capsule shells). 	在试验一个系列规格的某制剂时，如果其组成相同或非常相近（如将相似的颗粒压成不同片重的系列，或将相同组份填充于不同体积的空胶囊中所得到的不同填充量的胶囊系列），即可用括号法。
+Bracketing can be applied to different container sizes or different fills in the same container closure system. 	括号法也适用于盛装在不同大小的容器或相同容器密封系统但填充量不同的制剂系列。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Climatic zones 	气候带（Climatic Zones）根据常规的年度的气候条件，将全球分为 4 个气候带。
+	依据是 W.Grimm 提出的概念 (Drugs Made in Germany28:196-202 ，
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+The four zones in the world that are distinguished by their characteristic prevalent annual climatic conditions. 	1985and29:39-47.1986)。
+This is based on the concept described by W. 	 
+Grimm (Drugs Made in Germany, 28:196-202, 1985 and 29:39-47, 1986). 	
+ 	
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Commitment batches 	承诺批次（Commitment batches） 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Production batches of a drug substance or drug product for which the stability studies are initiated or completed post approval through a commitment made in the registration application. 	在注册申请时，承诺在获得批准后，开始进行或继续完成稳定性研究的原料药或制剂的生产规模批次。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Container closure system 	容器密封系统（Container closure system） 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+The sum of packaging components that together contain and protect the dosage form. 	用于盛装和保护制剂的包装总和，包括内包装和次级包装，次级包装是为了给制剂提供进一步的保护。
+This includes primary packaging components and secondary packaging components, if the latter are intended to provide additional protection to the drug product. 	一个包装系统视为容器密封系统。
+A packaging system is equivalent to a container closure system. 	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Dosage form 	剂型（Dosage Form） 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+A pharmaceutical product type (e.g., tablet, capsule, solution, cream) that contains a drug substance generally, but not necessarily, in association with excipients. 	通常含有一种药物活性成分及各种辅料（但不一定必须有辅料）制成的药物制剂形式（如片剂、胶囊、溶液剂、乳膏剂）。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Drug product 	制剂（Drug Product） 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+The dosage form in the final immediate packaging intended for marketing. 	置于拟上市内包装中的药物制剂。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Drug substance 	原料药（Drug substance） 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+The unformulated drug substance that may subsequently be formulated with excipients to produce the dosage form. 	可与辅料一起生产制剂的未经配方的药物。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Excipient 	辅料（Excipient） 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Anything other than the drug substance in the dosage form. 	在剂型配方中除原料药以外的其他成分。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Expiration date 	失效日期（Expiration Date）这是制剂容器标签上的一个日期，在此日期前，某一批制剂只要贮藏于规定的条件下，将保持符合其批准的货架期标准的要求，在此日期以后该药不能使用。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+The date placed on the container label of a drug product designating the time prior to which a batch of the product is expected to remain within the approved shelf life specification if stored under defined conditions, and after which it must not be used. 	正式稳定性研究（Formal stability Studies） 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Formal stability studies 	按照呈报的稳定性方案对申报和/或承诺的批次的样品进行的长期和加速（和中间）试验，以建立或确定原料药的复检期或制剂的货架期。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Long term and accelerated (and intermediate) studies undertaken on primary and/or commitment batches according to a prescribed stability protocol to establish or confirm the re-test period of a drug substance or the shelf life of a drug product. 	非渗透性容器（Impermeable containers） 
+ 	
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Impermeable containers 	能对气体或溶剂通透设置永久性屏障的容器，如半固体（制剂）的密封铝管，溶液剂的密封玻璃安瓿。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Containers that provide a permanent barrier to the passage of gases or solvents, e.g., sealed aluminum tubes for semi-solids, sealed glass ampoules for solutions. 	中间试验（Intermediate testing） 
+ 	
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Intermediate testing 	为拟在 25℃下长期贮藏的原料药和制剂所设计的在 30℃
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Studies conducted at 30°C/65% RH and designed to moderately increase the rate of chemical degradation or physical changes for a drug substance or drug product intended to be stored long term at 25°C. 	/65%RH 条件下的试验，以适当加速其化学降解或物理变化。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Long term testing 	长期试验（Long-Term Testing） 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Stability studies under the recommended storage condition for the re-test period or shelf life proposed (or approved) for labeling. 	为确立标签上建议（或批准）的复检期和货架期、在推荐的贮藏条件下进行的稳定性研究。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Mass balance 	质量平衡（Mass Balance） 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+The process of adding together the assay value and levels of degradation products to see how closely these add up to 100% of the initial value, with due consideration of the margin of analytical error. 	在充分考虑了分析方法误差的情况下，将含量和降解产物测定值相加，以考察其是否接近初始值的 100％。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Matrixing 	矩阵设计（Matrixing）这是稳定性试验方案的一种简化设计方法。
+	据此方法，在指定的取样时间点，只需从所有因素组合的总样品数中取出一组进行测定。
+	在随后的取样时间点，则测定所有因素组合的总体样品中的另一组样品。
+	此设计假定在特定时间点被测定的每一组样品的稳定性具有代表性。
+	同一种制剂中样品的各种差异应作为因素加以考，如不同的批号、规格、大小不同的相同容器密封系统，在某些情况可能连容器密封系统也不同。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+The design of a stability schedule such that a selected subset of the total number of possible samples for all factor combinations is tested at a specified time point. 	平均动力学温度（Mean Kinetic Temperature） 
+At a subsequent time point, another subset of samples for all factor combinations is tested. 	
+The design assumes that the stability of each subset of samples tested represents the stability of all samples at a given time point. 	
+The differences in the samples for the same drug product should be identified as, for example, covering different batches, different strengths, different sizes of the same container closure system, and, possibly in some cases, different container closure systems. 	
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Mean kinetic temperature 	单一的推导温度。
+	如果在相同特定的时期将原料药或制剂维持在该温度下，和同时经历较高和较低温度的情况相比，该推导温度可以对原料药或制剂提供相同的热挑战。
+	平均动力学温度比算术平均温度高，其考虑了 Arrhenius 方程。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+A single derived temperature that, if maintained over a defined period of time, affords the same thermal challenge to a drug substance or drug product as would be experienced over a range of both higher and lower temperatures for an equivalent defined period. 	在为一个特定的时期估计平均动力学温度时，可用 J. 
+The mean kinetic temperature is higher than the arithmetic mean temperature and takes into account the Arrhenius equation. 	D. 
+ 	
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+When establishing the mean kinetic temperature for a defined period, the formula of J. 	Haynes (J. 
+D. 	Pharm. 
+Haynes (J. 	Sci.，•60：927—929， l971)的公式来计算。
+Pharm. 	 
+Sci., 60:927-929, 1971) can be used. 	
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+New molecular entity 	新分子实体（New Molecular Entity） 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+An active pharmaceutical substance not previously contained in any drug product registered with the national or regional authority concerned. 	在有关国家或地区的药品管理机构注册过的任何药品中从未出现过的一种活性药物成分。
+ A new salt, ester, or non-covalent-bond derivative of an approved drug substance is considered a new molecular entity for the purpose of stability testing under this guidance. 	在本指导原则中，一种已批准原料药的新的盐、酯或非共价结合的衍生物也认为是一种需进行稳定性试验的新分子实体。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Pilot scale batch 	中试规模批次（Pilot Scale batch）按照模拟生产规模所生产的原料药或制剂批次。
+	对固体口服制剂，中试生产规模一般至少是生产规模的十分之一或至少生产
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+A batch of a drug substance or drug product manufactured by a procedure fully representative of and simulating that to be applied to a full production scale batch. 	100000 片或粒的规模，取较大者。
+For solid oral dosage forms, a pilot scale is generally, at a minimum, one-tenth that of a full production scale or 100,000 tablets or capsules, whichever is the larger. 	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Primary batch 	注册批次（Primary batch） 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+A batch of a drug substance or drug product used in a formal stability study, from which stability data are submitted in a registration application for the purpose of establishing a re-test period or shelf life, respectively. 	用于正式稳定性研究的原料药或制剂批次，其稳定性数据在注册申报时可分别用于建立复检期或货架期。
+ A primary batch of a drug substance should be at least a pilot scale batch. 	原料药的注册批次至少是中试生产规模批次。
+ For a drug product, two of the three batches should be at least pilot scale batch, and the third batch can be smaller if it is representative with regard to the critical manufacturing steps. 	对于制剂，三批中至少两批是中试规模批次，第三批规模可小一些，只要它代表了关键生产步骤。
+ However, a primary batch may be a production batch. 	然而，一个注册批次也可以是生产规模的批次。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Production batch 	生产批次（Production batch） 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+A batch of a drug substance or drug product manufactured at production scale by using production equipment in a production facility as specified in the application. 	使用在申报时规定的生产设备和场所，以生产规模生产的原料药或制剂批次。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Re-test date 	复验日期（Re-Test Date） 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+The date after which samples of the drug substance should be examined to ensure that the material is still in compliance with the specification and thus suitable for use in the manufacture of a given drug product. 	在这一日期以后必须对原料药进行再测试，以保证其仍符合标准并适合用于生产规定的制剂。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Re-test period 	复检期（Re-Test Period） 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+The period of time during which the drug substance is expected to remain within its specification and, therefore, can be used in the manufacture of a given drug product, provided that the drug substance has been stored under the defined conditions. 	在这段时间内，只要原料药保存于规定的条件下就被认为其质量符合标准要求，可用于生产相应的制剂。
+After this period, a batch of drug substance destined for use in the manufacture of a drug product should be re-tested for compliance with the specification and then used immediately. 	在此期限以后，这批药物必须再检测以考察其是否符合标准要求，如符合就立刻使用。
+A batch of drug substance can be re-tested multiple times and a different portion of the batch used after each re-test, as long as it continues to comply with the specification. 	一批原料药可进行多次再测试，每次再测试后，只要符合标准要求，该批原料药即可用来投料。
+ For most biotechnological/biological substances known to be labile, it is more appropriate to establish a shelf life than a re-test period. 	对已知不稳定的生物技术/生物制品，建立货架期比建立复检期更合适，对某些抗生素也一样。
+The same may be true for certain antibiotics. 	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Semi-permeable containers 	半渗透性容器（Semi-permeable containers） 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Containers that allow the passage of solvent, usually water, while preventing solute loss. 	可防止溶质损失，但能允许溶剂尤其是水通过的容器。
+ The mechanism for solvent transport occurs by absorption into one container surface, diffusion through the bulk of the container material, and desorption from the other surface. 	溶剂渗透的机制为：被容器的内一侧表面吸收、扩散进入容器材料，再从另一侧表面解吸附。
+ Transport is driven by a partial-pressure gradient. 	渗透是通过分压梯度来完成的。
+ Examples of semipermeable containers include plastic bags and semi-rigid, low-density polyethylene (LDPE) pouches for large volume parenterals (LVPs), and LDPE ampoules, bottles, and vials. 	半渗透性容器的例子有塑料袋和用于大输液制剂（LVPs）的半硬性的低密度聚乙烯（LDPE）袋及低密度聚乙烯安瓿、瓶、小瓶。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Shelf life (also referred to as expiration dating period) 	货架期（也指有效期）（ Shelf life; also referred to as expiration Dating Period） 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+The time period during which a drug product is expected to remain within the approved shelf life specification, provided that it is stored under the conditions defined on the container label. 	在这段时间内，只要制剂在容器标签指定的条件下贮藏，就能符合经批准的货架期标准。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Specification 	质量标准（Specification）见 Q6A 和 Q6B。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+See Q6A and Q6B. 	放行标准（Specification-Release） 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Specification – Release 	包括物理、化学、生物学、微生物学试验和认可的限度要求。
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+The combination of physical, chemical, biological, and microbiological tests and acceptance criteria that determine the suitability of a drug product at the time of its release. 	在放行时，用于判断制剂是否合格。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Specification - Shelf life 	货架期标准（Specification-Shelf life） 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+The combination of physical, chemical, biological, and microbiological tests and acceptance criteria that determine the suitability of a drug substance throughout its re-test period, or that a drug product should meet throughout its shelf life. 	包括物理、化学、生物学、微生物学试验和认可的限度要求。
+	在整个复检期限内，用于判断原料药是否合格。
+	或在整个货架期内制剂必须符合其标准的要求。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Storage condition tolerances 	放置条件偏差（Storage condition tolerances） 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+The acceptable variations in temperature and relative humidity of storage facilities for formal stability studies. 	在正式稳定性研究中，对放置设备的温度和相对湿度的可接受的偏差。
+The equipment should be capable of controlling the storage condition within the ranges defined in this guideline. 	该设备应能将放置条件控制在本指导原则规定的范围内。
+The actual temperature and humidity (when controlled) should be monitored during stability storage. 	在稳定性放置期间应监控温度和湿度（当需控制时）。
+Short term spikes due to opening of doors of the storage facility are accepted as unavoidable. 	由于开启放置设备的门而导致的短期偏离认为是不可避免的。
+The effect of excursions due to equipment failure should be addressed, and reported if judged to affect stability results. 	应记录设备失控而导致的偏离的影响，如已证明影响稳定性结果，则需报告。
+Excursions that exceed the defined tolerances for more than 24 hours should be described in the study report and their effect assessed. 	超过允许偏差 24 小时的偏离，应在研究报告中说明并评估其影响。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Stress testing (drug substance) 	强力试验（原料药）（Stress Testing（Drug Substance）） 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Studies undertaken to elucidate the intrinsic stability of the drug substance. 	为了揭示原料药内在稳定性而进行的研究，它是开发研究的一部分。
+Such testing is part of the development strategy and is normally carried out under more severe conditions than those used for accelerated testing. 	这些试验通常是在比加速试验更剧烈的条件下进行。
+	强力试验（制剂）（Stress Testing（Drug Product）） 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Stress testing (drug product) 	为评估剧烈的条件对制剂的影响而进行的研究。
+	包括光稳定性研究（见 ICHQ1B）和对特定制剂（如定量吸入剂、乳膏、乳剂和需冷藏的水性液体制剂）的特殊试验。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Studies undertaken to assess the effect of severe conditions on the drug product. 	支持性数据（Supporting Data） 
+ Such studies include photostability testing (see ICH Q1B) and specific testing on certain products, (e.g., metered dose inhalers, creams, emulsions, refrigerated aqueous liquid products). 	
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Supporting data 	除了正式稳定性研究资料外，其他支持分析方法、复检期或货架期和贮藏条件的试验数据。
+	这些数据资料包括（1）最初合成路线生产的原料药，小试规模生产的原料药，不作为上市用的研究性处方，相关的其他处方及非市售容器包装的药品所进行的稳定性研究数据；（2）对容器进行的试验资料；（3）其他科学原理的试验资料。
+	 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Data, other than those from formal stability studies, that support the analytical procedures, the proposed re-test period or shelf life, and the label storage statements. 	4．参考文献 
+ Such data include (1) stability data on early synthetic route batches of drug substance, small scale batches of materials, investigational formulations not proposed for marketing, related formulations, and product presented in containers and closures other than those proposed for marketing; (2) information regarding test results on containers; and (3) other scientific rationales. 	
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+ 	ICH Q1B 稳定性试验：新原料药和制剂的光稳定性试验 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+4. 	ICH Q1C 稳定性试验：新剂型的要求 
+REFERENCES 	
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+ 	ICH Q3A 新原料药中的杂质 ICH Q3B 新药制剂中的杂质 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+ICH Q1B: “Photostability Testing of New Drug Substances and Products” 	ICH Q5C 生物技术/生物制品质量：生物技术/生物制品稳定性试验 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+ICH Q1C:  “Stability Testing of New Dosage Forms” 	ICH Q6A   质量标准：新原料药和新药制剂的测试方法和认可标准：化学物质 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+ICH Q3A:  “Impurities in New Drug Substances” 	ICH Q6B   质量标准：生物技术产品及生物制品的测试方法和认可标准 
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+ICH Q3B:  “Impurities in New Drug Products” 	
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+ICH Q5C:  “Stability Testing of Biotechnological/Biological Products” 	
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+ICH Q6A: “Specifications: Test Procedures and Acceptance Criteria for New Drug Substances and New Drug Products: Chemical Substances” 	
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+ICH Q6B: “Specifications: Test Procedures and Acceptance Criteria for New Drug 	
+_@λ_ PARAGRAPH _λ@_	_@λ_ PARAGRAPH _λ@_
+Substances and New Drug Products: Biotechnological/Biological Products” 	
+_@λ_ TABLE _λ@_	_@λ_ TABLE _λ@_
+Study 	研究 
+Storage condition 	放置条件 
+Minimum time period covered by data at submission 	申报数据涵盖的最少时间周期 
+Long term* 	长期试验★ 
+25°C ± 2°C/60% RH ± 5% RH or 	25℃±2℃/60% RH±5%RH 或
+30°C ± 2°C/65% RH ± 5% RH 	30℃±2℃/65%RH±5%RH 
+12 months 	12 个月 
+Intermediate** 	中间试验★★ 
+30°C ± 2°C/65% RH ± 5% RH 	30℃±2℃/65%RH±5%RH 
+6 months  	6 个月 
+Accelerated 	加速试验 
+40°C ± 2°C/75% RH ± 5% RH 	40℃±2℃/75%RH＋5%RH 
+6 months  	6 个月 
+_@λ_ TABLE _λ@_	_@λ_ TABLE _λ@_
+Study 	研究 
+Storage condition 	放置条件 
+Minimum time period covered by data at submission 	申报数据涵盖的最少时间周期 
+Long term 	长期试验 
+5°C ± 3°C 	5℃±3℃ 
+12 months 	12 个月 
+Accelerated 	加速试验 
+25°C ± 2°C/60% RH ± 5% RH 	25℃±2℃/60%RH±5%RH 
+6 months  	6 个月 
+_@λ_ TABLE _λ@_	_@λ_ TABLE _λ@_
+Study 	研究 
+Storage condition 	放置条件 
+Minimum time period covered by data at submission 	申报数据涵盖的最少时间周期 
+Long term 	长期试验 
+- 20°C ± 5°C 	-20℃±5℃ 
+12 months 	12 个月 
+_@λ_ TABLE _λ@_	_@λ_ TABLE _λ@_
+Study 	研究 
+Storage condition 	放置条件 
+Minimum time period covered by data at submission 	申报数据涵盖的最少时间周期 
+Long term* 	长期试验★ 
+25°C ± 2°C/60% RH ± 5% RH or 	25℃±2℃/60%RH±5%RH 或 
+30°C ± 2°C/65% RH ± 5% RH 	30℃±2℃/65%RH±5%RH 
+12 months 	12 个月 
+Intermediate** 	中间试验★★ 
+30°C ± 2°C/65% RH ± 5% RH 	30℃±2℃/65%RH±5%RH 
+6 months  	6 个月 
+Accelerated 	加速试验★★ 
+40°C ± 2°C/75% RH ± 5% RH 	40℃±2℃/75%RH±5%RH 
+6 months  	6 个月 
+_@λ_ TABLE _λ@_	_@λ_ TABLE _λ@_
+Study 	研究 
+Storage condition 	放置条件 
+Minimum time period covered by data at submission 	申报数据涵盖的最少时间周期 
+Long term*  	长期试验★ 
+25°C ± 2°C/40% RH ± 5% RH or 	25℃±2℃/40%RH±5%RH 或 
+30°C ± 2°C/35% RH ± 5% RH 	30℃±2℃/35%RH±5%RH 
+12 months 	12 个月 
+Intermediate** 	中间试验★★ 
+30°C ± 2°C/65% RH ± 5% RH 	30℃±2℃/65%RH±5%RH 
+6 months 	6 个月 
+Accelerated  	加速试验★★ 
+40°C ± 2°C/not more than (NMT) 25% RH 	40℃±2℃/不超过（NMT）
+6 months  	25%RH 
+	6 个月 
+_@λ_ TABLE _λ@_	_@λ_ TABLE _λ@_
+Alternative relative humidity 	实测时的相对湿度 
+Reference relative humidity 	参比相对湿度 
+Ratio of water loss rates at a given temperature  	给定温度下失水率之比 
+60% RH 	60%RH 
+25% RH 	25%RH 
+1.9  	1.9  
+60% RH 	60%RH 
+40% RH 	40%RH 
+1.5 	1.5  
+65% RH 	65% RH 
+35% RH 	35% RH 
+1.9 	1.9  
+75% RH 	75%RH 
+25% RH 	25%RH 
+3.0 	3.0  
+_@λ_ TABLE _λ@_	_@λ_ TABLE _λ@_
+Study 	研究 
+Storage condition 	放置条件 
+Minimum time period covered by data at submission 	申报数据涵盖的最少时间周期 
+Long term 	长期试验 
+5°C ± 3°C  	5℃±3℃ 
+12 months 	12 个月 
+Accelerated 	加速试验 
+25°C ± 2°C/60% RH ± 5% RH 	25℃±2℃/60%RH±5%RH 
+6 months  	6 个月 
+_@λ_ TABLE _λ@_	_@λ_ TABLE _λ@_
+Study 	研究 
+Storage condition 	放置条件 
+Minimum time period covered by data at submission 	申报数据涵盖的最少时间周期 
+Long term 	长期 
+- 20°C ± 5°C 	-20℃±5℃ 
+12 months 	12 个月 
+_@@_ EOF	_@@_ EOF

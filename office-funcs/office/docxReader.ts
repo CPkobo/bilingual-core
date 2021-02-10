@@ -1,10 +1,9 @@
 const JSZip = require('jszip');
 
-import { ExtractedText, ExtractedContent } from '../extract';
 import { ReadingOption } from '../option';
-import { applySegRules, ReadFailure } from '../util';
+import { applySegRules } from '../util';
 
-
+// Wordファイルの読み込みに使用
 export async function docxReader(docxFile: any, fileName: string, opt: ReadingOption): Promise<ExtractedContent> {
   return new Promise((resolve, reject) => {
     const zip = new JSZip();
@@ -19,12 +18,13 @@ export async function docxReader(docxFile: any, fileName: string, opt: ReadingOp
           const dom: any = require('xmldom').DOMParser;
           const doc: any = new dom().parseFromString(wordxml);
           const bodyNd: any = doc.lastChild.firstChild;
-          const bodyCds: any = bodyNd.childNodes !== undefined ? bodyNd.childNodes : [];
+          // const bodyCds: any = bodyNd.childNodes !== undefined ? bodyNd.childNodes : [];
+          const bodyCds: any = bodyNd.childNodes || [];
           const bodyCdsLen: number = bodyCds.length;
           for (let i = 0; i < bodyCdsLen; i++) {
             switch (bodyCds[String(i)].nodeName) {
               case 'w:p': {
-                let paraTexts: string[] = [wordParaReder(bodyCds[String(i)], opt.wordRev)];
+                let paraTexts: string[] = [wordParaReder(bodyCds[String(i)], opt.word.afterRev || true)];
                 paraTexts = applySegRules(paraTexts, opt);
                 if (paraTexts.length !== 0) {
                   const paraContents: ExtractedText = {
@@ -39,7 +39,7 @@ export async function docxReader(docxFile: any, fileName: string, opt: ReadingOp
               }
 
               case 'w:tbl': {
-                let tblTexts: string[] = wordTableReader(bodyCds[String(i)], opt.wordRev);
+                let tblTexts: string[] = wordTableReader(bodyCds[String(i)], opt.word.afterRev || true);
                 tblTexts = applySegRules(tblTexts, opt);
                 if (tblTexts.length !== 0) {
                   const tblContents: ExtractedText = {
@@ -72,7 +72,7 @@ export async function docxReader(docxFile: any, fileName: string, opt: ReadingOp
 
 function wordParaReder(pNd: any, rev: boolean): string {
   const paraTexts: string[] = [];
-  const pCds: any = pNd.childNodes !== undefined ? pNd.childNodes : [];
+  const pCds: any = pNd.childNodes || [];
   const pCdsLen: number = pCds.length;
   for (let i = 0; i < pCdsLen; i++) {
     switch (pCds[String(i)].nodeName) {
@@ -109,14 +109,14 @@ function wordParaReder(pNd: any, rev: boolean): string {
 
 function wordTableReader(tblNd: any, rev: boolean): string[] {
   const tableTexts: string[] = [];
-  const tblCds: any = tblNd.childNodes !== undefined ? tblNd.childNodes : [];
+  const tblCds: any = tblNd.childNodes || [];
   const tblCdsLen: number = tblCds.length;
   for (let i = 0; i < tblCdsLen; i++) {
     if (tblCds[String(i)].nodeName === 'w:tr') {
-      const cellNds: any = tblCds[String(i)].childNodes !== undefined ? tblCds[String(i)].childNodes : [];
+      const cellNds: any = tblCds[String(i)].childNodes || [];
       const cellLen: number = cellNds.length;
       for (let j = 0; j < cellLen; j++) {
-        const cellCds: any = cellNds[String(j)].childNodes !== undefined ? cellNds[String(j)].childNodes : [];
+        const cellCds: any = cellNds[String(j)].childNodes || [];
         const cellCdsLen: number = cellCds.length;
         for (let k = 0; k < cellCdsLen; k++) {
           if (cellCds[String(k)].nodeName === 'w:p') {
@@ -133,7 +133,7 @@ function wordTableReader(tblNd: any, rev: boolean): string[] {
 }
 
 function wordRunReader(rNd: any, rev: boolean): string {
-  const rCds: any = rNd.childNodes !== undefined ? rNd.childNodes : [];
+  const rCds: any = rNd.childNodes || [];
   const rCdsLen: number = rCds.length;
   let textVal = '';
   for (let i = 0; i < rCdsLen; i++) {
@@ -151,7 +151,7 @@ function wordRunReader(rNd: any, rev: boolean): string {
 
       case 'w:delText':
         if (!rev) {
-          const t = rCds[String(i)].firstChild.data !== undefined ? rCds[String(i)].firstChild.data : '';
+          const t = rCds[String(i)].firstChild.data || '';
           textVal += t;
         }
         break;
@@ -165,22 +165,22 @@ function wordRunReader(rNd: any, rev: boolean): string {
         break;
 
       case 'w:pict': {
-        const pictCds = rCds[String(i)].childNodes !== undefined ? rCds[String(i)].childNodes : [];
+        const pictCds = rCds[String(i)].childNodes || [];
         for (let j = 0; j < pictCds.length; j++) {
           if (pictCds[String(j)].nodeName !== 'v:shape') {
             continue;
           }
-          const shpCds = pictCds[String(j)].childNodes !== undefined ? pictCds[String(j)].childNodes : [];
+          const shpCds = pictCds[String(j)].childNodes || [];
           for (let k = 0; k < shpCds.length; k++) {
             if (shpCds[String(k)].nodeName !== 'v:textbox') {
               continue;
             }
-            const vtboxCds = shpCds[String(k)].childNodes !== undefined ? shpCds[String(k)].childNodes : [];
+            const vtboxCds = shpCds[String(k)].childNodes || [];
             for (let l = 0; l < vtboxCds.length; l++) {
               if (vtboxCds[String(l)].nodeName !== 'w:txbxContent') {
                 continue;
               }
-              const wtboxCds = vtboxCds[String(l)].childNodes !== undefined ? vtboxCds[String(l)].childNodes : [];
+              const wtboxCds = vtboxCds[String(l)].childNodes || [];
               for (let m = 0; m < wtboxCds.length; m++) {
                 if (wtboxCds[String(m)].nodeName !== 'w:p') {
                   continue;
@@ -202,7 +202,7 @@ function wordRunReader(rNd: any, rev: boolean): string {
 
 function wordTboxReader(shpNd: any, rev: boolean): string {
   let textVal = '';
-  const shpCds: any = shpNd.firstChild.firstChild.firstChild.childNodes !== undefined ? shpNd.firstChild.firstChild.firstChild.childNodes : [];
+  const shpCds: any = shpNd.firstChild.firstChild.firstChild.childNodes || [];
   const shpCdsLen: number = shpCds.length;
   let wpsNd: any;
   for (let i = 0; i < shpCdsLen; i++) {
@@ -211,11 +211,11 @@ function wordTboxReader(shpNd: any, rev: boolean): string {
       break;
     }
   }
-  const wpsCds: any = wpsNd.childNodes !== undefined ? wpsNd.childNodes : [];
+  const wpsCds: any = wpsNd.childNodes || [];
   const wpsCdsLen: number = wpsCds.length;
   for (let i = 0; i < wpsCdsLen; i++) {
     if (wpsCds[String(i)].nodeName === 'wps:txbx') {
-      const wpsTxConPara = wpsCds[String(i)].firstChild.childNodes !== undefined ? wpsCds[String(i)].firstChild.childNodes : [];
+      const wpsTxConPara = wpsCds[String(i)].firstChild.childNodes || [];
       const wpsTxConParaLen = wpsTxConPara.length;
       for (let j = 0; j < wpsTxConParaLen; j++) {
         textVal += wordParaReder(wpsTxConPara[String(j)], rev);

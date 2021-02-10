@@ -1,13 +1,13 @@
 import { readFileSync, readdirSync, statSync, writeFileSync } from 'fs';
 
-import { CatovisContext } from './cli-funcs/extract';
-import { ReadingOption } from './cli-funcs/option';
-import { DiffInfo } from './cli-funcs/diff';
-import { FileStats } from './cli-funcs/stats';
-import { Tovis } from './cli-funcs/tovis';
+import { CatovisContext } from './office-funcs/extract';
+import { ReadingOption } from './office-funcs/option';
+import { DiffInfo } from './office-funcs/diff';
+import { FileStats } from './office-funcs/stats';
+import { Tovis } from './office-funcs/tovis';
 
-// import { cnm, pathContentsReader, ReadFailure } from './cli-funcs/util';
-import { pathContentsReader } from './cli-funcs/util-sv'
+// import { cnm, pathContentsReader, ReadFailure } from './office-funcs/util';
+import { pathContentsReader } from './office-funcs/util-sv'
 
 const modeChoices = ['EXTRACT', 'ALIGN', 'COUNT', 'DIFF', 'TOVIS'];
 

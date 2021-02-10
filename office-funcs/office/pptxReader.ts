@@ -110,9 +110,9 @@ async function slideReader(path: string, fileObj: any, opt: ReadingOption): Prom
           console.log(err);
         } else {
           const textInSlide: string[] = [];
-          const pTree = root['p:sld']['p:cSld'][0]['p:spTree'][0] !== undefined ? root['p:sld']['p:cSld'][0]['p:spTree'][0] : {};
-          const groups: any[] = pTree['p:grpSp'] !== undefined ? pTree['p:grpSp'] : [];
-          const shapes: any[] = pTree['p:sp'] !== undefined ? pTree['p:sp'] : [];
+          const pTree = root['p:sld']['p:cSld'][0]['p:spTree'][0] || {};
+          const groups: any[] = pTree['p:grpSp'] || [];
+          const shapes: any[] = pTree['p:sp'] || [];
           for (const group of groups) {
             if (group['p:sp'] === undefined) {
               continue;
@@ -123,9 +123,9 @@ async function slideReader(path: string, fileObj: any, opt: ReadingOption): Prom
             if (shape['p:txBody'] === undefined) {
               continue;
             }
-            const paras: any[] = shape['p:txBody'][0]['a:p'] !== undefined ? shape['p:txBody'][0]['a:p'] : [];
+            const paras: any[] = shape['p:txBody'][0]['a:p'] || [];
             for (const para of paras) {
-              const runs: any = para['a:r'] !== undefined ? para['a:r'] : [];
+              const runs: any = para['a:r'] || [];
               let textInPara = '';
               for (const run of runs) {
                 if (run['a:t'] === undefined) {
@@ -136,7 +136,7 @@ async function slideReader(path: string, fileObj: any, opt: ReadingOption): Prom
               textInSlide.push(textInPara.replace('\t', '\n'));
             }
           }
-          const gFrames: any[] = pTree['p:graphicFrame'] !== undefined ? pTree['p:graphicFrame'] : [];
+          const gFrames: any[] = pTree['p:graphicFrame'] || [];
           for (const gFrame of gFrames) {
             if (gFrame['a:graphic'] === undefined) {
               continue;
@@ -144,19 +144,19 @@ async function slideReader(path: string, fileObj: any, opt: ReadingOption): Prom
             if (gFrame['a:graphic'][0]['a:graphicData'] === undefined) {
               continue;
             }
-            const tables: any[] = gFrame['a:graphic'][0]['a:graphicData'][0]['a:tbl'] !== undefined ? gFrame['a:graphic'][0]['a:graphicData'][0]['a:tbl'] : [];
+            const tables: any[] = gFrame['a:graphic'][0]['a:graphicData'][0]['a:tbl'] || [];
             for (const table of tables) {
-              const rows: any[] = table['a:tr'] !== undefined ? table['a:tr'] : [];
+              const rows: any[] = table['a:tr'] || [];
               for (const row of rows) {
-                const cells: any[] = row['a:tc'] !== undefined ? row['a:tc'] : [];
+                const cells: any[] = row['a:tc'] || [];
                 for (const cell of cells) {
                   if (cell['a:txBody'] === undefined) {
                     continue
                   }
-                  const paras = cell['a:txBody'][0]['a:p'] !== undefined ? cell['a:txBody'][0]['a:p'] : [];
+                  const paras = cell['a:txBody'][0]['a:p'] || [];
                   let textInCell = '';
                   for (const para of paras) {
-                    const runs = para['a:r'] !== undefined ? para['a:r'] : [];
+                    const runs = para['a:r'] || [];
                     for (const run of runs) {
                       textInCell += run['a:t'];
                     }
@@ -219,17 +219,17 @@ async function noteReader(path: string, fileObj: any, opt: ReadingOption): Promi
           console.log(err);
         } else {
           const textInNote: string[] = [];
-          const pTree: any = root['p:notes']['p:cSld'][0]['p:spTree'][0] !== undefined ? root['p:notes']['p:cSld'][0]['p:spTree'][0] : {};
-          const shapes: any[] = pTree['p:sp'] !== undefined ? pTree['p:sp'] : [];
+          const pTree: any = root['p:notes']['p:cSld'][0]['p:spTree'][0] || {};
+          const shapes: any[] = pTree['p:sp'] || [];
           for (const shape of shapes) {
-            const txBody: any[] = shape['p:txBody'] !== undefined ? shape['p:txBody'] : [];
+            const txBody: any[] = shape['p:txBody'] || [];
             if (txBody.length === 0) {
               continue;
             }
-            const paras: any[] = txBody[0]['a:p'] !== undefined ? txBody[0]['a:p'] : [];
+            const paras: any[] = txBody[0]['a:p'] || [];
             for (const para of paras) {
               const textInPara: string[] = [];
-              const runs: any[] = para['a:r'] !== undefined ? para['a:r'] : [];
+              const runs: any[] = para['a:r'] || [];
               for (const run of runs) {
                 if (run['a:t'][0] !== '' && run['a:t'][0] !== '\t') {
                   textInPara.push(...run['a:t']);
@@ -259,17 +259,17 @@ async function slideDiagramReader(path: string, fileObj: any, opt: ReadingOption
           console.log(err);
         } else {
           const textInDiagram: string[] = [];
-          const patterns: any[] = root['dgm:dataModel']['dgm:ptLst'][0]['dgm:pt'] !== undefined ? root['dgm:dataModel']['dgm:ptLst'][0]['dgm:pt'] : [];
+          const patterns: any[] = root['dgm:dataModel']['dgm:ptLst'][0]['dgm:pt'] || [];
           for (const pattern of patterns) {
-            const dgmt: any[] = pattern['dgm:t'] !== undefined ? pattern['dgm:t'] : [];
+            const dgmt: any[] = pattern['dgm:t'] || [];
             if (dgmt.length === 0) {
               continue;
             }
-            const dgmtp: any[] = dgmt[0]['a:p'] !== undefined ? dgmt[0]['a:p'] : [];
+            const dgmtp: any[] = dgmt[0]['a:p'] || [];
             if (dgmtp.length === 0) {
               continue;
             }
-            const dgmtprun: any[] = dgmtp[0]['a:r'] !== undefined ? dgmtp[0]['a:r'] : [];
+            const dgmtprun: any[] = dgmtp[0]['a:r'] || [];
             if (dgmtprun.length === 0) {
               continue;
             }
@@ -294,7 +294,7 @@ async function slideChartReader(path: string, fileObj: any, opt: ReadingOption):
       const dom: any = require('xmldom').DOMParser;
       const cht: any = new dom().parseFromString(chtxml);
       const chtSpace = cht.lastChild;
-      const chtSpCds = chtSpace.childNodes !== undefined ? chtSpace.childNodes : [];
+      const chtSpCds = chtSpace.childNodes || [];
 
       const textInChart: string[] = [];
       slideChartVisitor(chtSpace, textInChart);

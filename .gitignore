@@ -89,6 +89,7 @@ sw.*
 # Vim swap files
 *.swp
 
+/target
 /localtest
 /test
 ~$*
