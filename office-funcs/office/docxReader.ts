@@ -1,7 +1,7 @@
 const JSZip = require('jszip');
 
 import { ReadingOption } from '../option';
-import { applySegRules } from '../util';
+import { applySegRules, countCharas, countWords } from '../util';
 
 // Wordファイルの読み込みに使用
 export async function docxReader(docxFile: any, fileName: string, opt: ReadingOption): Promise<ExtractedContent> {
@@ -32,6 +32,8 @@ export async function docxReader(docxFile: any, fileName: string, opt: ReadingOp
                     position: i,
                     isActive: true,
                     value: paraTexts,
+                    sumCharas: countCharas(paraTexts.join()),
+                    sumWords: countWords(paraTexts.join()),
                   };
                   wordContents.exts.push(paraContents);
                 }
@@ -47,6 +49,8 @@ export async function docxReader(docxFile: any, fileName: string, opt: ReadingOp
                     position: i,
                     isActive: true,
                     value: tblTexts,
+                    sumCharas: countCharas(tblTexts.join()),
+                    sumWords: countWords(tblTexts.join()),
                   };
                   wordContents.exts.push(tblContents);
                 }

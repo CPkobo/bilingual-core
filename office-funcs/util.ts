@@ -7,6 +7,46 @@ export function cnm(data: any) {
   console.log(data);
 }
 
+export function path2Name(path: string): string {
+  return path.substr(path.lastIndexOf('\\') + 1)
+}
+
+export function path2Format(path: string): string {
+  return path.substr(path.lastIndexOf('.') + 1).toLowerCase()
+}
+
+export function path2FormatClassify(path: string): ClassifiedFormat {
+  const format = path2Format(path)
+  switch (format) {
+    case 'docx':
+    case 'docm':
+      return 'is-word'
+
+    case 'xlsx':
+    case 'xlsm':
+      return 'is-excel'
+
+    case 'pptx':
+    case 'pptm':
+      return 'is-ppt'
+  
+    default:
+      return ''
+  }
+}
+
+export function index2Range(index: number, startFrom: number = 0) {
+  return [...Array(index).keys()].slice(startFrom)
+}
+
+export function countCharas(text: string): number {
+  return text.replace(/\s+/g, '').length
+}
+
+export function countWords(text: string): number {
+  return `${text}.`.replace(/(\,|\.|:|;|\!|\?|\s)+/g, ' ').split(' ').length - 1;
+}
+
 export function blobContentsReader(files: any, order: number[], opq?: OptionQue): Promise<ExtractedContent[]> {
   const que = opq !== undefined ? opq : {};
   const opt = new ReadingOption(que);
@@ -79,7 +119,8 @@ export function applyOpcodes(original: string, diffed: string, opcodes: Opcode[]
   // OpcodeのDelete / Replace 用にオリジナルテキストをとっておく
   const crtSegment = original;
   // 類似テキストを一つずつ取得して処理
-  let tagged: string = diffed.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  // let tagged: string = diffed.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  let tagged:string = diffed
   const processCodes: Opcode[] = opcodes.reverse();
   for (const processCode of processCodes) {
     switch (processCode[0]) {

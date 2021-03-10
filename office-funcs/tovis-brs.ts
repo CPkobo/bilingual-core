@@ -1,6 +1,6 @@
 import { DiffInfoBrowser } from './diff-brs';
 import { ExtractContext } from './extract';
-import { MyPlugins } from './plugins'
+// import { MyPlugins } from './plugins'
 import { cnm } from './util';
 
 // export type TovisOpcodeSymbol = '='|'~'|'+'|'-'
@@ -10,7 +10,7 @@ import { cnm } from './util';
 export class TovisBrowser {
   public meta: TovisMeta;
   public blocks: TovisBlock[];
-  public plugins: MyPlugins;
+  // public plugins: MyPlugins;
   protected lineHead: RegExp
 
   constructor() {
@@ -23,7 +23,7 @@ export class TovisBrowser {
       remarks: '',
     };
     this.blocks = [];
-    this.plugins = new MyPlugins()
+    // this.plugins = new MyPlugins()
     this.lineHead = new RegExp('^(@|λ|_|%|\\!)+:(\\d+)}\\s?');
   }
 
@@ -349,18 +349,20 @@ export class TovisBrowser {
   }
 
   protected setSource(block: TovisBlock, text: string): void {
-    if (this.plugins.onSetSouce.length === 0) {
-      block.s = text
-    } else {
-      block.s = this.plugins.execFuncs('onSetSouce', text)
-    }
+    // if (this.plugins.onSetSouce.length === 0) {
+    //   block.s = text
+    // } else {
+    //   block.s = this.plugins.execFuncs('onSetSouce', text)
+    // }
+    block.s = text
   }
 
   protected setMT(block: TovisBlock, type: string, text: string): void {
-    if (this.plugins.onSetMT.length === 0) {
-      block.m.push({ type, text })
-    } else {
-      block.m.push({ type, text: this.plugins.execFuncs('onSetMT', text) })
-    }
+    // if (this.plugins.onSetMT.length === 0) {
+    //   block.m.push({ type, text })
+    // } else {
+    //   block.m.push({ type, text: this.plugins.execFuncs('onSetMT', text) })
+    // }
+    block.m.push({ type, text })
   }
 }

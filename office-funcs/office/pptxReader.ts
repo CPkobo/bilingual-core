@@ -1,8 +1,9 @@
 const JSZip = require('jszip');
+import { text } from 'svelte/internal';
 import { parseString } from 'xml2js';
 
 import { ReadingOption } from '../option';
-import { applySegRules } from '../util';
+import { applySegRules, countCharas, countWords } from '../util';
 
 // PPTファイルを読み込むための関数
 export async function pptxReader(pptxFile: any, fileName: string, opt: ReadingOption): Promise<ExtractedContent> {
@@ -167,11 +168,14 @@ async function slideReader(path: string, fileObj: any, opt: ReadingOption): Prom
               }
             }
           }
+          const textVals = applySegRules(textInSlide, opt)
           const slideContents: ExtractedText = {
             type: 'PPT-Slide',
             position: Number(path.replace('slide', '').replace('.xml', '')),
             isActive: true,
-            value: applySegRules(textInSlide, opt),
+            value: textVals,
+            sumCharas: countCharas(textVals.join()),
+            sumWords: countWords(textVals.join()),
           };
           resolve(slideContents);
         }
@@ -238,11 +242,14 @@ async function noteReader(path: string, fileObj: any, opt: ReadingOption): Promi
               textInNote.push(textInPara.join(''));
             }
           }
+          const textVals = applySegRules(textInNote, opt);
           const noteContents: ExtractedText = {
             type: 'PPT-Note',
             position: Number(path.replace('notesSlide', '').replace('.xml', '')),
             isActive: true,
-            value: applySegRules(textInNote, opt),
+            value: textVals,
+            sumCharas: countCharas(textVals.join()),
+            sumWords: countWords(textVals.join()),
           };
           resolve(noteContents);
         }
@@ -275,11 +282,14 @@ async function slideDiagramReader(path: string, fileObj: any, opt: ReadingOption
             }
             textInDiagram.push(...dgmtprun[0]['a:t']);
           }
+          const textVals = applySegRules(textInDiagram, opt);
           const dgmContents: ExtractedText = {
             type: 'PPT-Diagram',
             position: Number(path.replace('data', '').replace('.xml', '')),
             isActive: true,
-            value: applySegRules(textInDiagram, opt),
+            value: textVals,
+            sumCharas: countCharas(textVals.join()),
+            sumWords: countWords(textVals.join()),
           };
           resolve(dgmContents);
         }
@@ -298,12 +308,14 @@ async function slideChartReader(path: string, fileObj: any, opt: ReadingOption):
 
       const textInChart: string[] = [];
       slideChartVisitor(chtSpace, textInChart);
-
+      const textVals = applySegRules(textInChart, opt);
       const chartContents: ExtractedText = {
         type: 'PPT-Chart',
         position: Number(path.replace('chart', '').replace('Ex', '10000').replace('.xml', '')),
         isActive: true,
-        value: applySegRules(textInChart, opt),
+        value: textVals,
+        sumCharas: countCharas(textVals.join()),
+        sumWords: countWords(textVals.join()),
       };
       resolve(chartContents);
     });

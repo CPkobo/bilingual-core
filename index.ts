@@ -1,6 +1,6 @@
 import { readFileSync, readdirSync, statSync, writeFileSync } from 'fs';
 
-import { CatovisContext } from './office-funcs/extract';
+import { ExtractContext } from './office-funcs/extract';
 import { ReadingOption } from './office-funcs/option';
 import { DiffInfo } from './office-funcs/diff';
 import { FileStats } from './office-funcs/stats';
@@ -270,7 +270,7 @@ class CLIParams {
       prs.push(pathContentsReader(this.tFiles, opt));
     }
     Promise.all(prs).then((ds: ExtractedContent[][]) => {
-      const cxt = new CatovisContext();
+      const cxt = new ExtractContext();
       const diff = new DiffInfo();
       switch (this.mode) {
         case 'EXTRACT':
@@ -313,7 +313,7 @@ class CLIParams {
   private async cliOutlet(
     eMode: 'EXTRACT' | 'ALIGN' | 'COUNT' | 'DIFF' | 'TOVIS' | 'DEBUG',
     opt: OptionQue, oMode: 'json' | 'plain' | 'console' | '',
-    oFile: string, data: { cxt?: CatovisContext, diff?: DiffInfo },
+    oFile: string, data: { cxt?: ExtractContext, diff?: DiffInfo },
   ): Promise<void> {
 
     console.log(`${eMode}->${oFile}@${oMode}`)

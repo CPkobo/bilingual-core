@@ -1,15 +1,18 @@
 import { statSync, readFileSync, writeFileSync, createReadStream } from 'fs';
 import { createInterface } from 'readline';
-
+import { MyPlugins } from './plugins'
 import { DiffInfo } from './diff'
 import { TovisBrowser } from './tovis-brs'
 
 export class Tovis extends TovisBrowser {
+  public plugins: MyPlugins;
+
   constructor() {
     super()
     // .tovisrcを読み込む
     const cwd = process.cwd()
     const plPaths: string[][] = []
+    this.plugins = new MyPlugins()
     try {
       statSync('./.tovisrc')
       const rcs = readFileSync('./.tovisrc').toString()
@@ -122,5 +125,21 @@ export class Tovis extends TovisBrowser {
         })
       }
     }) 
+  }
+
+  protected setSource(block: TovisBlock, text: string): void {
+    if (this.plugins.onSetSouce.length === 0) {
+      block.s = text
+    } else {
+      block.s = this.plugins.execFuncs('onSetSouce', text)
+    }
+  }
+
+  protected setMT(block: TovisBlock, type: string, text: string): void {
+    if (this.plugins.onSetMT.length === 0) {
+      block.m.push({ type, text })
+    } else {
+      block.m.push({ type, text: this.plugins.execFuncs('onSetMT', text) })
+    }
   }
 }

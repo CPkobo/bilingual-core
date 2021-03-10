@@ -2,7 +2,7 @@ const JSZip = require('jszip');
 import { parseString } from 'xml2js';
 
 import { ReadingOption } from '../option';
-import { applySegRules } from '../util';
+import { applySegRules, countCharas, countWords } from '../util';
 
 // Excelファイルを読み込むための関数
 export async function xlsxReader(xlsxFile: any, fileName: string, opt: ReadingOption): Promise<ExtractedContent> {
@@ -212,11 +212,14 @@ async function eachSheetReader(path: string, fileObj: any, shared: string[], fil
               }
             }
           }
+          const textVals = applySegRules(textInSheet, opt);
           const sheetContents: ExtractedText = {
             type: 'Excel-Sheet',
             position: Number(path.replace('sheet', '').replace('.xml', '')),
             isActive: true,
-            value: applySegRules(textInSheet, opt),
+            value: textVals,
+            sumCharas: countCharas(textVals.join()),
+            sumWords: countWords(textVals.join()),
           };
           resolve(sheetContents);
         }
@@ -253,11 +256,14 @@ async function eachDrawingReader(path: string, fileObj: any, opt: ReadingOption)
               }).join(''));
             }
           }
+          const textVals = applySegRules(drawingText, opt);
           const shapeContents: ExtractedText = {
             type: 'Excel-Shape',
             position: Number(path.replace('drawing', '').replace('.xml', '')),
             isActive: true,
-            value: applySegRules(drawingText, opt),
+            value: textVals,
+            sumCharas: countCharas(textVals.join()),
+            sumWords: countWords(textVals.join()),
           };
           resolve(shapeContents);
         }

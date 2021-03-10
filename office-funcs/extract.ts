@@ -65,13 +65,32 @@ export class ExtractContext {
     }
   }
 
-  public moveFile(target: 'src' | 'tgt' | 'both', fx: number, move: -1 | 1): void {
+  public changeFilePriority(target: 'src' | 'tgt' | 'both', fx: number, move: -1 | 1): void {
     const toChange: ExtractedContent[] | null = target === 'src' ? this.src : this.tgt;
     if (toChange === null) {
       return;
     }
     const tempCon: ExtractedContent = toChange.splice(fx, 1)[0];
     toChange.splice(fx + move, 0, tempCon);
+  }
+
+  public getContentsLength(target: 'src' | 'tgt' | 'longer' | 'shorter'): number {
+    switch (target) {
+      case 'src':
+        return this.src.length;
+    
+      case 'tgt':
+        return this.tgt.length;
+
+      case 'longer':
+        return this.src.length >= this.tgt.length ? this.src.length : this.tgt.length;
+      
+      case 'shorter':
+        return this.src.length <= this.tgt.length ? this.src.length : this.tgt.length;
+      
+      default:
+        break;
+    }
   }
 
   public getRawContent(target: 'src' | 'tgt' | 'both'): ExtractedContent[] | null {
@@ -91,7 +110,7 @@ export class ExtractContext {
       let target: ExtractedContent[] = [];
       if (from === 'src') {
         if (this.src === null) {
-          reject('No Source files contained');
+          reject('No Source 0s contained');
         } else {
           target = this.src;
         }
@@ -110,7 +129,13 @@ export class ExtractContext {
         }
         for (const text of file.exts) {
           if (!text.isActive) {
-            continue;
+            if (file.format === 'xlsx') {
+              if (!opt.excel.readHiddenSheet) {
+                continue
+              }
+            } else {
+              continue;
+            }
           }
           if (opt.common.withSeparator) {
             let mark = '';
@@ -159,31 +184,46 @@ export class ExtractContext {
     });
   }
 
-  public simpleCalcOneFile(unit: 'chara' | 'word', fx: number, opq?: OptionQue): number[] {
+  public simpleCalcOneFile(unit: 'chara' | 'word', fx: number, opq?: OptionQue, part?: SeparateMark): {subs:number[], sum: number, partial: number} {
     const que = opq !== undefined ? opq : {};
     const opt = new ReadingOption(que);
+    const partMark: SeparateMark = part || 'PPT-Note';
     if (this.src === null) {
-      return [];
+      return {subs:[], sum: 0, partial: 0};
     } else {
-      const sums: number[] = [];
-      const spaces = new RegExp('\\s+', 'g');
-      const marks = new RegExp('(\\,|\\.|:|;|\\!|\\?|\\s)+', 'g');
+      const subs: number[] = [];
+      let sum: number = 0
+      let partial: number = 0
+      // const spaces = new RegExp('\\s+', 'g');
+      // const marks = new RegExp('(\\,|\\.|:|;|\\!|\\?|\\s)+', 'g');
       for (const ext of this.src[fx].exts) {
-        if (!opt.excel.readHiddenSheet || !ext.isActive) {
-          sums.push(0);
-          continue;
-        }
-        let sum = 0;
-        ext.value.map((val: string) => {
-          if (unit === 'chara') {
-            sum += val.replace(spaces, '').length;
-          } else if (unit === 'word') {
-            sum += `${val}.`.replace(marks, ' ').split(' ').length - 1;
+        if (!ext.isActive) {
+          if (this.src[fx].format === 'xlsx') {
+            if (!opt.excel.readHiddenSheet) {
+              subs.push(0);
+              continue;
+            }
+          } else {
+            subs.push(0);
+            continue;
           }
-        });
-        sums.push(sum);
+        }
+        const insum = unit === 'chara' ? ext.sumCharas : ext.sumWords;
+        // let insum = 0;
+        // ext.value.map((val: string) => {
+        //   if (unit === 'chara') {
+        //     insum += val.replace(spaces, '').length;
+        //   } else if (unit === 'word') {
+        //     insum += `${val}.`.replace(marks, ' ').split(' ').length - 1;
+        //   }
+        // });
+        subs.push(insum);
+        sum += insum
+        if (ext.type === partMark) {
+          partial += insum
+        }
       }
-      return sums;
+      return {subs, sum, partial};
     }
   }
 
@@ -193,24 +233,35 @@ export class ExtractContext {
     let totalSum = 0;
     const unitStr = unit === 'chara' ? '文字数' : '単語数';
     const result: string[] = [`ファイル名\t${unitStr}`, ''];
-    const spaces = new RegExp('\\s+', 'g');
-    const marks = new RegExp('(\\,|\\.|:|;|\\!|\\?|\\s)+', 'g');
+    // const spaces = new RegExp('\\s+', 'g');
+    // const marks = new RegExp('(\\,|\\.|:|;|\\!|\\?|\\s)+', 'g');
     if (this.src === null) {
       return [];
     } else {
       for (const con of this.src) {
         let sum = 0;
-        for (const text of con.exts) {
-          if (!opt.excel.readHiddenSheet && !text.isActive) {
-            continue;
-          }
-          text.value.map((val: string) => {
-            if (unit === 'chara') {
-              sum += val.replace(spaces, '').length;
-            } else if (unit === 'word') {
-              sum += `${val}.`.replace(marks, ' ').split(' ').length - 1;
+        for (const ext of con.exts) {
+          if (!ext.isActive) {
+            if (con.format === 'xlsx') {
+              if (!opt.excel.readHiddenSheet) {
+                continue
+              }
+            } else {
+              continue;
             }
-          });
+          }
+          if (unit === 'chara') {
+            sum += ext.sumCharas;
+          } else if (unit === 'word') {
+            sum += ext.sumWords;
+          }
+          // text.value.map((val: string) => {
+          //   if (unit === 'chara') {
+          //     sum += val.replace(spaces, '').length;
+          //   } else if (unit === 'word') {
+          //     sum += `${val}.`.replace(marks, ' ').split(' ').length - 1;
+          //   }
+          // });
         }
         totalSum += sum;
         result.push(`${con.name}\t${sum}`);
