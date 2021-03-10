@@ -1,5 +1,4 @@
 const JSZip = require('jszip');
-import { text } from 'svelte/internal';
 import { parseString } from 'xml2js';
 
 import { ReadingOption } from '../option';

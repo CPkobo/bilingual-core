@@ -15,6 +15,14 @@ export function path2Format(path: string): string {
   return path.substr(path.lastIndexOf('.') + 1).toLowerCase()
 }
 
+export function checkValidText(text: string): boolean {
+  if (text.match(/^\s*$/) === null) {
+    return true
+  } else {
+    return false
+  }
+}
+
 export function path2FormatClassify(path: string): ClassifiedFormat {
   const format = path2Format(path)
   switch (format) {

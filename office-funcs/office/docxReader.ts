@@ -1,7 +1,7 @@
 const JSZip = require('jszip');
 
 import { ReadingOption } from '../option';
-import { applySegRules, countCharas, countWords } from '../util';
+import { applySegRules, countCharas, countWords, checkValidText } from '../util';
 
 // Wordファイルの読み込みに使用
 export async function docxReader(docxFile: any, fileName: string, opt: ReadingOption): Promise<ExtractedContent> {
@@ -24,20 +24,22 @@ export async function docxReader(docxFile: any, fileName: string, opt: ReadingOp
           for (let i = 0; i < bodyCdsLen; i++) {
             switch (bodyCds[String(i)].nodeName) {
               case 'w:p': {
-                let paraTexts: string[] = [wordParaReder(bodyCds[String(i)], opt.word.afterRev || true)];
-                paraTexts = applySegRules(paraTexts, opt);
-                if (paraTexts.length !== 0) {
-                  const paraContents: ExtractedText = {
-                    type: 'Word-Paragraph',
-                    position: i,
-                    isActive: true,
-                    value: paraTexts,
-                    sumCharas: countCharas(paraTexts.join()),
-                    sumWords: countWords(paraTexts.join()),
-                  };
-                  wordContents.exts.push(paraContents);
+                const textInPara = wordParaReder(bodyCds[String(i)], opt.word.afterRev || true)
+                if (checkValidText(textInPara)) {
+                  const paraTexts: string[] = applySegRules([textInPara], opt);
+                  if (paraTexts.length !== 0) {
+                    const paraContents: ExtractedText = {
+                      type: 'Word-Paragraph',
+                      position: i,
+                      isActive: true,
+                      value: paraTexts,
+                      sumCharas: countCharas(paraTexts.join()),
+                      sumWords: countWords(paraTexts.join()),
+                    };
+                    wordContents.exts.push(paraContents);
+                  }
+                  break;
                 }
-                break;
               }
 
               case 'w:tbl': {
@@ -125,7 +127,8 @@ function wordTableReader(tblNd: any, rev: boolean): string[] {
         for (let k = 0; k < cellCdsLen; k++) {
           if (cellCds[String(k)].nodeName === 'w:p') {
             const cellText = wordParaReder(cellCds[String(k)], rev);
-            if (cellText !== '') {
+            const valid = checkValidText(cellText)
+            if (valid) {
               tableTexts.push(cellText);
             }
           }

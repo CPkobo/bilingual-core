@@ -1,3 +1,7 @@
+declare type ClassifiedFormat = 'is-word' | 'is-excel' | 'is-ppt' | ''
+
+declare type CountType = 'unit' | 'chara'
+
 // extract
 declare interface ExtractedContent {
   name: string;
@@ -5,11 +9,15 @@ declare interface ExtractedContent {
   exts: ExtractedText[];
 }
 
+declare type SeparateMark = 'Word-Paragraph' | 'Word-Table' | 'Excel-Sheet' | 'Excel-Shape' | 'PPT-Slide' | 'PPT-Note' | 'PPT-Diagram' | 'PPT-Chart';
+
 declare interface ExtractedText {
-  type: 'Word-Paragraph' | 'Word-Table' | 'Excel-Sheet' | 'Excel-Shape' | 'PPT-Slide' | 'PPT-Note' | 'PPT-Diagram' | 'PPT-Chart';
+  type: SeparateMark;
   position: number;
   isActive: boolean;
   value: string[];
+  sumCharas: number;
+  sumWords: number;
 }
 
 declare interface ExcelSubInfoRel {

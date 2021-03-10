@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "ES5",
+    "target": "ESNext",
     "module": "CommonJS",
     "strict": true,
     "importHelpers": true,
@@ -10,6 +10,7 @@
     "allowSyntheticDefaultImports": true,
     "sourceMap": false,
     "baseUrl": ".",
+    "downlevelIteration": true,
     "outDir": "./dist",
     "types": [
       "node",

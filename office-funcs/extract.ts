@@ -77,19 +77,43 @@ export class ExtractContext {
   public getContentsLength(target: 'src' | 'tgt' | 'longer' | 'shorter'): number {
     switch (target) {
       case 'src':
-        return this.src.length;
+        if (this.src === null) {
+          return 0;
+        } else {
+          return this.src.length;
+        }
     
       case 'tgt':
-        return this.tgt.length;
+        if (this.tgt === null) {
+          return 0;
+        } else {
+          return this.tgt.length;
+        }
 
       case 'longer':
-        return this.src.length >= this.tgt.length ? this.src.length : this.tgt.length;
+        if (this.src === null && this.tgt === null) {
+          return 0;
+        } else if (this.src === null && this.tgt !== null) {
+          return this.tgt.length;
+        } else if (this.src !== null && this.tgt === null) {
+          return this.src.length;
+        } else if (this.src !== null && this.tgt !== null) {
+          return this.src.length >= this.tgt.length ? this.src.length : this.tgt.length;
+        }
       
       case 'shorter':
-        return this.src.length <= this.tgt.length ? this.src.length : this.tgt.length;
+        if (this.src === null && this.tgt === null) {
+          return 0;
+        } else if (this.src === null && this.tgt !== null) {
+          return this.tgt.length;
+        } else if (this.src !== null && this.tgt === null) {
+          return this.src.length;
+        } else if (this.src !== null && this.tgt !== null) {
+          return this.src.length <= this.tgt.length ? this.src.length : this.tgt.length;
+        }
       
       default:
-        break;
+        return 0;
     }
   }
 
@@ -430,10 +454,14 @@ export class ExtractContext {
     const larger = sLen >= tLen ? sLen : tLen;
     if (sLen > tLen) {
       const diff = sLen - tLen;
-      tVal.push(...Array(diff).fill(''));
+      for (let i = 0; i < diff; i++) {
+        tVal.push('');
+      }
     } else if (sLen < tLen) {
       const diff = tLen - sLen;
-      sVal.push(...Array(diff).fill(''));
+      for (let i = 0; i < diff; i++) {
+        sVal.push('');
+      }
     }
     for (let i = 0; i < larger; i++) {
       if (!(sVal[i] === '' && tVal[i] === '')) {

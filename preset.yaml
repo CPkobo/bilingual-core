@@ -1,0 +1,29 @@
+# mode select from 'EXTRACT' | 'ALIGN' | 'COUNT' | 'DIFF' | 'TOVIS'
+mode: 'EXTRACT'
+# outputType select from 'json' | 'plain' | 'console' | ''
+outputType: 'console'
+
+# set a filename to output
+outputFile: '../ext/preset2.tsv'
+
+# list the source file(s)
+sourceFiles:
+  - ../ext/test.docx
+  # - ../ext/RHBX.docx
+# list the target file(s)
+targetFiles:
+  - ../ext/NCT2.docx
+  - ../ext/RHBX2.docx
+
+common:
+  excludePattern: ''
+  withSeparator: true
+
+word:
+  rev: true
+excel:
+  readHiddenSheet: false
+  readFilledCell: true
+ppt:
+  readNote: true
+  

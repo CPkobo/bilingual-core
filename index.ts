@@ -1,4 +1,5 @@
 import { readFileSync, readdirSync, statSync, writeFileSync } from 'fs';
+import { load } from 'js-yaml'
 
 import { ExtractContext } from './office-funcs/extract';
 import { ReadingOption } from './office-funcs/option';
@@ -539,13 +540,45 @@ const args: any = program.parse(process.argv);
 if (args.preset) {
   const params = new CLIParams({})
   // あらかじめ動作を設定する
-  params.source = './demo.docx'
-  // params.mode = 'DIFF'
-  // params.oFile = './preset.json'
-  // params.oMode = 'json'
-  params.mode = 'TOVIS'
-  params.oFile = './preset.tovis'
-  params.oMode = 'plain'
+  const presetYaml = readFileSync('./preset.yaml').toString();
+  const yamlOpt = load(presetYaml) as any;
+  params.mode = yamlOpt.mode || 'EXTRACT';
+  params.oFile = yamlOpt.outputFile || 'preset';
+  params.oMode = yamlOpt.outputType || '';
+  params.source = yamlOpt.sourceFiles.join(',');
+  if (yamlOpt.targetFiles !== undefined) {
+    params.target = yamlOpt.targetFiles.join(',')
+  }
+  if (yamlOpt.common !== undefined) {
+    if (yamlOpt.common.excludePattern !== undefined && yamlOpt.common.excludePattern !== '') {
+      params.excluding = true;
+      params.excludePattern = yamlOpt.common.excludePattern;
+    } else {
+      params.excluding = false;
+    }
+    if (yamlOpt.common.withSeparator !== undefined) {
+      params.withSeparator = yamlOpt.common.withSeparator;
+    }
+  }
+  if (yamlOpt.word !== undefined) {
+    if (yamlOpt.word.rev !== undefined) {
+      params.wordRev = yamlOpt.word.rev;
+    }
+  }
+  if (yamlOpt.excel !== undefined) {
+    if (yamlOpt.excel.readHiddenSheet !== undefined) {
+      params.readHiddenSheet = yamlOpt.excel.readHiddenSheet;
+    }
+    if (yamlOpt.excel.readFilledCell !== undefined) {
+      params.readFilledCell = yamlOpt.excel.readFilledCell;
+    }
+  }
+  if (yamlOpt.ppt !== undefined) {
+    if (yamlOpt.ppt.readNote !== undefined) {
+      params.readNote = yamlOpt.ppt.readNote;
+    }
+  }
+  console.log(params)
   params.executeByParams();
 } else if (args.cmd === false) {
   if (args.args.length !== 0) {
