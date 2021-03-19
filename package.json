@@ -1,4 +1,15 @@
 {
+  "name": "catovis-office-cli",
+  "version": "0.2.0",
+  "description": "Tools for Translators, enabling to extract/align/diff/ for MS Office files and etc.",
+  "keywords": ["translation", "MS Office", "docx/xlsx/pptx", "text-diff"],
+  "license": "MIT",
+  "homepage": "https://catovis.com",
+  "author": {
+    "name": "DianziYang",
+    "email": "catovis@tuta.io",
+    "url": "https://catovis.com"
+  },
   "scripts": {
     "build": "npx tsc --build tsconfig.json",
     "start": "node ./dist/index.js",

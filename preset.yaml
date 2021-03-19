@@ -1,19 +1,18 @@
 # mode select from 'EXTRACT' | 'ALIGN' | 'COUNT' | 'DIFF' | 'TOVIS'
-mode: 'EXTRACT'
+mode: 'ALIGN'
 # outputType select from 'json' | 'plain' | 'console' | ''
-outputType: 'console'
+outputType: 'plain'
 
 # set a filename to output
-outputFile: '../ext/preset2.tsv'
+outputFile: '../ext/test.tsv'
 
 # list the source file(s)
 sourceFiles:
-  - ../ext/test.docx
+  - ../ext/src/
   # - ../ext/RHBX.docx
 # list the target file(s)
 targetFiles:
-  - ../ext/NCT2.docx
-  - ../ext/RHBX2.docx
+  - ../ext/tgt/
 
 common:
   excludePattern: ''
