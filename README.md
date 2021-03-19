@@ -7,7 +7,7 @@
 中国語⇔日本語の翻訳者である電氣羊（DianziYang）が、翻訳者視点から開発を進めています。
 他の商用の翻訳支援ツール（CATツール）よりも安価に（現時点では無料）で提供しています。
 
-![ポータルサイト](https://catovis.com)はこちら
+[ポータルサイト](https://catovis.com)はこちら
 
 ## CATOVIS Officeとは
 
@@ -17,8 +17,8 @@ OOXMLファイルを直接読み込んでいるため、MS　Officeがインス�
 対応フォーマット： docx / docm / xlsx / xlsm / pptx / pptm
 
 このリポジトリは、上記の機能のCLI版です。
-- ![GUI付のWebアプリ版](https://office.catovis.com)はこちら
-- ![Webアプリのリポジトリ](https://github.com/CPkobo/office)はこちら
+- [GUI付のWebアプリ版](https://office.catovis.com)はこちら
+- [Webアプリのリポジトリ](https://github.com/CPkobo/office)はこちら
 
 ## ライセンス
 
