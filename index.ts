@@ -6,9 +6,11 @@ import { ReadingOption } from './office-funcs/option';
 import { DiffInfo } from './office-funcs/diff';
 import { FileStats } from './office-funcs/stats';
 import { Tovis } from './office-funcs/tovis';
+import { CatDataContent } from './office-funcs/cats';
 
 // import { cnm, pathContentsReader, ReadFailure } from './office-funcs/util';
-import { pathContentsReader } from './office-funcs/util-sv'
+import { pathContentsReader, path2ContentStr } from './office-funcs/util-sv'
+import { path2Format } from './office-funcs/util';
 
 const modeChoices = ['EXTRACT', 'ALIGN', 'COUNT', 'DIFF', 'TOVIS'];
 
@@ -23,7 +25,7 @@ const modeChoices = ['EXTRACT', 'ALIGN', 'COUNT', 'DIFF', 'TOVIS'];
 
 class CLIParams {
   // validateメソッドで、ファイルパスにすべて問題がないと判断されたら true になる
-  public validated: boolean;
+  private validated: boolean;
 
   // 処理の大分類：MS office または CAT(TMX / TBX / XLIFF)
   public hyperMode: 'OFFICE' | 'CAT';
@@ -32,11 +34,13 @@ class CLIParams {
   public mode: 'EXTRACT' | 'ALIGN' | 'COUNT' | 'DIFF' | 'TOVIS';
   public source: string;
   public target: string;
-  public sFiles: string[];
-  public tFiles: string[];
   public oMode: 'json' | 'plain' | 'console' | '';
   public oFile: string;
+  private sFiles: string[];
+  private tFiles: string[];
 
+  // Officeの抽出に関係するオプション項目
+  // ReadingOptionの各項目に対応している
   public excluding: boolean;
   public excludePattern: string;
   public wordRev: boolean;
@@ -45,17 +49,38 @@ class CLIParams {
   public readHiddenSheet: boolean;
   public readFilledCell: boolean;
 
+  public locales: string[] | 'all';
+  public fullset: boolean;
+
   constructor(args: any) {
+    // 初期値の設定を行う
+
+    // 自身のメソッド内でのみ変更可能な項目をつくる
     this.sFiles = [];
     this.tFiles = [];
     this.validated = false;
-    this.hyperMode = 'OFFICE';
 
+    this.locales = [];
+    this.fullset = false;
+
+    // OFFICEファイル か CAT ファイルか
+    // 既定値は OFFICE
+    if (args.hyperMode === 'CAT') {
+      this.hyperMode = 'CAT';
+    } else {
+      this.hyperMode = 'OFFICE';
+    }
+
+    // モード設定　既定値は EXTRACT
     if (args.mode !== undefined && modeChoices.indexOf(args.mode) !== -1) {
       this.mode = args.mode;
     } else {
       this.mode = 'EXTRACT';
     }
+
+    // 原稿ファイルの場所
+    // 既定値はルート
+    // 名前付き引数のほか、コマンドライン引数の最初に入れることもできる
     if (args.args !== undefined && args.args[0] !== undefined) {
       this.source = args.args[0];
     } else if (args.source !== undefined) {
@@ -63,6 +88,9 @@ class CLIParams {
     } else {
       this.source = './';
     }
+
+    // 訳文ファイルの場所
+    // 既定値はルート
     if (args.target !== undefined) {
       this.target = args.target !== '' ? args.target : './';
     } else {
@@ -70,6 +98,9 @@ class CLIParams {
     }
     this.oFile = args.output !== undefined ? args.output : '';
 
+    // 出力モード
+    // 出力ファイル名から、モードの設定を行う
+    // 入力が無かった場合は基本的にはコンソール出力
     if (this.oFile === undefined) {
       this.oMode = 'console';
     } else if (this.oFile.endsWith('.json')) {
@@ -80,6 +111,8 @@ class CLIParams {
       this.oMode = 'console';
     }
 
+    // 抽出のための設定
+    // コマンドライン引数から読み込む場合
     this.excluding = args.excludePattern === undefined;
     this.excludePattern = args.excludePattern !== undefined ? args.excludePattern : '';
     this.wordRev = true;
@@ -88,6 +121,7 @@ class CLIParams {
     this.readHiddenSheet = true;
     this.readFilledCell = true;
 
+    // ダイアログから読み込む場合
     const others: string[] = args.others !== undefined ? args.others.split(',') : [];
     for (let other of others) {
       other = other.toLowerCase();
@@ -149,8 +183,38 @@ class CLIParams {
     };
   }
 
+  public getSettingInfo(): string {
+    const info = {
+      validated: this.validate,
+      hyperMode: this.hyperMode,
+      mode: this.mode,
+      source: this.source,
+      target: this.target,
+      oMode: this.oMode,
+      oFile: this.oFile,
+      sFiles: this.sFiles,
+      tFiles: this.tFiles,
+      excluding: this.excluding,
+      excludePattern: this.excludePattern,
+      wordRev: this.wordRev,
+      withSeparator: this.withSeparator,
+      readNote: this.readNote,
+      readHiddenSheet: this.readHiddenSheet,
+      readFilledCell: this.readFilledCell,
+      locales: this.locales,
+      fullset: this.fullset,
+    }
+    return JSON.stringify(info, null, 2)
+  }
+
+  // ダイアログの設定をもとに、再設定する
   public updateFromDialog(ans: any): void {
-    this.mode = ans.mode;
+    if (ans.hyperMode) {
+      this.hyperMode = ans.hyperMode;
+    }
+    if (ans.mode) {
+      this.mode = ans.mode;
+    }
     this.excluding = ans.excludePattern !== '';
     this.excludePattern = ans.excludePattern;
     this.withSeparator = ans.withSeparator;
@@ -239,45 +303,66 @@ class CLIParams {
         break;
     }
 
-    for (const other of ans.others) {
-      switch (other) {
-        case 'Dont add separation marks':
-          this.withSeparator = false;
-          break;
+    if (ans.others !== undefined) {
+      for (const other of ans.others) {
+        switch (other) {
+          case 'Dont add separation marks':
+            this.withSeparator = false;
+            break;
 
-        case 'Word-Before-Revision':
-          this.wordRev = false;
-          break;
+          case 'Word-Before-Revision':
+            this.wordRev = false;
+            break;
 
-        case 'PPT-Note':
-          this.readNote = false;
-          break;
+          case 'PPT-Note':
+            this.readNote = false;
+            break;
 
-        case 'Excel-Hidden-Sheet':
-          this.readHiddenSheet = false;
-          break;
+          case 'Excel-Hidden-Sheet':
+            this.readHiddenSheet = false;
+            break;
 
-        case 'Excel-Filled-Cell':
-          this.readFilledCell = false;
-          break;
+          case 'Excel-Filled-Cell':
+            this.readFilledCell = false;
+            break;
 
-        case 'DEBUG':
-          this.oMode = '';
-          break;
+          case 'DEBUG':
+            this.oMode = '';
+            break;
 
-        default:
-          break;
+          default:
+            break;
+        }
       }
+    }
+
+    if (ans.locales !== undefined) {
+      this.locales = ans.locales;
+    }
+
+    if (ans.fullset !== undefined) {
+      this.fullset = ans.fullset.toLowerCase() === 'only-fullset';
     }
   }
 
+  // ファイルの場所や拡張子等をチェックし、
+  // 大分類に応じて処理を実行する
   public executeByParams(): void {
     const err = this.validate();
     if (err !== '') {
       console.log(`Validation Error: ${err}`);
       return;
     }
-    // cnm(JSON.stringify(this, null, 2))
+    console.log(this.getSettingInfo())
+    if (this.hyperMode === 'OFFICE') {
+      this.exec4Office();
+    } else {
+      this.exec4CAT();
+    }
+  }
+
+  // 大分類が OFFICE だった場合の入力処理～出力メソッドの呼び出し
+  private exec4Office(): void {
     const opt: OptionQue = this.exportAsOptionQue();
     console.log('------------------------');
     const prs: Array<Promise<ExtractedContent[]>> = [];
@@ -291,28 +376,28 @@ class CLIParams {
       switch (this.mode) {
         case 'EXTRACT':
           cxt.readContent(ds[0]);
-          this.cliOutlet('EXTRACT', opt, this.oMode, this.oFile, { cxt });
+          this.officeOutlet('EXTRACT', opt, this.oMode, this.oFile, { cxt });
           break;
 
         case 'COUNT':
           diff.analyze(ds[0]);
           diff.calcWWC('chara');
-          this.cliOutlet('COUNT', opt, this.oMode, this.oFile, { diff });
+          this.officeOutlet('COUNT', opt, this.oMode, this.oFile, { diff });
           break;
 
         case 'DIFF':
           diff.analyze(ds[0]);
-          this.cliOutlet('DIFF', opt, this.oMode, this.oFile, { diff });
+          this.officeOutlet('DIFF', opt, this.oMode, this.oFile, { diff });
           break;
 
         case 'ALIGN':
           cxt.readContent(ds[0], ds[1]);
-          this.cliOutlet('ALIGN', opt, this.oMode, this.oFile, { cxt });
+          this.officeOutlet('ALIGN', opt, this.oMode, this.oFile, { cxt });
           break;
 
         case 'TOVIS':
           diff.analyze(ds[0]);
-          this.cliOutlet('TOVIS', opt, this.oMode, this.oFile, { diff });
+          this.officeOutlet('TOVIS', opt, this.oMode, this.oFile, { diff });
           break;
 
         default:
@@ -326,7 +411,8 @@ class CLIParams {
     });
   }
 
-  private async cliOutlet(
+  // 大分類が OFFICE だった場合の出力メソッド
+  private async officeOutlet(
     eMode: 'EXTRACT' | 'ALIGN' | 'COUNT' | 'DIFF' | 'TOVIS' | 'DEBUG',
     opt: OptionQue, oMode: 'json' | 'plain' | 'console' | '',
     oFile: string, data: { cxt?: ExtractContext, diff?: DiffInfo },
@@ -395,14 +481,33 @@ class CLIParams {
     }
   }
 
+  // 大分類が CAT だった場合の入力処理～出力メソッドの呼び出し
+  private exec4CAT(): void {
+    const cat = new CatDataContent()
+    const prs: Promise<boolean>[] = []
+    for (const file of this.sFiles) {
+      const xml = path2ContentStr(file);
+      prs.push(cat.loadMultlangXml(file, xml))
+    }
+    Promise.all(prs).then(() => {
+      const exp = cat.getMultipleTexts(this.locales, this.fullset)
+      console.log(cat.getFilesInfo())
+      console.log(cat.getLangsInfo())
+      console.log(cat.getContentLength())
+      console.log(exp)
+    }).catch(e => {
+      console.log(e)
+    })   
+  }
+
   private validate(): string {
     let errMes = '';
     this.validated = true;
-    const isSourceOk = this.convertIntoFiles('source');
+    const isSourceOk = this.validateAndSetFiles('source');
     if (!isSourceOk) {
       errMes += 'Source Files Error; ';
     }
-    const isTargetOK = this.mode === 'ALIGN' ? this.convertIntoFiles('target') : true;
+    const isTargetOK = this.mode === 'ALIGN' ? this.validateAndSetFiles('target') : true;
     if (!isTargetOK) {
       errMes += 'Target Files Error; ';
     }
@@ -418,9 +523,11 @@ class CLIParams {
     return errMes;
   }
 
-  private convertIntoFiles(srcOrTgt: 'source' | 'target'): boolean {
+  private validateAndSetFiles(srcOrTgt: 'source' | 'target'): boolean {
     // const oooxml = ['.docx', '.docm', '.xlsx', '.xlsm', '.pptx', '.pptm'];
-    const validFormat = ['.docx', '.docm', '.xlsx', '.xlsm', '.pptx', '.pptm', '.json'];
+    const validFormat = this.hyperMode === 'OFFICE'
+      ? ['docx', 'docm', 'xlsx', 'xlsm', 'pptx', 'pptm', 'json']
+      : ['xliff', 'mxliff', 'tmx', 'tbx'];
     const isWhich = srcOrTgt === 'source' ? this.source : this.target;
     const toWhich = srcOrTgt === 'source' ? this.sFiles : this.tFiles;
     const files = isWhich.split(',');
@@ -431,12 +538,14 @@ class CLIParams {
           const dirName = f.replace('\\', '').endsWith('/') ? f : `${f}/`;
           const clds = readdirSync(f);
           for (const cld of clds) {
-            if (validFormat.indexOf(cld.substr(-5, 5)) !== -1) {
+            const format = path2Format(cld)
+            if (validFormat.indexOf(format) !== -1) {
               toWhich.push(`${dirName}${cld}`);
             }
           }
         } else {
-          if (validFormat.indexOf(f.substr(-5, 5)) !== -1) {
+          const format = path2Format(f)
+          if (validFormat.indexOf(format) !== -1) {
             toWhich.push(f);
           }
         }
@@ -454,8 +563,30 @@ class CLIParams {
   }
 }
 
-function inquirerDialog(sourceFiles?: string) {
+
+function selectHyperMode(): Promise<'OFFICE' | 'CAT'> {
   console.log('CATOVIS Dialog Interface');
+  return new Promise((resolve, reject) => {
+    const inquirer = require('inquirer');
+    const prompts = [
+      {
+        type: 'list',
+        name: 'hyperMode',
+        message: 'Select Format',
+        choices: ['OFFICE', 'CAT'],
+      },
+    ]
+    inquirer.prompt(prompts).then((answer: any) => {
+      if (answer.hyperMode === 'CAT') {
+        resolve('CAT');
+      } else {
+        resolve('OFFICE');
+      }
+    })
+  })
+}
+
+function officeInquirerDialog(sourceFiles?: string) {
   const params = new CLIParams({});
   const inquirer = require('inquirer');
   const prompts = [
@@ -500,7 +631,7 @@ function inquirerDialog(sourceFiles?: string) {
             mes += 'Able to use ".json"(implicit), output to "console" if blank.';
             break;
 
-          case 'DIFF':
+          case 'TOVIS':
             mes += 'Able to use ".tovis"(implicit), output to "console" if blank.';
             break;
 
@@ -534,6 +665,51 @@ function inquirerDialog(sourceFiles?: string) {
   });
 }
 
+function catInquirerDialog(sourceFiles?: string) {
+  const params = new CLIParams({});
+  const inquirer = require('inquirer');
+  const prompts = [
+    {
+      name: 'source',
+      message: 'Source input file(s)/folder(s) with comma separated. Remain blank for current directory',
+      when: (): boolean => {
+        return sourceFiles === undefined;
+      },
+    },
+    {
+      name: 'locales',
+      message: 'Input locales to extract with comma separated. Remain blank for all locales.',
+    },
+    {
+      type: 'list',
+      name: 'fullset',
+      message: 'Select if you only want to export the segments that have the sentences in all of the locales',
+      choices: ['All', 'Only-fullset'],
+      when: (answerSoFar: any): boolean => {
+        return answerSoFar.locales.split(',').length > 1 || answerSoFar.locales === '';
+      },
+    },
+    {
+      name: 'outputFile',
+      message: 'Output file name. Able to use ".tsv". output to "console" if blank.',
+    }
+  ];
+  inquirer.prompt(prompts).then((answer: any) => {
+    if (sourceFiles !== undefined) {
+      answer.source = sourceFiles;
+    }
+    answer.hyperMode = 'CAT';
+    if (answer.locales === '') {
+      answer.locales = 'all'
+    }
+    if (answer.outputFile !== '' && !answer.outputFile.endsWith('.tsv')) {
+      answer.outputFile = answer.outputFile + '.tsv'
+    }
+    params.updateFromDialog(answer);
+    params.executeByParams();
+  });
+}
+
 // #起動時に処理される部分
 console.log('------------------------');
 const program = require('commander');
@@ -557,10 +733,13 @@ if (args.preset) {
   // あらかじめ動作を設定する
   const presetYaml = readFileSync('./preset.yaml').toString();
   const yamlOpt = load(presetYaml) as any;
+  params.hyperMode = yamlOpt.hyperMode || 'OFFICE';
   params.mode = yamlOpt.mode || 'EXTRACT';
   params.oFile = yamlOpt.outputFile || 'preset';
   params.oMode = yamlOpt.outputType || '';
-  params.source = yamlOpt.sourceFiles.join(',');
+  params.locales = yamlOpt.locales || 'all';
+  params.fullset = yamlOpt.locales || false;
+  params.source = yamlOpt.sourceFiles ? yamlOpt.sourceFiles.join(',') : '';
   if (yamlOpt.targetFiles !== undefined) {
     params.target = yamlOpt.targetFiles.join(',')
   }
@@ -596,11 +775,21 @@ if (args.preset) {
   console.log(params)
   params.executeByParams();
 } else if (args.cmd === false) {
-  if (args.args.length !== 0) {
-    inquirerDialog(args.args[0]);
-  } else {
-    inquirerDialog();
-  }
+  selectHyperMode().then((hm) => {
+    if (hm === 'OFFICE') {
+      if (args.args.length !== 0) {
+        officeInquirerDialog(args.args[0]);
+      } else {
+        officeInquirerDialog();
+      }
+    } else {
+      if (args.args.length !== 0) {
+        catInquirerDialog(args.args[0]);
+      } else {
+        catInquirerDialog();
+      }
+    }
+  })
 } else {
   const params = new CLIParams(args);
   params.executeByParams();

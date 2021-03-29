@@ -61,6 +61,15 @@ export class CatDataContent {
     return this.contents.length;
   }
 
+  public getContentStats(): string {
+    const stats = {
+      files: this.fileNames,
+      langs: this.langs,
+      segments: this.getContentLength(),
+    }
+    return JSON.stringify(stats, null, 2)
+  }
+
   public getSingleText(lang: string): string[] {
     const isValidLang = this.getLangExists(lang);
     let lang_ = lang;
@@ -98,7 +107,7 @@ export class CatDataContent {
       }
       if (onlyFullUnit) {
         // 空白文字列が残っていないセットのみをpush
-        if (inTexts.indexOf('') !== -1) {
+        if (inTexts.indexOf('') === -1) {
           texts.push(inTexts)
         }
       } else {
@@ -287,18 +296,18 @@ export class CatDataContent {
 }
 
 
-const samples = ['./cattest/merged.mxliff']
-const cat = new CatDataContent()
-const prs: Promise<boolean>[] = []
-for (const sample of samples) {
-  const xml = path2ContentStr(sample);
-  prs.push(cat.loadMultlangXml(sample, xml))
-}
-Promise.all(prs).then(() => {
-  const exp = cat.getSingleText('all')
-  console.log(exp)
-}).catch(e => {
-  console.log(e)
-})   
+// const samples = ['./cattest/merged.mxliff']
+// const cat = new CatDataContent()
+// const prs: Promise<boolean>[] = []
+// for (const sample of samples) {
+//   const xml = path2ContentStr(sample);
+//   prs.push(cat.loadMultlangXml(sample, xml))
+// }
+// Promise.all(prs).then(() => {
+//   const exp = cat.getSingleText('all')
+//   console.log(exp)
+// }).catch(e => {
+//   console.log(e)
+// })   
 // const ext = tmx.getSingleText('ja')
 // const exts = tmx.getMultipleTexts(['ja', 'zh-cn'], true)

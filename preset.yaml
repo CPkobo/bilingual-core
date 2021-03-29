@@ -1,19 +1,51 @@
-# mode select from 'EXTRACT' | 'ALIGN' | 'COUNT' | 'DIFF' | 'TOVIS'
-mode: 'ALIGN'
-# outputType select from 'json' | 'plain' | 'console' | ''
+# ------------------------------------------------------------
+# HYPER MODE select from 'OFFICE' | 'CAT' (default: OFFICE)
+# OFFICE supports: docx / docm / xlsx / xlsm / pptx / pptm
+# CAT supports: xliff / mxliff / tmx / tbx
+# ------------------------------------------------------------
+hyperMode: 'CAT'
+
+# ---------------
+# [OFFICE] mode select from 'EXTRACT' | 'ALIGN' | 'COUNT' | 'DIFF' | 'TOVIS'　(default: EXTRACT)
+# ---------------
+# mode: 'ALIGN'
+
+# ---------------
+# [CAT] Select Locales, blank for all
+# ---------------
+locales: 'all'
+
+# ---------------
+# [CAT] Select true, if you only want to extract the segments which have all locales
+# ---------------
+fullset: false
+
+# ---------------
+# outputType select from 'json' | 'plain' | 'console' | ''　
+# ---------------
 outputType: 'plain'
 
+# ---------------
 # set a filename to output
+# ---------------
 outputFile: '../ext/test.tsv'
 
+# ---------------
 # list the source file(s)
+# ---------------
 sourceFiles:
-  - ../ext/src/
+  # - ../ext/src/
   # - ../ext/RHBX.docx
+
+# ---------------
 # list the target file(s)
+# ---------------
 targetFiles:
   - ../ext/tgt/
 
+# ---------------
+# Setting for detailed extraction (for office files)
+# ---------------
 common:
   excludePattern: ''
   withSeparator: true
