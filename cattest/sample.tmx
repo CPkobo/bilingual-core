@@ -1,9 +1,74 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <tmx version="1.4">
-  <header creationtool="memsource_tool" creationtoolversion="2.0" segtype="sentence" o-tmf="memsourceTM" adminlang="en" srclang="ja" datatype="unknown" creationdate="20210326T214519Z">
+  <header creationtool="memsource_tool" creationtoolversion="2.0" segtype="sentence" o-tmf="memsourceTM" adminlang="en" srclang="ja" datatype="unknown" creationdate="20210329T045734Z">
     <prop type="name">サンプルPJ</prop>
   </header>
   <body>
+    <tu tuid="_631ufe0q18omMixwQF2eiYqp0">
+      <tuv xml:lang="ja">
+        <prop type="context_prev">ビデオを使うと、伝えたい内容を明確に表現できます。</prop>
+        <prop type="context_next">キーワードを入力して、文書に最適なビデオをオンラインで検索することもできます。</prop>
+        <seg>[オンライン ビデオ] をクリックすると、追加したいビデオを、それに応じた埋め込みコードの形式で貼り付けできるようになります。</seg>
+      </tuv>
+      <tuv xml:lang="en" creationdate="20210328T214532Z" changedate="20210328T214532Z">
+        <prop type="project">21373062</prop>
+        <prop type="created_at">1616967932000</prop>
+        <prop type="created_by">GB-admin</prop>
+        <prop type="modified_at">1616967932000</prop>
+        <prop type="modified_by">GB-admin</prop>
+        <prop type="filename">rand30.docx</prop>
+        <seg>Click Online Video and you will be able to paste the video you want to add in the appropriate embed code format.</seg>
+      </tuv>
+      <tuv xml:lang="zh-cn" creationdate="20210328T214634Z" changedate="20210328T214634Z">
+        <prop type="project">21373062</prop>
+        <prop type="created_at">1616967994000</prop>
+        <prop type="created_by">GB-admin</prop>
+        <prop type="modified_at">1616967994000</prop>
+        <prop type="modified_by">GB-admin</prop>
+        <prop type="filename">rand30.docx</prop>
+        <seg>单击在线视频，您将能够以适当的嵌入代码格式粘贴要添加的视频。</seg>
+      </tuv>
+    </tu>
+    <tu tuid="_64hUTBGqgen2MX4I2EMj0EJw0">
+      <tuv xml:lang="ja">
+        <prop type="context_prev">表で作業している場合は、行または列を追加する場所をクリックして、プラス記号をクリックします。</prop>
+        <prop type="context_next">文書の一部を折りたたんで、必要な箇所に集中することができます。</prop>
+        <seg>新しい閲覧ビューが導入され、閲覧もさらに便利になりました。</seg>
+      </tuv>
+      <tuv xml:lang="zh-cn" creationdate="20210328T214655Z" changedate="20210328T214655Z">
+        <prop type="project">21373062</prop>
+        <prop type="created_at">1616968015000</prop>
+        <prop type="created_by">GB-admin</prop>
+        <prop type="modified_at">1616968015000</prop>
+        <prop type="modified_by">GB-admin</prop>
+        <prop type="filename">rand30.docx</prop>
+        <seg>引入了新的浏览视图，以使浏览更加方便。</seg>
+      </tuv>
+    </tu>
+    <tu tuid="_EPgvpc37MZ92Jr4cxb0EVG481">
+      <tuv xml:lang="ja">
+        <prop type="context_next">[オンライン ビデオ] をクリックすると、追加したいビデオを、それに応じた埋め込みコードの形式で貼り付けできるようになります。</prop>
+        <seg>ビデオを使うと、伝えたい内容を明確に表現できます。</seg>
+      </tuv>
+      <tuv xml:lang="en" creationdate="20210328T214530Z" changedate="20210328T214530Z">
+        <prop type="project">21373062</prop>
+        <prop type="created_at">1616967930000</prop>
+        <prop type="created_by">GB-admin</prop>
+        <prop type="modified_at">1616967930000</prop>
+        <prop type="modified_by">GB-admin</prop>
+        <prop type="filename">rand30.docx</prop>
+        <seg>Video allows you to clearly express what you want to convey.</seg>
+      </tuv>
+      <tuv xml:lang="zh-cn" creationdate="20210328T214634Z" changedate="20210328T214634Z">
+        <prop type="project">21373062</prop>
+        <prop type="created_at">1616967994000</prop>
+        <prop type="created_by">GB-admin</prop>
+        <prop type="modified_at">1616967994000</prop>
+        <prop type="modified_by">GB-admin</prop>
+        <prop type="filename">rand30.docx</prop>
+        <seg>视频使您可以清楚地表达您想要传达的内容。</seg>
+      </tuv>
+    </tu>
     <tu tuid="_HseiYErdweB27y4EHpwap3Kg">
       <tuv xml:lang="ja">
         <seg>サンプルですよ。
@@ -17,6 +82,47 @@
         <seg>翻译样品。</seg>
       </tuv>
     </tu>
+    <tu tuid="_TPfqZxYrMT22B5408rwWP2W40">
+      <tuv xml:lang="ja">
+        <prop type="context_prev">キーワードを入力して、文書に最適なビデオをオンラインで検索することもできます。</prop>
+        <prop type="context_next">たとえば、一致する表紙、ヘッダー、サイドバーを追加できます。</prop>
+        <seg>Word に用意されているヘッダー、フッター、表紙、テキスト ボックス デザインを組み合わせると、プロのようなできばえの文書を作成できます。</seg>
+      </tuv>
+      <tuv xml:lang="en" creationdate="20210328T214534Z" changedate="20210328T214534Z">
+        <prop type="project">21373062</prop>
+        <prop type="created_at">1616967934000</prop>
+        <prop type="created_by">GB-admin</prop>
+        <prop type="modified_at">1616967934000</prop>
+        <prop type="modified_by">GB-admin</prop>
+        <prop type="filename">rand30.docx</prop>
+        <seg>Combine the header, footer, cover, and text box designs provided by Word to create professional-looking documents.</seg>
+      </tuv>
+    </tu>
+    <tu tuid="_TpWrYUSu0sY4wq90qo12l7MT4">
+      <tuv xml:lang="ja">
+        <prop type="context_prev">最後まで読み終わる前に中止する必要がある場合、Word では、たとえ別のデバイスであっても、どこまで読んだかが記憶されます。</prop>
+        <prop type="context_next">[オンライン ビデオ] をクリックすると、追加したいビデオを、それに応じた埋め込みコードの形式で貼り付けできるようになります。</prop>
+        <seg>ビデオを使うと、伝えたい内容を明確に表現できます。</seg>
+      </tuv>
+      <tuv xml:lang="en" creationdate="20210328T214530Z" changedate="20210328T214530Z">
+        <prop type="project">21373062</prop>
+        <prop type="created_at">1616967930000</prop>
+        <prop type="created_by">GB-admin</prop>
+        <prop type="modified_at">1616967930000</prop>
+        <prop type="modified_by">GB-admin</prop>
+        <prop type="filename">rand30.docx</prop>
+        <seg>Video allows you to clearly express what you want to convey.</seg>
+      </tuv>
+      <tuv xml:lang="zh-cn" creationdate="20210328T214634Z" changedate="20210328T214634Z">
+        <prop type="project">21373062</prop>
+        <prop type="created_at">1616967994000</prop>
+        <prop type="created_by">GB-admin</prop>
+        <prop type="modified_at">1616967994000</prop>
+        <prop type="modified_by">GB-admin</prop>
+        <prop type="filename">rand30.docx</prop>
+        <seg>视频使您可以清楚地表达您想要传达的内容。</seg>
+      </tuv>
+    </tu>
     <tu tuid="_Z2DfpNgcgMx2ea404zxFJvAI1">
       <tuv xml:lang="ja">
         <seg>サンプルですね。</seg>
@@ -27,6 +133,22 @@
         <prop type="created_at">1579160607000</prop>
         <prop type="modified_at">1579160607000</prop>
         <seg>样品翻译。</seg>
+      </tuv>
+    </tu>
+    <tu tuid="_ZPBNHN1f06d8UDhgPe1ACB5z7">
+      <tuv xml:lang="ja">
+        <prop type="context_prev">[オンライン ビデオ] をクリックすると、追加したいビデオを、それに応じた埋め込みコードの形式で貼り付けできるようになります。</prop>
+        <prop type="context_next">Word に用意されているヘッダー、フッター、表紙、テキスト ボックス デザインを組み合わせると、プロのようなできばえの文書を作成できます。</prop>
+        <seg>キーワードを入力して、文書に最適なビデオをオンラインで検索することもできます。</seg>
+      </tuv>
+      <tuv xml:lang="en" creationdate="20210328T214533Z" changedate="20210328T214533Z">
+        <prop type="project">21373062</prop>
+        <prop type="created_at">1616967933000</prop>
+        <prop type="created_by">GB-admin</prop>
+        <prop type="modified_at">1616967933000</prop>
+        <prop type="modified_by">GB-admin</prop>
+        <prop type="filename">rand30.docx</prop>
+        <seg>You can also enter keywords to search online for the best video for your document.</seg>
       </tuv>
     </tu>
   </body>

@@ -12,9 +12,23 @@ import { pathContentsReader } from './office-funcs/util-sv'
 
 const modeChoices = ['EXTRACT', 'ALIGN', 'COUNT', 'DIFF', 'TOVIS'];
 
+// 初期設定値とともにオプション項目を管理するクラス
+// 主要な機能は以下のとおり
+// 1. コンストラクタ
+// - 引数を受け取ると、指定項目のみを変更する
+// 2. OptionQue にあった形で設定をエクスポートする
+// 3. ダイアログで入力した項目をもとに、指定項目を再設定する
+// 4. オプション項目をもとに、処理を実行する
+// - ファイルパスの検証等は、実行時に行われる
+
 class CLIParams {
+  // validateメソッドで、ファイルパスにすべて問題がないと判断されたら true になる
   public validated: boolean;
 
+  // 処理の大分類：MS office または CAT(TMX / TBX / XLIFF)
+  public hyperMode: 'OFFICE' | 'CAT';
+
+  // 入出力に関するオプション項目
   public mode: 'EXTRACT' | 'ALIGN' | 'COUNT' | 'DIFF' | 'TOVIS';
   public source: string;
   public target: string;
@@ -35,6 +49,7 @@ class CLIParams {
     this.sFiles = [];
     this.tFiles = [];
     this.validated = false;
+    this.hyperMode = 'OFFICE';
 
     if (args.mode !== undefined && modeChoices.indexOf(args.mode) !== -1) {
       this.mode = args.mode;
