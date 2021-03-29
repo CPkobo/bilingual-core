@@ -1,0 +1,73 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<martif xml:lang="en" type="TBX">
+  <text>
+    <body>
+      <termEntry>
+        <descrip type="conceptId">Rria2y1lwkQ4u29wmPxMzNaW0</descrip>
+        <langSet xml:lang="ja">
+          <tig>
+            <term>です</term>
+            <termNote type="termId">sbCSdBOY0i18ATggj53aFy0x3</termNote>
+            <termNote type="forbidden">false</termNote>
+            <termNote type="preferred">false</termNote>
+            <termNote type="exactMatch">false</termNote>
+            <termNote type="status">Approved</termNote>
+            <termNote type="caseSensitive">false</termNote>
+            <termNote type="createdBy">GB-admin</termNote>
+            <termNote type="createdAt">1579160666111</termNote>
+            <termNote type="lastModifiedBy">GB-admin</termNote>
+            <termNote type="lastModifiedAt">1579160666111</termNote>
+          </tig>
+        </langSet>
+        <langSet xml:lang="zh-cn">
+          <tig>
+            <term>翻译</term>
+            <termNote type="termId">iKoMXLLAgZ05Ub9Max1w3lqs3</termNote>
+            <termNote type="forbidden">false</termNote>
+            <termNote type="preferred">false</termNote>
+            <termNote type="exactMatch">false</termNote>
+            <termNote type="status">Approved</termNote>
+            <termNote type="caseSensitive">false</termNote>
+            <termNote type="createdBy">GB-admin</termNote>
+            <termNote type="createdAt">1579160666112</termNote>
+            <termNote type="lastModifiedBy">GB-admin</termNote>
+            <termNote type="lastModifiedAt">1579160666112</termNote>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry>
+        <descrip type="conceptId">ZXkjS5HBwJg2vo4wwv0Y5g5f0</descrip>
+        <langSet xml:lang="ja">
+          <tig>
+            <term>サンプル</term>
+            <termNote type="termId">PpAE5NPjgyA2TM44qFgiqxGC</termNote>
+            <termNote type="forbidden">false</termNote>
+            <termNote type="preferred">false</termNote>
+            <termNote type="exactMatch">false</termNote>
+            <termNote type="status">Approved</termNote>
+            <termNote type="caseSensitive">false</termNote>
+            <termNote type="createdBy">GB-admin</termNote>
+            <termNote type="createdAt">1579160666108</termNote>
+            <termNote type="lastModifiedBy">GB-admin</termNote>
+            <termNote type="lastModifiedAt">1579160666108</termNote>
+          </tig>
+        </langSet>
+        <langSet xml:lang="zh-cn">
+          <tig>
+            <term>样品</term>
+            <termNote type="termId">jSfT5Sx4MGZ2vO4kbJ0aq1Jd2</termNote>
+            <termNote type="forbidden">false</termNote>
+            <termNote type="preferred">false</termNote>
+            <termNote type="exactMatch">false</termNote>
+            <termNote type="status">Approved</termNote>
+            <termNote type="caseSensitive">false</termNote>
+            <termNote type="createdBy">GB-admin</termNote>
+            <termNote type="createdAt">1579160666109</termNote>
+            <termNote type="lastModifiedBy">GB-admin</termNote>
+            <termNote type="lastModifiedAt">1579160666109</termNote>
+          </tig>
+        </langSet>
+      </termEntry>
+    </body>
+  </text>
+</martif>

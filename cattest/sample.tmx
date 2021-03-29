@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<tmx version="1.4">
+  <header creationtool="memsource_tool" creationtoolversion="2.0" segtype="sentence" o-tmf="memsourceTM" adminlang="en" srclang="ja" datatype="unknown" creationdate="20210326T214519Z">
+    <prop type="name">サンプルPJ</prop>
+  </header>
+  <body>
+    <tu tuid="_HseiYErdweB27y4EHpwap3Kg">
+      <tuv xml:lang="ja">
+        <seg>サンプルですよ。
+</seg>
+      </tuv>
+      <tuv xml:lang="zh-cn" creationdate="20200116T074327Z" changedate="20200116T074327Z">
+        <prop type="reviewed">false</prop>
+        <prop type="aligned">false</prop>
+        <prop type="created_at">1579160607000</prop>
+        <prop type="modified_at">1579160607000</prop>
+        <seg>翻译样品。</seg>
+      </tuv>
+    </tu>
+    <tu tuid="_Z2DfpNgcgMx2ea404zxFJvAI1">
+      <tuv xml:lang="ja">
+        <seg>サンプルですね。</seg>
+      </tuv>
+      <tuv xml:lang="zh-cn" creationdate="20200116T074327Z" changedate="20200116T074327Z">
+        <prop type="reviewed">false</prop>
+        <prop type="aligned">false</prop>
+        <prop type="created_at">1579160607000</prop>
+        <prop type="modified_at">1579160607000</prop>
+        <seg>样品翻译。</seg>
+      </tuv>
+    </tu>
+  </body>
+</tmx>
