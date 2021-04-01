@@ -9,8 +9,8 @@ import { Tovis } from './office-funcs/tovis';
 import { CatDataContent } from './office-funcs/cats';
 
 // import { cnm, pathContentsReader, ReadFailure } from './office-funcs/util';
-import { pathContentsReader, path2ContentStr } from './office-funcs/util-sv'
-import { path2Format } from './office-funcs/util';
+import { pathContentsReader, path2ContentStr, createTsvArray } from './office-funcs/util-sv'
+import { path2Format, path2Name, path2Dir } from './office-funcs/util';
 
 const modeChoices = ['EXTRACT', 'ALIGN', 'COUNT', 'DIFF', 'TOVIS'];
 
@@ -31,13 +31,13 @@ class CLIParams {
   public hyperMode: 'OFFICE' | 'CAT';
 
   // 入出力に関するオプション項目
-  public mode: 'EXTRACT' | 'ALIGN' | 'COUNT' | 'DIFF' | 'TOVIS';
+  public mode: 'EXTRACT' | 'ALIGN' | 'COUNT' | 'DIFF' | 'TOVIS' | 'UPDATE';
   public source: string;
   public target: string;
   public oMode: 'json' | 'plain' | 'console' | '';
   public oFile: string;
-  private sFiles: string[];
-  private tFiles: string[];
+  public sFiles: string[];
+  public tFiles: string[];
 
   // Officeの抽出に関係するオプション項目
   // ReadingOptionの各項目に対応している
@@ -49,8 +49,11 @@ class CLIParams {
   public readHiddenSheet: boolean;
   public readFilledCell: boolean;
 
+  // CATの処理に関するオプション項目
   public locales: string[] | 'all';
   public fullset: boolean;
+  public overWrite: boolean;
+  public asTerm: boolean;
 
   constructor(args: any) {
     // 初期値の設定を行う
@@ -62,6 +65,8 @@ class CLIParams {
 
     this.locales = [];
     this.fullset = false;
+    this.overWrite = false;
+    this.asTerm = false;
 
     // OFFICEファイル か CAT ファイルか
     // 既定値は OFFICE
@@ -299,6 +304,7 @@ class CLIParams {
           this.oMode = 'plain';
         }
         break;
+
       default:
         break;
     }
@@ -485,19 +491,37 @@ class CLIParams {
   private exec4CAT(): void {
     const cat = new CatDataContent()
     const prs: Promise<boolean>[] = []
-    for (const file of this.sFiles) {
-      const xml = path2ContentStr(file);
-      prs.push(cat.loadMultlangXml(file, xml))
+    if (this.mode === 'UPDATE') {
+      const xliffStr = path2ContentStr(this.sFiles[0])
+      const tsv = createTsvArray(this.tFiles)
+      if (typeof tsv === 'boolean') {
+        console.log('TSV/TXT file error')
+      } else {
+        const xliffName = path2Name(this.sFiles[0])
+        const xliffDir = path2Dir(this.sFiles[0])
+        cat.updateXliff(xliffStr, tsv, false, false).then(({xml, log}) => {
+          // console.log(xliffDir)
+          // console.log(xliffName)
+          writeFileSync(`${xliffDir}UPDATE_${xliffName}`, xml)
+          writeFileSync(`${xliffDir}UPDATE_log.txt`, JSON.stringify(log, null, 2))
+        })
+      }
+    } else {
+      for (const file of this.sFiles) {
+        const xml = path2ContentStr(file);
+        const name = path2Name(file);
+        prs.push(cat.loadMultilangXml(name, xml))
+      }
+      Promise.all(prs).then(() => {
+        const exp = cat.getMultipleTexts(this.locales, this.fullset)
+        console.log(cat.getFilesInfo())
+        console.log(cat.getLangsInfo())
+        console.log(cat.getContentLength())
+        console.log(exp)
+      }).catch(e => {
+        console.log(e)
+      })
     }
-    Promise.all(prs).then(() => {
-      const exp = cat.getMultipleTexts(this.locales, this.fullset)
-      console.log(cat.getFilesInfo())
-      console.log(cat.getLangsInfo())
-      console.log(cat.getContentLength())
-      console.log(exp)
-    }).catch(e => {
-      console.log(e)
-    })   
   }
 
   private validate(): string {
@@ -527,7 +551,7 @@ class CLIParams {
     // const oooxml = ['.docx', '.docm', '.xlsx', '.xlsm', '.pptx', '.pptm'];
     const validFormat = this.hyperMode === 'OFFICE'
       ? ['docx', 'docm', 'xlsx', 'xlsm', 'pptx', 'pptm', 'json']
-      : ['xliff', 'mxliff', 'tmx', 'tbx'];
+      : this.mode === 'UPDATE' ? ['xliff', 'mxliff'] : ['xliff', 'mxliff', 'tmx', 'tbx'];
     const isWhich = srcOrTgt === 'source' ? this.source : this.target;
     const toWhich = srcOrTgt === 'source' ? this.sFiles : this.tFiles;
     const files = isWhich.split(',');
@@ -670,6 +694,12 @@ function catInquirerDialog(sourceFiles?: string) {
   const inquirer = require('inquirer');
   const prompts = [
     {
+      type: 'list',
+      name: 'mode',
+      message: 'Select Execution Mode.',
+      choices: ['EXTRACT', 'UPDATE'],
+    },
+    {
       name: 'source',
       message: 'Source input file(s)/folder(s) with comma separated. Remain blank for current directory',
       when: (): boolean => {
@@ -677,8 +707,18 @@ function catInquirerDialog(sourceFiles?: string) {
       },
     },
     {
+      name: 'target',
+      message: 'Target input file(s)/folder(s) with comma separated.',
+      when: (answerSoFar: any): boolean => {
+        return answerSoFar.mode === 'UPDATE';
+      },
+    },
+    {
       name: 'locales',
       message: 'Input locales to extract with comma separated. Remain blank for all locales.',
+      when: (answerSoFar: any): boolean => {
+        return answerSoFar.mode === 'EXTRACT';
+      },
     },
     {
       type: 'list',
@@ -686,13 +726,24 @@ function catInquirerDialog(sourceFiles?: string) {
       message: 'Select if you only want to export the segments that have the sentences in all of the locales',
       choices: ['All', 'Only-fullset'],
       when: (answerSoFar: any): boolean => {
-        return answerSoFar.locales.split(',').length > 1 || answerSoFar.locales === '';
+        if (answerSoFar.mode === 'UPDATE') {
+          return false
+        } else {
+          return answerSoFar.locales.split(',').length > 1 || answerSoFar.locales === '';
+        }
       },
     },
     {
       name: 'outputFile',
       message: 'Output file name. Able to use ".tsv". output to "console" if blank.',
-    }
+      when: (answerSoFar: any): boolean => {
+        if (answerSoFar.mode === 'UPDATE') {
+          return false
+        } else {
+          return answerSoFar.locales.split(',').length > 1 || answerSoFar.locales === '';
+        }
+      },
+    },
   ];
   inquirer.prompt(prompts).then((answer: any) => {
     if (sourceFiles !== undefined) {
@@ -702,8 +753,10 @@ function catInquirerDialog(sourceFiles?: string) {
     if (answer.locales === '') {
       answer.locales = 'all'
     }
-    if (answer.outputFile !== '' && !answer.outputFile.endsWith('.tsv')) {
-      answer.outputFile = answer.outputFile + '.tsv'
+    if (answer.outputFile !== undefined) {
+      if (answer.outputFile !== '' && !answer.outputFile.endsWith('.tsv')) {
+        answer.outputFile = answer.outputFile + '.tsv'
+      }
     }
     params.updateFromDialog(answer);
     params.executeByParams();

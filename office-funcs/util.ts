@@ -3,12 +3,24 @@ import { xlsxReader } from './office/xlsxReader';
 import { pptxReader } from './office/pptxReader';
 import { ReadingOption } from './option';
 
-export function cnm(data: any) {
-  console.log(data);
+export function cnm(data: string | object, row?: number) {
+  const text = typeof data === 'string' ? data : JSON.stringify(data);
+  const log = row ? `${row}: ${text}` : text
+  console.log(log);
 }
 
 export function path2Name(path: string): string {
-  return path.substr(path.lastIndexOf('\\') + 1)
+  const path_ = path.replace(/\//g, '\\')
+  return path_.substr(path_.lastIndexOf('\\') + 1)
+}
+
+export function path2Dir(path: string): string {
+  if (path.endsWith('\\') || path.endsWith('/')) {
+    return path
+  } else {
+    const file = path2Name(path)
+    return path.replace(file, '')
+  }
 }
 
 export function path2Format(path: string): string {

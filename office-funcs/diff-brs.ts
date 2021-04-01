@@ -1,3 +1,5 @@
+import { countCharas, countWords} from './util';
+
 export class DiffInfoBrowser {
   public dsegs: DiffSeg[];
   public d: any;
@@ -51,19 +53,22 @@ export class DiffInfoBrowser {
         over50: 1,
         under49: 1,
       };
-
-    const first: WWCInfo = {
-      name: this.dsegs[0].file,
-      sum: 0,
-      sum2: 0,
-      dupli: 0,
-      over95: 0,
-      over85: 0,
-      over75: 0,
-      over50: 0,
-      under49: 0,
-    };
-    const files: WWCInfo[] = [first];
+    
+    // 結果を格納するオブジェクト report の準備
+    // 1つ目のファイルのレポートは別途準備しておく
+    const files: WWCInfo[] = [
+      {
+        name: this.dsegs[0].file,
+        sum: 0,
+        sum2: 0,
+        dupli: 0,
+        over95: 0,
+        over85: 0,
+        over75: 0,
+        over50: 0,
+        under49: 0,
+      }
+    ];
     const report: WWCReport = {
       name: 'summary',
       base: rate,
@@ -79,8 +84,18 @@ export class DiffInfoBrowser {
     };
     let i = 0;
     for (const dseg of this.dsegs) {
+      // ファイル名が変わった場合に行う処理
       if (dseg.file !== report.files[i].name) {
+        // 課金率適用後の文字数を計算
+        report.files[i].sum2 += 
+          Math.round(report.files[i].under49 * rate.under49 * 10) / 10 +
+          Math.round(report.files[i].over50 * rate.over50 * 10) / 10 +
+          Math.round(report.files[i].over75 * rate.over75 * 10) / 10 +
+          Math.round(report.files[i].over85 * rate.over85 * 10) / 10 +
+          Math.round(report.files[i].over95 * rate.over95 * 10) / 10 +
+          Math.round(report.files[i].dupli * rate.dupli * 10) / 10;
 
+        // Summary に一つ前のファイルの文字数を加算しておく
         report.sum += report.files[i].sum;
         report.sum2 += report.files[i].sum2;
         report.dupli += report.files[i].dupli;
@@ -90,6 +105,7 @@ export class DiffInfoBrowser {
         report.over50 += report.files[i].over50;
         report.under49 += report.files[i].under49;
 
+        // ファイルの参照を進める
         i++;
         report.files.push({
           name: dseg.file,
@@ -104,40 +120,41 @@ export class DiffInfoBrowser {
         });
       }
 
-      let len: number;
-
-      if (unit === 'chara') {
-        len = dseg.len;
-      } else if (unit === 'word') {
-        const wordText = dseg.st + '.';
-        len = `${dseg.st}.`.replace(/(,|\.|:|;|!|\?|\s)+/g, ' ').split(' ').length - 1;
-      } else {
-        len = 0;
-      }
+      const len: number = unit === 'chara' ? countCharas(dseg.st) : countWords(dseg.st);
 
       report.files[i].sum += len;
 
+      // 一致率に応じて文字数を振り分けておく
       if (dseg.max < 50) {
         report.files[i].under49 += len;
-        report.files[i].sum2 += Math.round(len * rate.under49 * 10) / 10;
+        // report.files[i].sum2 += Math.round(len * rate.under49 * 10) / 10;
       } else if (dseg.max < 75) {
         report.files[i].over50 += len;
-        report.files[i].sum2 += Math.round(len * rate.over50 * 10) / 10;
+        // report.files[i].sum2 += Math.round(len * rate.over50 * 10) / 10;
       } else if (dseg.max < 85) {
         report.files[i].over75 += len;
-        report.files[i].sum2 += Math.round(len * rate.over75 * 10) / 10;
+        // report.files[i].sum2 += Math.round(len * rate.over75 * 10) / 10;
       } else if (dseg.max < 95) {
         report.files[i].over85 += len;
-        report.files[i].sum2 += Math.round(len * rate.over85 * 10) / 10;
+        // report.files[i].sum2 += Math.round(len * rate.over85 * 10) / 10;
       } else if (dseg.max < 100) {
         report.files[i].over95 += len;
-        report.files[i].sum2 += Math.round(len * rate.over95 * 10) / 10;
+        // report.files[i].sum2 += Math.round(len * rate.over95 * 10) / 10;
       } else {
         report.files[i].dupli += len;
-        report.files[i].sum2 += Math.round(len * rate.dupli * 10) / 10;
+        // report.files[i].sum2 += Math.round(len * rate.dupli * 10) / 10;
       }
     }
+    // 課金率適用後の文字数を計算
+    report.files[i].sum2 += 
+      Math.round(report.files[i].under49 * rate.under49 * 10) / 10 +
+      Math.round(report.files[i].over50 * rate.over50 * 10) / 10 +
+      Math.round(report.files[i].over75 * rate.over75 * 10) / 10 +
+      Math.round(report.files[i].over85 * rate.over85 * 10) / 10 +
+      Math.round(report.files[i].over95 * rate.over95 * 10) / 10 +
+      Math.round(report.files[i].dupli * rate.dupli * 10) / 10;
 
+    // Summary に一つ前のファイルの文字数を加算しておく
     report.sum += report.files[i].sum;
     report.sum2 += report.files[i].sum2;
     report.dupli += report.files[i].dupli;
@@ -226,7 +243,7 @@ export class DiffInfoBrowser {
       file,
       st,
       tt,
-      len: st.replace(this.spaces, '').length,
+      len: countCharas(st),
       sims: sims.sims,
       max: sims.max,
       maxp: sims.maxp,

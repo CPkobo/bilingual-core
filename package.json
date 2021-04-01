@@ -2,7 +2,12 @@
   "name": "catovis-office-cli",
   "version": "0.2.0",
   "description": "Tools for Translators, enabling to extract/align/diff/ for MS Office files and etc.",
-  "keywords": ["translation", "MS Office", "docx/xlsx/pptx", "text-diff"],
+  "keywords": [
+    "translation",
+    "MS Office",
+    "docx/xlsx/pptx",
+    "text-diff"
+  ],
   "license": "MIT",
   "homepage": "https://catovis.com",
   "author": {

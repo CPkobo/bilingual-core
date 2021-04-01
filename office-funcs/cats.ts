@@ -1,7 +1,9 @@
-import { parseString } from 'xml2js';
+import { parseString, Builder } from 'xml2js';
+// import Js2Xml from 'js2xml'
 
-import { path2ContentStr } from './util-sv'
+import { createTsvArray, path2ContentStr } from './util-sv'
 import { applySegRules, countCharas, countWords, checkValidText, cnm } from './util';
+import { writeFileSync } from 'fs';
 
 export class CatDataContent {
   // public toolName: string;
@@ -16,7 +18,32 @@ export class CatDataContent {
     this.contents = [];
   }
 
-  public loadMultlangXml(fileName: string, xmlStr: string): Promise<boolean> {
+  public getLangsInfo(): string[] {
+    return this.langs;
+  }
+
+  public getLangExists(lang: string): boolean {
+    return this.langs.indexOf(lang) !== -1;
+  }
+
+  public getFilesInfo(): string[] {
+    return this.fileNames;
+  }
+
+  public getContentLength(): number {
+    return this.contents.length;
+  }
+
+  public getContentStats(): string {
+    const stats = {
+      files: this.fileNames,
+      langs: this.langs,
+      segments: this.getContentLength(),
+    }
+    return JSON.stringify(stats, null, 2)
+  }
+
+  public loadMultilangXml(fileName: string, xmlStr: string): Promise<boolean> {
     return new Promise((resolve, reject) => {
       const name = fileName.toLowerCase()
       if (name.endsWith('xliff')) {
@@ -43,31 +70,6 @@ export class CatDataContent {
         reject('This Program only support "XLIFF", "TMX" and "TBX" files' )
       }
     })
-  }
-
-  public getLangsInfo(): string[] {
-    return this.langs;
-  }
-
-  public getLangExists(lang: string): boolean {
-    return this.langs.indexOf(lang) !== -1;
-  }
-
-  public getFilesInfo(): string[] {
-    return this.fileNames;
-  }
-
-  public getContentLength(): number {
-    return this.contents.length;
-  }
-
-  public getContentStats(): string {
-    const stats = {
-      files: this.fileNames,
-      langs: this.langs,
-      segments: this.getContentLength(),
-    }
-    return JSON.stringify(stats, null, 2)
   }
 
   public getSingleText(lang: string): string[] {
@@ -115,6 +117,67 @@ export class CatDataContent {
       }
     }
     return texts;
+  }
+
+  public updateXliff(xliffStr: string, tsv: string[][], asTerm: boolean, overWrite: boolean): Promise<{
+    xml: string, 
+    log: {
+      already: string[],
+      updated: string[],
+      notFounds: string[]
+    }
+  }> {
+    return new Promise((resolve, reject) => {
+      parseString(xliffStr, (err: Error | null, xliff) => {
+        if (err !== null) {
+          console.log(err)
+          reject(false)
+        } else {
+          const xliffTag = xliff.xliff || [{}];
+          const files = xliffTag.file || []
+          const already: string[] = []
+          const updated: string[] = []
+          const notFounds: string[] = []
+          for (const file of files) {
+            const body = file.body || [{}]
+            const groups = body[0].group || []
+            for (const group of groups) {
+              const gid = Number(group.$.id) + 1
+              const tu = group['trans-unit'] || [{}];
+              const srcTag: string[] = tu[0].source || [''];
+              const tgtTag: string[] = tu[0].target || [''];
+              const srcText = srcTag[0]
+              const tgtText = tgtTag[0]
+              if (srcText === '') {
+                continue;
+              } else if (overWrite === false && tgtText !== '') {
+                already.push(`${gid}: ${srcText}`)
+                continue;
+              }
+              const upTgt = asTerm ? this.searchTranslation(srcText, tsv) : this.applyTermbase(srcText, tsv);
+              if (upTgt === '') {
+                notFounds.push(`${gid}: ${srcText}`);
+              }
+              else {
+                tu[0].target[0] = upTgt;
+                updated.push(`${gid}: ${srcText}`)
+              }
+            }
+          }
+          // file タグに対する繰り返しここまで
+          const builder = new Builder()
+          resolve({
+            xml: builder.buildObject(xliff),
+            log: {
+              already,
+              updated,
+              notFounds
+            }
+          })
+        }   
+      })
+    })
+    
   }
 
   public exportTMX(): string {
@@ -236,9 +299,6 @@ export class CatDataContent {
               }
               this.contents.push(units)
             }
-            // const toolName = headerAttr.creationtool || '';
-            // const toolVer = headerAttr.creationtoolversion || ''; 
-            // this.toolName = `${toolName}@${toolVer}`
             resolve(true);
           }
         }
@@ -253,7 +313,6 @@ export class CatDataContent {
           console.log(err)
           reject(err)
         } else {
-          // 	Machine Readable Terminology Interchange Format
           const martifTag = tbx.martif || [{}];
           const textTag = martifTag.text || [{}];
           const bodyTag = textTag[0].body || [{}];
@@ -277,14 +336,30 @@ export class CatDataContent {
               }
               this.contents.push(units)
             }
-            // const toolName = '';
-            // const toolVer = ''; 
-            // this.toolName = `${toolName}@${toolVer}`
             resolve(true);
           }
         }
       })
     })
+  }
+
+  private searchTranslation(src: string, transPairs: string[][]): string {
+    let tgt = ''
+    for (const transPair of transPairs) {
+      if (src === transPair[0]) {
+        tgt = transPair[1]
+        break
+      }
+    }
+    return tgt
+  }
+
+  private applyTermbase(src: string, transPairs: string[][]): string {
+    let tgt = src
+    for (const transPair of transPairs) {
+      tgt = tgt.replace(transPair[0], transPair[1])
+    }
+    return tgt
   }
 
   private getValidLangArray(langs: string[]): string[] {
@@ -295,19 +370,3 @@ export class CatDataContent {
 
 }
 
-
-// const samples = ['./cattest/merged.mxliff']
-// const cat = new CatDataContent()
-// const prs: Promise<boolean>[] = []
-// for (const sample of samples) {
-//   const xml = path2ContentStr(sample);
-//   prs.push(cat.loadMultlangXml(sample, xml))
-// }
-// Promise.all(prs).then(() => {
-//   const exp = cat.getSingleText('all')
-//   console.log(exp)
-// }).catch(e => {
-//   console.log(e)
-// })   
-// const ext = tmx.getSingleText('ja')
-// const exts = tmx.getMultipleTexts(['ja', 'zh-cn'], true)
