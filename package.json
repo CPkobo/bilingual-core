@@ -19,8 +19,8 @@
     "build": "npx tsc --build tsconfig.json",
     "start": "node ./dist/index.js",
     "preset": "node ./dist/index.js --preset",
-    "cli": "node ./dist/index.js --cmd",
-    "test": "ts-node ./cli-funcs/plugins/pltest.ts"
+    "preset:yaml": "node ./dist/index.js --preset --yaml",
+    "preset:default": "node ./dist/index.js --default-preset"
   },
   "dependencies": {
     "@types/js-yaml": "^4.0.0",

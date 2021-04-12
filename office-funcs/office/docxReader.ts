@@ -15,14 +15,17 @@ export async function docxReader(docxFile: any, fileName: string, opt: ReadingOp
     zip.loadAsync(docxFile).then((inzip: any) => {
       if (inzip !== null) {
         inzip.file('word/document.xml').async('string').then((wordxml: string) => {
+          // Wordファイルは修正履歴などの順番を保つ必要があるため、xml2js ではなく xmldom を使う
           const dom: any = require('xmldom').DOMParser;
           const doc: any = new dom().parseFromString(wordxml);
+          // root > w:document > w:body
           const bodyNd: any = doc.lastChild.firstChild;
-          // const bodyCds: any = bodyNd.childNodes !== undefined ? bodyNd.childNodes : [];
+          // w:body の直下のノードから w:p または w:tbl のみを選択して処理
           const bodyCds: any = bodyNd.childNodes || [];
           const bodyCdsLen: number = bodyCds.length;
           for (let i = 0; i < bodyCdsLen; i++) {
             switch (bodyCds[String(i)].nodeName) {
+              // w:p の場合
               case 'w:p': {
                 const textInPara = wordParaReder(bodyCds[String(i)], opt.word.afterRev || true)
                 if (checkValidText(textInPara)) {
@@ -42,6 +45,8 @@ export async function docxReader(docxFile: any, fileName: string, opt: ReadingOp
                 }
               }
 
+              // w:tbl の場合
+              // 実際にはセルの中にまた w:p があるので、関数の中で再度 wordParaReder を呼び出すことになる
               case 'w:tbl': {
                 let tblTexts: string[] = wordTableReader(bodyCds[String(i)], opt.word.afterRev || true);
                 tblTexts = applySegRules(tblTexts, opt);
@@ -63,6 +68,7 @@ export async function docxReader(docxFile: any, fileName: string, opt: ReadingOp
                 break;
             }
           }
+          // w:body の子ノードの処理がすべて終わったらresolve
           resolve(wordContents);
         });
       }
@@ -76,6 +82,8 @@ export async function docxReader(docxFile: any, fileName: string, opt: ReadingOp
   });
 }
 
+// w:p 用の処理関数
+// RUNを示すw:r、挿入を示すw:ins、削除を示すw:delにあたれば抽出処理を実行する
 function wordParaReder(pNd: any, rev: boolean): string {
   const paraTexts: string[] = [];
   const pCds: any = pNd.childNodes || [];
@@ -113,14 +121,19 @@ function wordParaReder(pNd: any, rev: boolean): string {
   return paraTexts.join('');
 }
 
+// w:tbl 用の処理関数
+// 行を示す w:trの下の、セルを示すw:cellをループし
+// その中の段落 w:p について通常の段落と同じよう段落用の処理関数を実行する
 function wordTableReader(tblNd: any, rev: boolean): string[] {
   const tableTexts: string[] = [];
   const tblCds: any = tblNd.childNodes || [];
   const tblCdsLen: number = tblCds.length;
+  // 行単位のループ
   for (let i = 0; i < tblCdsLen; i++) {
     if (tblCds[String(i)].nodeName === 'w:tr') {
       const cellNds: any = tblCds[String(i)].childNodes || [];
       const cellLen: number = cellNds.length;
+      // セル単位のループ
       for (let j = 0; j < cellLen; j++) {
         const cellCds: any = cellNds[String(j)].childNodes || [];
         const cellCdsLen: number = cellCds.length;
@@ -139,64 +152,50 @@ function wordTableReader(tblNd: any, rev: boolean): string[] {
   return tableTexts;
 }
 
+// RUN に入ればテキストを直接取得することができる
+// 
 function wordRunReader(rNd: any, rev: boolean): string {
   const rCds: any = rNd.childNodes || [];
   const rCdsLen: number = rCds.length;
   let textVal = '';
   for (let i = 0; i < rCdsLen; i++) {
-    if (rCds[String(i)].firstChild === null) {
+    const i_ = String(i)
+    if (rCds[i_].firstChild === null) {
       continue;
     }
-    switch (rCds[String(i)].nodeName) {
+    switch (rCds[i_].nodeName) {
       case 'w:t':
-        textVal += rCds[String(i)].firstChild.data;
+        textVal += rCds[i_].firstChild.data;
         break;
 
+      // タブ記号はセグメントで分けるために改行に変換している
       case 'w:tab':
         textVal += '\n';
         break;
 
+      // w:del の中のテキスト部分
       case 'w:delText':
         if (!rev) {
-          const t = rCds[String(i)].firstChild.data || '';
+          const t = rCds[i_].firstChild.data || '';
           textVal += t;
         }
         break;
 
+      // Field Code ？ 要検証
       case 'w:instrText':
         textVal += ' ';
         break;
 
+      // テキストボックスの場合
+      // 再度 W:p を探す処理に入る
       case 'mc:AlternateContent':
-        textVal += wordTboxReader(rCds[String(i)], rev);
+        textVal += shapeVisitor(rCds[i_], rev) + '\n'
         break;
 
+      // シェイプの場合
+      // 再度 W:p を探す処理に入る
       case 'w:pict': {
-        const pictCds = rCds[String(i)].childNodes || [];
-        for (let j = 0; j < pictCds.length; j++) {
-          if (pictCds[String(j)].nodeName !== 'v:shape') {
-            continue;
-          }
-          const shpCds = pictCds[String(j)].childNodes || [];
-          for (let k = 0; k < shpCds.length; k++) {
-            if (shpCds[String(k)].nodeName !== 'v:textbox') {
-              continue;
-            }
-            const vtboxCds = shpCds[String(k)].childNodes || [];
-            for (let l = 0; l < vtboxCds.length; l++) {
-              if (vtboxCds[String(l)].nodeName !== 'w:txbxContent') {
-                continue;
-              }
-              const wtboxCds = vtboxCds[String(l)].childNodes || [];
-              for (let m = 0; m < wtboxCds.length; m++) {
-                if (wtboxCds[String(m)].nodeName !== 'w:p') {
-                  continue;
-                }
-                textVal += wordParaReder(wtboxCds[String(m)], rev);
-              }
-            }
-          }
-        }
+        textVal += shapeVisitor(rCds[i_], rev) + '\n'
         break;
       }
 
@@ -207,28 +206,24 @@ function wordRunReader(rNd: any, rev: boolean): string {
   return textVal;
 }
 
-function wordTboxReader(shpNd: any, rev: boolean): string {
-  let textVal = '';
-  const shpCds: any = shpNd.firstChild.firstChild.firstChild.childNodes || [];
-  const shpCdsLen: number = shpCds.length;
-  let wpsNd: any;
-  for (let i = 0; i < shpCdsLen; i++) {
-    if (shpCds[String(i)].nodeName === 'a:graphic') {
-      wpsNd = shpCds[String(i)].firstChild.firstChild;
-      break;
+// テキストボックスやシェイプの処理
+// これらは作り方によって入れ子になっている数が違うので、
+// ビジター関数で w:p ノードが見つかるまで再帰的にノードを訪問する
+function shapeVisitor(anyNode: any, rev: boolean): string {
+  const ndName = anyNode.nodeName || '';
+  // mc:Fallback は同じ内容が入っているため、処理をスキップして文字の重複を防ぐ
+  if (ndName === 'mc:Fallback') {
+    return ''
+  } else if (ndName === 'w:p') {
+    return wordParaReder(anyNode, rev)
+  } else if (anyNode.childNodes === undefined || anyNode.childNodes === null) {
+    return '';
+  } else {
+    const cdNds = anyNode.childNodes;
+    let textVal = ''
+    for (let j = 0; j < cdNds.length; j++) {
+      textVal += shapeVisitor(cdNds[j], rev);
     }
+    return textVal
   }
-  const wpsCds: any = wpsNd.childNodes || [];
-  const wpsCdsLen: number = wpsCds.length;
-  for (let i = 0; i < wpsCdsLen; i++) {
-    if (wpsCds[String(i)].nodeName === 'wps:txbx') {
-      const wpsTxConPara = wpsCds[String(i)].firstChild.childNodes || [];
-      const wpsTxConParaLen = wpsTxConPara.length;
-      for (let j = 0; j < wpsTxConParaLen; j++) {
-        textVal += wordParaReder(wpsTxConPara[String(j)], rev);
-      }
-      break;
-    }
-  }
-  return textVal;
 }

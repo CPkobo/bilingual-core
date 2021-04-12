@@ -4,7 +4,7 @@ import { load } from 'js-yaml'
 import { ExtractContext } from './office-funcs/extract';
 import { ReadingOption } from './office-funcs/option';
 import { DiffInfo } from './office-funcs/diff';
-import { FileStats } from './office-funcs/stats';
+// import { FileStats } from './office-funcs/stats';
 import { Tovis } from './office-funcs/tovis';
 import { CatDataContent } from './office-funcs/cats';
 
@@ -12,7 +12,31 @@ import { CatDataContent } from './office-funcs/cats';
 import { pathContentsReader, path2ContentStr, createTsvArray } from './office-funcs/util-sv'
 import { path2Format, path2Name, path2Dir } from './office-funcs/util';
 
-const modeChoices = ['EXTRACT', 'ALIGN', 'COUNT', 'DIFF', 'TOVIS'];
+type ModeLarge = 'OFFICE' | 'COUNT' | 'CAT' | 'DEFAULT PRESET'
+
+type ModeMiddleOffice = 'EXTRACT txt' | 'ALIGN tsv' | 'EXTRACT json' | 'EXTRACT-DIFF json' | 'EXTRACT-DIFF tovis'
+type ModeMiddleCount = 'CHARAS tsv' | 'WORDS tsv' | 'DIFF-CHARAS tsv' | 'DIFF-WORDS tsv'
+type ModeMiddleCat = 'EXTRACT tsv' | 'EXTRACT-DIFF json' | 'EXTRACT-DIFF tovis' | 'UPDATE xliff' | 'REPLACE xliff'
+
+
+// とり得る値としてのタイプ
+type ModeOption =
+    'OFFICE:EXTRACT txt' | 'OFFICE:EXTRACT json' |
+    'OFFICE:EXTRACT-DIFF json' | 'OFFICE:EXTRACT-DIFF tovis' | 
+    'OFFICE:ALIGN tsv' | 
+    'COUNT:CHARAS tsv' | 'COUNT:WORDS tsv' |'COUNT:DIFF-CHARAS tsv' |'COUNT:DIFF-WORDS tsv' |
+    'CAT:EXTRACT tsv' | 'CAT:EXTRACT-DIFF json' | 'CAT:EXTRACT-DIFF tovis' | 
+    'CAT:UPDATE xliff' | 'CAT:REPLACE xliff' 
+
+const officeModes: ModeMiddleOffice[] = [
+  'EXTRACT txt', 'ALIGN tsv', 'EXTRACT json', 'EXTRACT-DIFF json', 'EXTRACT-DIFF tovis'
+]
+const countModes: ModeMiddleCount[] = [
+  'CHARAS tsv', 'WORDS tsv', 'DIFF-CHARAS tsv', 'DIFF-WORDS tsv'
+]
+const catModes: ModeMiddleCat[] = [
+  'EXTRACT tsv', 'EXTRACT-DIFF json', 'EXTRACT-DIFF tovis', 'UPDATE xliff', 'REPLACE xliff'
+]
 
 // 初期設定値とともにオプション項目を管理するクラス
 // 主要な機能は以下のとおり
@@ -23,331 +47,333 @@ const modeChoices = ['EXTRACT', 'ALIGN', 'COUNT', 'DIFF', 'TOVIS'];
 // 4. オプション項目をもとに、処理を実行する
 // - ファイルパスの検証等は、実行時に行われる
 
-class CLIParams {
+class CLIController {
   // validateメソッドで、ファイルパスにすべて問題がないと判断されたら true になる
   private validated: boolean;
 
-  // 処理の大分類：MS office または CAT(TMX / TBX / XLIFF)
-  public hyperMode: 'OFFICE' | 'CAT';
+  private mode: {
+    lg: ModeLarge,
+    md: ModeMiddleOffice | ModeMiddleCount | ModeMiddleCat,
+    format: string,
+    console: boolean
+  }
 
-  // 入出力に関するオプション項目
-  public mode: 'EXTRACT' | 'ALIGN' | 'COUNT' | 'DIFF' | 'TOVIS' | 'UPDATE';
-  public source: string;
-  public target: string;
-  public oMode: 'json' | 'plain' | 'console' | '';
-  public oFile: string;
-  public sFiles: string[];
-  public tFiles: string[];
+  private source: string;
+  private target: string;
+  private outputFile: string;
+  private srcFiles: string[];
+  private tgtFiles: string[];
 
   // Officeの抽出に関係するオプション項目
   // ReadingOptionの各項目に対応している
-  public excluding: boolean;
-  public excludePattern: string;
-  public wordRev: boolean;
-  public withSeparator: boolean;
-  public readNote: boolean;
-  public readHiddenSheet: boolean;
-  public readFilledCell: boolean;
+  private officeOptions: {
+    common: CommonOption,
+    word: WordOption,
+    excel: ExcelOption,
+    ppt: PptOption
+  }
 
   // CATの処理に関するオプション項目
-  public locales: string[] | 'all';
-  public fullset: boolean;
-  public overWrite: boolean;
-  public asTerm: boolean;
+  private catOptions: {
+    locales: string[] | 'all';
+    fullset: boolean;
+    overWrite: boolean;
+  }
 
-  constructor(args: any) {
+  private WWCOption: WWCRate;
+
+  constructor() {
     // 初期値の設定を行う
-
-    // 自身のメソッド内でのみ変更可能な項目をつくる
-    this.sFiles = [];
-    this.tFiles = [];
     this.validated = false;
 
-    this.locales = [];
-    this.fullset = false;
-    this.overWrite = false;
-    this.asTerm = false;
-
-    // OFFICEファイル か CAT ファイルか
-    // 既定値は OFFICE
-    if (args.hyperMode === 'CAT') {
-      this.hyperMode = 'CAT';
-    } else {
-      this.hyperMode = 'OFFICE';
-    }
-
-    // モード設定　既定値は EXTRACT
-    if (args.mode !== undefined && modeChoices.indexOf(args.mode) !== -1) {
-      this.mode = args.mode;
-    } else {
-      this.mode = 'EXTRACT';
+    this.mode = {
+      lg: 'OFFICE',
+      md: 'EXTRACT txt',
+      format: 'txt',
+      console: false
     }
 
     // 原稿ファイルの場所
     // 既定値はルート
-    // 名前付き引数のほか、コマンドライン引数の最初に入れることもできる
-    if (args.args !== undefined && args.args[0] !== undefined) {
-      this.source = args.args[0];
-    } else if (args.source !== undefined) {
-      this.source = args.source !== '' ? args.source : './';
-    } else {
-      this.source = './';
-    }
+    this.source = './'
+    this.target = './'
+    this.srcFiles = [];
+    this.tgtFiles = [];
+    this.outputFile = './'
 
-    // 訳文ファイルの場所
-    // 既定値はルート
-    if (args.target !== undefined) {
-      this.target = args.target !== '' ? args.target : './';
-    } else {
-      this.target = './';
-    }
-    this.oFile = args.output !== undefined ? args.output : '';
-
-    // 出力モード
-    // 出力ファイル名から、モードの設定を行う
-    // 入力が無かった場合は基本的にはコンソール出力
-    if (this.oFile === undefined) {
-      this.oMode = 'console';
-    } else if (this.oFile.endsWith('.json')) {
-      this.oMode = 'json';
-    } else if (this.oFile.endsWith('.txt') || this.oFile.endsWith('.tsv')) {
-      this.oMode = 'plain';
-    } else {
-      this.oMode = 'console';
-    }
-
-    // 抽出のための設定
-    // コマンドライン引数から読み込む場合
-    this.excluding = args.excludePattern === undefined;
-    this.excludePattern = args.excludePattern !== undefined ? args.excludePattern : '';
-    this.wordRev = true;
-    this.withSeparator = true;
-    this.readNote = true;
-    this.readHiddenSheet = true;
-    this.readFilledCell = true;
-
-    // ダイアログから読み込む場合
-    const others: string[] = args.others !== undefined ? args.others.split(',') : [];
-    for (let other of others) {
-      other = other.toLowerCase();
-      switch (other) {
-        case 'without-separator':
-        case 'wosep':
-          this.withSeparator = false;
-
-        case 'word-before-rev':
-        case 'norev':
-          this.wordRev = false;
-          break;
-
-        case 'ppt-note':
-        case 'note':
-          this.readNote = false;
-          break;
-
-        case 'excel-hidden-sheet':
-        case 'hide':
-          this.readHiddenSheet = false;
-          break;
-
-        case 'excel-filled-cell':
-        case 'filled':
-          this.readFilledCell = false;
-          break;
-
-        case 'debug':
-          this.oMode = '';
-          break;
-
-        default:
-          break;
-      }
-    }
-  }
-
-  public exportAsOptionQue(): OptionQue {
-    return {
+    this.officeOptions = {
       common: {
         name: 'via-cli',
-        withSeparator: this.withSeparator,
-        excluding: this.excluding,
-        excludePattern: this.excludePattern,
+        withSeparator: true,
+        excluding: false,
+        excludePattern: '',
         segmentation: true,
         delimiters: '(\\。|\\. |\\! |\\? |\\！|\\？)',
       },
       word: {
-        afterRev: this.wordRev,
+        afterRev: true,
       },
       excel: {
-        readHiddenSheet: this.readHiddenSheet,
-        readFilledCell: this.readFilledCell,
+        readHiddenSheet: false,
+        readFilledCell: true,
       },
       ppt: {
-        readNote: this.readNote,
+        readNote: true,
       }
-    };
+    }
+    this.catOptions = {
+      locales: 'all',
+      fullset: false,
+      overWrite: false,
+    }
+
+    this.WWCOption = {
+      dupli: 1,
+      over95: 1,
+      over85: 1,
+      over75: 1,
+      over50: 1,
+      under49: 1,
+    }
+  }
+
+  public exportAsOptionQue(): OptionQue {
+    return this.officeOptions
   }
 
   public getSettingInfo(): string {
+    if (!this.validated) {
+      this.validate()
+    }
     const info = {
-      validated: this.validate,
-      hyperMode: this.hyperMode,
+      validated: this.validated,
       mode: this.mode,
       source: this.source,
       target: this.target,
-      oMode: this.oMode,
-      oFile: this.oFile,
-      sFiles: this.sFiles,
-      tFiles: this.tFiles,
-      excluding: this.excluding,
-      excludePattern: this.excludePattern,
-      wordRev: this.wordRev,
-      withSeparator: this.withSeparator,
-      readNote: this.readNote,
-      readHiddenSheet: this.readHiddenSheet,
-      readFilledCell: this.readFilledCell,
-      locales: this.locales,
-      fullset: this.fullset,
+      outputFile: this.outputFile,
+      srcFiles: this.srcFiles,
+      tgtFiles: this.tgtFiles,
+      office: this.officeOptions,
+      cat: this.catOptions,
+      wwc: this.WWCOption,
     }
     return JSON.stringify(info, null, 2)
   }
 
-  // ダイアログの設定をもとに、再設定する
-  public updateFromDialog(ans: any): void {
-    if (ans.hyperMode) {
-      this.hyperMode = ans.hyperMode;
-    }
-    if (ans.mode) {
-      this.mode = ans.mode;
-    }
-    this.excluding = ans.excludePattern !== '';
-    this.excludePattern = ans.excludePattern;
-    this.withSeparator = ans.withSeparator;
-    this.source = ans.source !== '' ? ans.source : './';
-    if (ans.target !== undefined) {
-      this.target = ans.target !== '' ? ans.target : './';
-    }
-    switch (this.mode) {
-      case 'EXTRACT':
-        if (ans.outputFile === undefined || ans.outputFile === '') {
-          this.oFile = '';
-          this.oMode = 'console';
-        } else if (ans.outputFile.endsWith('.txt')) {
-          this.oFile = ans.outputFile;
-          this.oMode = 'plain';
-        } else if (ans.outputFile.endsWith('.json')) {
-          this.oFile = ans.outputFile;
-          this.oMode = 'json';
-        } else {
-          this.oFile = ans.outputFile + '.txt';
-          this.oMode = 'plain';
+  public setMode1(mode: string | undefined | null): boolean {
+    if (mode === undefined || mode === null) {
+      return false
+    } else {
+      const modes = mode.split(':')
+      switch (modes[0]) {
+        case 'OFFICE':
+          switch (modes[1]) {
+            case 'EXTRACT txt':
+            case 'ALIGN tsv':
+            case 'EXTRACT-DIFF json':
+            case 'EXTRACT-DIFF tovis':
+              this.mode.lg = 'OFFICE'
+              this.mode.md = modes[1]
+              this.mode.format = modes[1].substr(modes[1].lastIndexOf(' ') + 1)
+              return true
+          
+            default:
+              return false
+          }
+
+        case 'COUNT':{
+          switch (modes[1]) {
+            case 'CHARAS tsv':
+            case 'WORDS tsv':
+            case 'DIFF-CHARAS tsv':
+            case 'DIFF-WORDS tsv':
+              this.mode.lg = 'COUNT'
+              this.mode.md = modes[1]
+              this.mode.format = 'tsv'
+              return true
+          
+            default:
+              return false
+          }
         }
-        break;
 
-      case 'ALIGN':
-        if (ans.outputFile === undefined || ans.outputFile === '') {
-          this.oFile = '';
-          this.oMode = 'console';
-        } else if (ans.outputFile.endsWith('.tsv')) {
-          this.oFile = ans.outputFile;
-          this.oMode = 'plain';
-        } else if (ans.outputFile.endsWith('.json')) {
-          this.oFile = ans.outputFile;
-          this.oMode = 'json';
-        } else {
-          this.oFile = ans.outputFile + '.tsv';
-          this.oMode = 'plain';
-        }
-        break;
-
-      case 'COUNT':
-        if (ans.outputFile === undefined || ans.outputFile === '') {
-          this.oFile = '';
-          this.oMode = 'console';
-        } else if (ans.outputFile.endsWith('.tsv')) {
-          this.oFile = ans.outputFile;
-          this.oMode = 'plain';
-        } else if (ans.outputFile.endsWith('.json')) {
-          this.oFile = ans.outputFile;
-          this.oMode = 'json';
-        } else {
-          this.oFile = ans.outputFile + '.tsv';
-          this.oMode = 'plain';
-        }
-        break;
-
-      case 'DIFF':
-        if (ans.outputFile === undefined || ans.outputFile === '') {
-          this.oFile = '';
-          this.oMode = 'console';
-        } else if (ans.outputFile.endsWith('.json')) {
-          this.oFile = ans.outputFile;
-          this.oMode = 'json';
-        } else {
-          this.oFile = ans.outputFile + '.json';
-          this.oMode = 'json';
-        }
-        break;
-
-      case 'TOVIS':
-        if (ans.outputFile === undefined || ans.outputFile === '') {
-          this.oFile = '';
-          this.oMode = 'console';
-        } else if (ans.outputFile.endsWith('.tovis')) {
-          this.oFile = ans.outputFile;
-          this.oMode = 'plain';
-        } else if (ans.outputFile.endsWith('.json')) {
-          this.oFile = ans.outputFile;
-          this.oMode = 'json';
-        } else {
-          this.oFile = ans.outputFile + '.tovis';
-          this.oMode = 'plain';
-        }
-        break;
-
-      default:
-        break;
-    }
-
-    if (ans.others !== undefined) {
-      for (const other of ans.others) {
-        switch (other) {
-          case 'Dont add separation marks':
-            this.withSeparator = false;
-            break;
-
-          case 'Word-Before-Revision':
-            this.wordRev = false;
-            break;
-
-          case 'PPT-Note':
-            this.readNote = false;
-            break;
-
-          case 'Excel-Hidden-Sheet':
-            this.readHiddenSheet = false;
-            break;
-
-          case 'Excel-Filled-Cell':
-            this.readFilledCell = false;
-            break;
-
-          case 'DEBUG':
-            this.oMode = '';
-            break;
-
-          default:
-            break;
-        }
+        case 'CAT':
+          switch (modes[1]) {
+            case 'EXTRACT tsv':
+            case 'EXTRACT-DIFF json':
+            case 'EXTRACT-DIFF tovis':
+            case 'UPDATE xliff':
+              this.mode.lg = 'OFFICE'
+              this.mode.md = modes[1]
+              this.mode.format = modes[1].substr(modes[1].lastIndexOf(' ') + 1)
+              return true
+          
+            default:
+              return false;
+          }
+      
+        default:
+          return false;
       }
     }
+  }
 
-    if (ans.locales !== undefined) {
-      this.locales = ans.locales;
+  public setMode2(
+    modeLg: ModeLarge | undefined | null,
+    modeMd: ModeMiddleOffice | ModeMiddleCat | undefined | null) {
+    if (modeLg === undefined || modeLg === null ||
+      modeMd === undefined || modeMd === null) {
+      return false
+    } else {
+      this.mode.lg = modeLg;
+      this.mode.md = modeMd;
+      return true
     }
+  }
 
-    if (ans.fullset !== undefined) {
-      this.fullset = ans.fullset.toLowerCase() === 'only-fullset';
+  public setConsole(console: boolean | undefined | null): boolean {
+    if (console === undefined || console === null) {
+      return false
+    } else {
+      this.mode.console = console;
+      return true
+    }
+  }
+
+  public setSource(src: string | string[] | undefined | null): boolean {
+    if (src !== undefined && src !== null) {
+      if (typeof src === 'string') {
+        this.source = src
+      } else {
+        this.source = src.join(',')
+      }
+    }
+    return this.setFilesArray('source')
+  }
+
+  public setTarget(tgt: string | string[] | undefined | null): boolean {
+    if (tgt !== undefined && tgt !== null) {
+      if (typeof tgt === 'string') {
+        this.source = tgt
+      } else {
+        this.source = tgt.join(',')
+      }
+    }
+    return this.setFilesArray('target')
+  }
+
+  public setOutputFile(name: string | undefined | null): boolean {
+    if (name === undefined || name === null) {
+      return false
+    } else {
+      if (name !== '') {
+        this.outputFile = name
+      } else {
+        this.outputFile = `./catovis.${this.mode.format}`
+      }
+      return true
+    }
+  }
+
+  public setOfficeOptions(opt: OptionQue | undefined | null): boolean {
+    if (opt === undefined || opt === null) {
+      return false
+    } else {
+      if (opt.common !== undefined) {
+        if (opt.common.withSeparator !== undefined) {
+          this.officeOptions.common.withSeparator = opt.common.withSeparator;
+        }
+        if (opt.common.excludePattern !== undefined && opt.common.excludePattern !== '') {
+          this.officeOptions.common.excluding = true;
+          this.officeOptions.common.excludePattern = opt.common.excludePattern;
+        }
+        if (opt.common.segmentation !== undefined) {
+          this.officeOptions.common.segmentation = opt.common.segmentation;
+        }
+        if (opt.common.delimiters !== undefined && opt.common.delimiters !== '') {
+          this.officeOptions.common.delimiters = opt.common.delimiters;
+        }
+      }
+      if (opt.word !== undefined) {
+        if (opt.word.afterRev !== undefined) {
+          this.officeOptions.word.afterRev = opt.word.afterRev;
+        }
+      }
+      if (opt.excel !== undefined) {
+        if (opt.excel.readHiddenSheet !== undefined) {
+          this.officeOptions.excel.readHiddenSheet = opt.excel.readHiddenSheet;
+        }
+        if (opt.excel.readFilledCell !== undefined) {
+          this.officeOptions.excel.readFilledCell = opt.excel.readFilledCell;
+        }
+      }
+      if (opt.ppt !== undefined) {
+        if (opt.ppt.readNote !== undefined) {
+          this.officeOptions.ppt.readNote = opt.ppt.readNote;
+        }
+      }
+      return true
+    }
+  }
+
+  public setCatOptions(
+    catOpt: {
+      locales: string[] | 'all' | undefined, 
+      fullset: boolean | undefined, 
+      overWrite: boolean | undefined,
+    } | undefined | null
+  ): boolean {
+    if (catOpt === undefined || catOpt === null) {
+      return false
+    } else {
+      if (catOpt.locales !== undefined) {
+        if (typeof catOpt.locales === 'string') {
+          if (catOpt.locales === 'all') {
+            this.catOptions.locales = 'all';
+          }
+        } else if (catOpt.locales.length === 0) {
+          this.catOptions.locales = 'all';
+        } else {
+          this.catOptions.locales = catOpt.locales;
+        }
+      }
+      if (catOpt.fullset !== undefined) {
+        this.catOptions.fullset = catOpt.fullset;
+      }
+      if (catOpt.overWrite !== undefined) {
+        this.catOptions.overWrite = catOpt.overWrite;
+      }
+      return true;
+    }
+  }
+
+  public setWWCOption(wwc: {
+    dupli?: string | number | null,
+    over95?: string | number | null,
+    over85?: string | number | null,
+    over75?: string | number | null,
+    over50?: string | number | null,
+    under49?: string | number | null,
+  } | undefined | null) {
+    if (wwc !== undefined && wwc !== null) {
+      if (wwc.dupli !== undefined && wwc.dupli !== null) {
+        this.WWCOption.dupli = Number(wwc.dupli)
+      }
+      if (wwc.over95 !== undefined && wwc.over95 !== null) {
+        this.WWCOption.over95 = Number(wwc.over95)
+      }
+      if (wwc.over85 !== undefined && wwc.over85 !== null) {
+        this.WWCOption.over85 = Number(wwc.over85)
+      }
+      if (wwc.over75 !== undefined && wwc.over75 !== null) {
+        this.WWCOption.over75 = Number(wwc.over75)
+      }
+      if (wwc.over50 !== undefined && wwc.over50 !== null) {
+        this.WWCOption.over95 = Number(wwc.over50)
+      }
+      if (wwc.under49 !== undefined && wwc.under49 !== null) {
+        this.WWCOption.under49 = Number(wwc.under49)
+      }
     }
   }
 
@@ -359,52 +385,91 @@ class CLIParams {
       console.log(`Validation Error: ${err}`);
       return;
     }
-    console.log(this.getSettingInfo())
-    if (this.hyperMode === 'OFFICE') {
-      this.exec4Office();
-    } else {
+    if (this.mode.lg === 'CAT') {
       this.exec4CAT();
+    } else {
+      this.exec4Office();
     }
   }
 
-  // 大分類が OFFICE だった場合の入力処理～出力メソッドの呼び出し
+  // 大分類が OFFICE または COUNT だった場合の入力処理～出力メソッドの呼び出し
   private exec4Office(): void {
     const opt: OptionQue = this.exportAsOptionQue();
     console.log('------------------------');
     const prs: Array<Promise<ExtractedContent[]>> = [];
-    prs.push(pathContentsReader(this.sFiles, opt));
-    if (this.mode === 'ALIGN') {
-      prs.push(pathContentsReader(this.tFiles, opt));
+    prs.push(pathContentsReader(this.srcFiles, opt));
+    if (this.mode.md === 'ALIGN tsv') {
+      prs.push(pathContentsReader(this.tgtFiles, opt));
     }
     Promise.all(prs).then((ds: ExtractedContent[][]) => {
       const cxt = new ExtractContext();
       const diff = new DiffInfo();
-      switch (this.mode) {
-        case 'EXTRACT':
+      switch (this.mode.md) {
+        case 'EXTRACT txt': {
           cxt.readContent(ds[0]);
-          this.officeOutlet('EXTRACT', opt, this.oMode, this.oFile, { cxt });
-          break;
+          cxt.getSingleText('src', opt).then(result => {
+            this.outlet(result)
+          })
+          break
+        }
+        case 'EXTRACT json': {
+          cxt.readContent(ds[0])
+          const result = cxt.getRawContent('src')
+          this.outlet(JSON.stringify(result, null, 2))
+          break
+        }
 
-        case 'COUNT':
-          diff.analyze(ds[0]);
-          diff.calcWWC('chara');
-          this.officeOutlet('COUNT', opt, this.oMode, this.oFile, { diff });
+        case 'CHARAS tsv': {
+          cxt.readContent(ds[0])
+          const result = cxt.simpleCalc('chara')
+          this.outlet(result)
           break;
+        }
 
-        case 'DIFF':
-          diff.analyze(ds[0]);
-          this.officeOutlet('DIFF', opt, this.oMode, this.oFile, { diff });
+        case 'WORDS tsv': {
+          cxt.readContent(ds[0])
+          const result = cxt.simpleCalc('word')
+          this.outlet(result)
           break;
-
-        case 'ALIGN':
+        }
+        
+        case 'ALIGN tsv': {
           cxt.readContent(ds[0], ds[1]);
-          this.officeOutlet('ALIGN', opt, this.oMode, this.oFile, { cxt });
+          cxt.getAlignedText(opt).then(result => {
+            this.outlet(result)
+          })
           break;
+        }
 
-        case 'TOVIS':
-          diff.analyze(ds[0]);
-          this.officeOutlet('TOVIS', opt, this.oMode, this.oFile, { diff });
-          break;
+        case 'DIFF-CHARAS tsv': {
+          diff.analyze(ds[0])
+          const result = diff.exportResult('wwc-chara', 'human', this.WWCOption)
+          this.outlet(result)
+          break
+        }
+
+        case 'DIFF-WORDS tsv': {
+          diff.analyze(ds[0])
+          const result = diff.exportResult('wwc-word', 'human', this.WWCOption)
+          this.outlet(result)
+          break
+        }
+
+        case 'EXTRACT-DIFF json': {
+          diff.analyze(ds[0])
+          const result = diff.exportResult('diff', 'json')
+          this.outlet(result)
+          break
+        }
+
+        case 'EXTRACT-DIFF tovis': {
+          diff.analyze(ds[0])
+          const tovis = new Tovis()
+          tovis.parseFromObj(diff)
+          const result = tovis.dump()
+          this.outlet(result)
+          break
+        }
 
         default:
           break;
@@ -417,73 +482,14 @@ class CLIParams {
     });
   }
 
-  // 大分類が OFFICE だった場合の出力メソッド
-  private async officeOutlet(
-    eMode: 'EXTRACT' | 'ALIGN' | 'COUNT' | 'DIFF' | 'TOVIS' | 'DEBUG',
-    opt: OptionQue, oMode: 'json' | 'plain' | 'console' | '',
-    oFile: string, data: { cxt?: ExtractContext, diff?: DiffInfo },
-  ): Promise<void> {
-
-    console.log(`${eMode}->${oFile}@${oMode}`)
-
-    let result: string[] = [];
-    switch (eMode) {
-      case 'EXTRACT':
-        if (data.cxt !== undefined) {
-          if (oMode === 'json') {
-            result = [JSON.stringify(data.cxt.getRawContent('src'), null, 2)];
-          } else {
-            result = await data.cxt.getSingleText('src', opt);
-          }
-        }
-        break;
-
-      case 'ALIGN':
-        if (data.cxt !== undefined) {
-          result = await data.cxt.getAlignedText(opt);
-        }
-        break;
-
-      case 'COUNT':
-        if (data.diff !== undefined) {
-          const format = oMode === 'json' ? 'json' : 'human';
-          result = [data.diff.exportResult('wwc-chara', format)];
-        }
-        break;
-
-      case 'DIFF':
-        if (data.diff !== undefined) {
-          result = [data.diff.exportResult('diff', 'json')];
-        }
-        break;
-
-      case 'TOVIS':
-        const tovis = new Tovis();
-        if (data.diff !== undefined) {
-          tovis.parseFromObj(data.diff);
-          if (oFile.endsWith('tovis')) {
-            result = tovis.dump();
-          } else {
-            result = [tovis.dumpToJson()];
-          }
-        }
-        break;
-
-      default:
-        break
-    }
-    switch (oMode) {
-      case 'console':
-        console.log(result.join('\n'));
-        break;
-
-      case 'json':
-      case 'plain':
-        writeFileSync(`./${oFile}`, result.join('\n'));
-        break;
-
-      default:
-        break;
+  private outlet(result: string | string[], name?: string) {
+    const data = typeof result === 'string' ? result : result.join('\n')
+    const filename = name ? name : this.outputFile
+    if (this.mode.console) {
+      console.log(data)
+    } else {
+      writeFileSync(filename, data)
+      console.log(`Success: ${this.outputFile}`)
     }
   }
 
@@ -491,33 +497,36 @@ class CLIParams {
   private exec4CAT(): void {
     const cat = new CatDataContent()
     const prs: Promise<boolean>[] = []
-    if (this.mode === 'UPDATE') {
-      const xliffStr = path2ContentStr(this.sFiles[0])
-      const tsv = createTsvArray(this.tFiles)
+    if (this.mode.md === 'UPDATE xliff' || this.mode.md === 'REPLACE xliff') {
+      const xliffStr = path2ContentStr(this.srcFiles[0])
+      const tsv = createTsvArray(this.tgtFiles)
       if (typeof tsv === 'boolean') {
         console.log('TSV/TXT file error')
       } else {
-        const xliffName = path2Name(this.sFiles[0])
-        const xliffDir = path2Dir(this.sFiles[0])
-        cat.updateXliff(xliffStr, tsv, false, false).then(({xml, log}) => {
-          // console.log(xliffDir)
-          // console.log(xliffName)
-          writeFileSync(`${xliffDir}UPDATE_${xliffName}`, xml)
-          writeFileSync(`${xliffDir}UPDATE_log.txt`, JSON.stringify(log, null, 2))
+        const xliffName = path2Name(this.srcFiles[0])
+        const xliffDir = path2Dir(this.srcFiles[0])
+        const asTerm = this.mode.md === 'REPLACE xliff'
+        cat.updateXliff(xliffStr, tsv, asTerm, this.catOptions.overWrite).then(({xml, log}) => {
+          this.outlet(xml, `${xliffDir}UPDATE_${xliffName}`)
+          this.outlet(JSON.stringify(log, null, 2), `${xliffDir}UPDATE_log.txt`)
         })
       }
     } else {
-      for (const file of this.sFiles) {
+      for (const file of this.srcFiles) {
         const xml = path2ContentStr(file);
         const name = path2Name(file);
         prs.push(cat.loadMultilangXml(name, xml))
       }
       Promise.all(prs).then(() => {
-        const exp = cat.getMultipleTexts(this.locales, this.fullset)
+        const tsv = cat.getMultipleTexts(this.catOptions.locales, this.catOptions.fullset)
         console.log(cat.getFilesInfo())
         console.log(cat.getLangsInfo())
         console.log(cat.getContentLength())
-        console.log(exp)
+        const tsv_: string[] = []
+        for (const t of tsv) {
+          tsv_.push(t.join('\t'))
+        }
+        this.outlet(tsv_)
       }).catch(e => {
         console.log(e)
       })
@@ -527,33 +536,26 @@ class CLIParams {
   private validate(): string {
     let errMes = '';
     this.validated = true;
-    const isSourceOk = this.validateAndSetFiles('source');
-    if (!isSourceOk) {
-      errMes += 'Source Files Error; ';
+    if (this.srcFiles.length === 0) {
+      errMes += 'No Source Files'
     }
-    const isTargetOK = this.mode === 'ALIGN' ? this.validateAndSetFiles('target') : true;
-    if (!isTargetOK) {
-      errMes += 'Target Files Error; ';
-    }
-    if (this.mode === 'ALIGN' && this.sFiles.length !== this.tFiles.length) {
+    if (this.mode.md === 'ALIGN tsv' && this.srcFiles.length !== this.tgtFiles.length) {
       errMes += 'ALIGN File Number Error; ';
     }
-    if (this.mode === 'EXTRACT' && this.oFile.endsWith('.tsv')) {
-      this.oFile = this.oFile.replace('.tsv', '.txt');
+    if (!this.outputFile.endsWith(this.mode.format)) {
+      this.outputFile = `${this.outputFile}.${this.mode.format}`
     }
-    if (this.mode === 'ALIGN' && this.oFile.endsWith('.txt')) {
-      this.oFile = this.oFile.replace('.txt', '.tsv');
-    }
+    console.log(this.getSettingInfo())
     return errMes;
   }
 
-  private validateAndSetFiles(srcOrTgt: 'source' | 'target'): boolean {
+  private setFilesArray(srcOrTgt: 'source' | 'target'): boolean {
     // const oooxml = ['.docx', '.docm', '.xlsx', '.xlsm', '.pptx', '.pptm'];
-    const validFormat = this.hyperMode === 'OFFICE'
+    const validFormat = this.mode.lg === 'OFFICE' || this.mode.lg === 'COUNT'
       ? ['docx', 'docm', 'xlsx', 'xlsm', 'pptx', 'pptm', 'json']
-      : this.mode === 'UPDATE' ? ['xliff', 'mxliff'] : ['xliff', 'mxliff', 'tmx', 'tbx'];
+      : this.mode.md === 'UPDATE xliff' ? ['xliff', 'mxliff'] : ['xliff', 'mxliff', 'tmx', 'tbx'];
     const isWhich = srcOrTgt === 'source' ? this.source : this.target;
-    const toWhich = srcOrTgt === 'source' ? this.sFiles : this.tFiles;
+    const toWhich = srcOrTgt === 'source' ? this.srcFiles : this.tgtFiles;
     const files = isWhich.split(',');
     for (const f of files) {
       try {
@@ -588,37 +590,34 @@ class CLIParams {
 }
 
 
-function selectHyperMode(): Promise<'OFFICE' | 'CAT'> {
+function selectmodeLg(): Promise<ModeLarge> {
   console.log('CATOVIS Dialog Interface');
   return new Promise((resolve, reject) => {
     const inquirer = require('inquirer');
     const prompts = [
       {
         type: 'list',
-        name: 'hyperMode',
+        name: 'modeLg',
         message: 'Select Format',
-        choices: ['OFFICE', 'CAT'],
+        choices: ['OFFICE', 'COUNT', 'CAT', 'DEFAULT PRESET'],
       },
     ]
     inquirer.prompt(prompts).then((answer: any) => {
-      if (answer.hyperMode === 'CAT') {
-        resolve('CAT');
-      } else {
-        resolve('OFFICE');
-      }
+      resolve(answer.modeLg as ModeLarge)
     })
   })
 }
 
-function officeInquirerDialog(sourceFiles?: string) {
-  const params = new CLIParams({});
+function officeInquirerDialog(largeChoice: 'OFFICE' | 'COUNT', sourceFiles?: string) {
+  const middleChoices = largeChoice === 'OFFICE' ? officeModes : countModes
+  const control = new CLIController();
   const inquirer = require('inquirer');
   const prompts = [
     {
       type: 'list',
-      name: 'mode',
+      name: 'modeMd',
       message: 'Select Execution Mode.',
-      choices: ['EXTRACT', 'ALIGN', 'COUNT', 'DIFF', 'TOVIS'],
+      choices: middleChoices,
     },
     {
       name: 'source',
@@ -631,38 +630,14 @@ function officeInquirerDialog(sourceFiles?: string) {
       name: 'target',
       message: 'Target input file(s)/folder(s) with comma separated.',
       when: (answerSoFar: any): boolean => {
-        return answerSoFar.mode === 'ALIGN';
+        return answerSoFar.modeMd === 'ALIGN tsv';
       },
     },
     {
       name: 'outputFile',
       message: (answerSoFar: any): string => {
-        let mes: string = 'Output file name. ';
-        switch (answerSoFar.mode) {
-          case 'EXTRACT':
-            mes += 'Able to use ".txt"(implicit) or ".json", output to "console" if blank.';
-            break;
-
-          case 'ALIGN':
-            mes += 'Able to use ".tsv"(implicit) or ".json", output to "console" if blank.';
-            break;
-
-          case 'COUNT':
-            mes += 'Able to use ".tsv"(implicit), output to "console" if blank.';
-            break;
-
-          case 'DIFF':
-            mes += 'Able to use ".json"(implicit), output to "console" if blank.';
-            break;
-
-          case 'TOVIS':
-            mes += 'Able to use ".tovis"(implicit), output to "console" if blank.';
-            break;
-
-          default:
-            break;
-        }
-        return mes;
+        const format = answerSoFar.modeMd.substr(answerSoFar.modeMd.lastIndexOf(' ') + 1)
+        return 'Input filename for output. ' + format + 'is selected'
       },
     },
     {
@@ -680,24 +655,43 @@ function officeInquirerDialog(sourceFiles?: string) {
     },
   ];
   inquirer.prompt(prompts).then((answer: any) => {
-    // cnm(answer)
     if (sourceFiles !== undefined) {
       answer.source = sourceFiles;
     }
-    params.updateFromDialog(answer);
-    params.executeByParams();
+    control.setMode2(largeChoice ,answer.modeMd);
+    control.setConsole(answer.outputFile === '')
+    control.setSource(answer.source);
+    control.setTarget(answer.target)
+    control.setOutputFile(answer.outputFile)
+    control.setOfficeOptions({
+      common: {
+        excludePattern: answer.excludingPattern,
+        withSeparator: answer.others['Dont add separation marks']
+      },
+      word: {
+        afterRev: answer.others['Word-Before-Revision']
+      },
+      excel: {
+        readFilledCell: answer.others['Excel-Filled-Cell'],
+        readHiddenSheet: answer.others['Excel-Hidden-Sheet'],
+      },
+      ppt: {
+        readNote: answer.others['PPT-Note'],
+      }
+    })
+    control.executeByParams();
   });
 }
 
 function catInquirerDialog(sourceFiles?: string) {
-  const params = new CLIParams({});
+  const control = new CLIController();
   const inquirer = require('inquirer');
   const prompts = [
     {
       type: 'list',
-      name: 'mode',
+      name: 'modeMd',
       message: 'Select Execution Mode.',
-      choices: ['EXTRACT', 'UPDATE'],
+      choices: catModes,
     },
     {
       name: 'source',
@@ -708,16 +702,16 @@ function catInquirerDialog(sourceFiles?: string) {
     },
     {
       name: 'target',
-      message: 'Target input file(s)/folder(s) with comma separated.',
+      message: 'Input 1 tsv or 2 txt files to update XLIFF file',
       when: (answerSoFar: any): boolean => {
-        return answerSoFar.mode === 'UPDATE';
+        return answerSoFar.modeMd === 'UPDATE xliff' || answerSoFar.modeMd === 'REPLACE xliff';
       },
     },
     {
       name: 'locales',
       message: 'Input locales to extract with comma separated. Remain blank for all locales.',
       when: (answerSoFar: any): boolean => {
-        return answerSoFar.mode === 'EXTRACT';
+        return answerSoFar.modeMd.startsWith('EXTRACT');
       },
     },
     {
@@ -726,10 +720,10 @@ function catInquirerDialog(sourceFiles?: string) {
       message: 'Select if you only want to export the segments that have the sentences in all of the locales',
       choices: ['All', 'Only-fullset'],
       when: (answerSoFar: any): boolean => {
-        if (answerSoFar.mode === 'UPDATE') {
-          return false
-        } else {
+        if (answerSoFar.modeMd.startsWith('EXTRACT')) {
           return answerSoFar.locales.split(',').length > 1 || answerSoFar.locales === '';
+        } else {
+          return false
         }
       },
     },
@@ -737,11 +731,7 @@ function catInquirerDialog(sourceFiles?: string) {
       name: 'outputFile',
       message: 'Output file name. Able to use ".tsv". output to "console" if blank.',
       when: (answerSoFar: any): boolean => {
-        if (answerSoFar.mode === 'UPDATE') {
-          return false
-        } else {
-          return answerSoFar.locales.split(',').length > 1 || answerSoFar.locales === '';
-        }
+        return answerSoFar.modeMd.startsWith('EXTRACT')
       },
     },
   ];
@@ -749,17 +739,14 @@ function catInquirerDialog(sourceFiles?: string) {
     if (sourceFiles !== undefined) {
       answer.source = sourceFiles;
     }
-    answer.hyperMode = 'CAT';
-    if (answer.locales === '') {
-      answer.locales = 'all'
+    control.setMode2('CAT', answer.modeMd);
+    control.setConsole(answer.outputFile === '' && answer.modeMd.startsWith('EXTRACT'))
+    control.setSource(answer.source);
+    if (answer.target !== undefined) {
+      control.setTarget(answer.target)
     }
-    if (answer.outputFile !== undefined) {
-      if (answer.outputFile !== '' && !answer.outputFile.endsWith('.tsv')) {
-        answer.outputFile = answer.outputFile + '.tsv'
-      }
-    }
-    params.updateFromDialog(answer);
-    params.executeByParams();
+    control.setOutputFile(answer.outputFile)
+    control.executeByParams();
   });
 }
 
@@ -767,73 +754,57 @@ function catInquirerDialog(sourceFiles?: string) {
 console.log('------------------------');
 const program = require('commander');
 program
-  .option('-c, --cmd', 'Use full CLI when true. Default value is "false"', false)
+  // .option('-c, --cmd', 'Use full CLI when true. Default value is "false"', false)
   .option('-p, --preset', 'Use this flag for executing with pre-designated params')
-  .option('-m, --mode <item>', 'Select Execution Mode. Choose From "EXTRACT" | "ALIGN" | "COUNT" | "DIFF" | "TOVIS"')
-  .option('-s, --source <item>', 'Source input file(s)/folder(s) with comma separated. You can input directly without option. Remain blank for current directory')
-  .option('-t, --target <item>', 'Target input file(s)/folder(s) with comma separated.')
-  .option('-i, --input <item>', 'A txt file which lists the input file. Currently not provided yet')
-  .option('-o, --output <item>', 'Designate output file name with extension. Format can be selected from json, txt or tsv. Use standard output when blank')
-  .option('-e, --excludePattern <item>', 'RegExp string for excluding from result. The expression "^" and "$" will be automaticaly added.')
-  .option('-w, --withSeparator', 'Use separation marks in out file. Default value is "true"', true)
-  .option('--others <item>',
-    'Designate "Without-Separator(or wosep) | Word-Before-Rev(or norev) |PPT-Note(or note) | Excel-Hidden-Sheet(or hide) | Excel-Filled-Cell(or filled) | DEBUG". Multiple selection with comma.');
+  .option('-y, --yaml <item>', 'Designate the yaml file for preset')
+  .option('--default-preset', 'Create the default preset file')
+  // .option('-m, --mode <item>', 'Select Execution Mode. Choose From "EXTRACT" | "ALIGN" | "COUNT" | "DIFF" | "TOVIS"')
+  // .option('-s, --source <item>', 'Source input file(s)/folder(s) with comma separated. You can input directly without option. Remain blank for current directory')
+  // .option('-t, --target <item>', 'Target input file(s)/folder(s) with comma separated.')
+  // .option('-i, --input <item>', 'A txt file which lists the input file. Currently not provided yet')
+  // .option('-o, --output <item>', 'Designate output file name with extension. Format can be selected from json, txt or tsv. Use standard output when blank')
+  // .option('-e, --excludePattern <item>', 'RegExp string for excluding from result. The expression "^" and "$" will be automaticaly added.')
+  // .option('-w, --withSeparator', 'Use separation marks in out file. Default value is "true"', true)
+  // .option('--others <item>',
+    // 'Designate "Without-Separator(or wosep) | Word-Before-Rev(or norev) |PPT-Note(or note) | Excel-Hidden-Sheet(or hide) | Excel-Filled-Cell(or filled) | DEBUG". Multiple selection with comma.');
 
 const args: any = program.parse(process.argv);
 
-if (args.preset) {
-  const params = new CLIParams({})
-  // あらかじめ動作を設定する
-  const presetYaml = readFileSync('./preset.yaml').toString();
-  const yamlOpt = load(presetYaml) as any;
-  params.hyperMode = yamlOpt.hyperMode || 'OFFICE';
-  params.mode = yamlOpt.mode || 'EXTRACT';
-  params.oFile = yamlOpt.outputFile || 'preset';
-  params.oMode = yamlOpt.outputType || '';
-  params.locales = yamlOpt.locales || 'all';
-  params.fullset = yamlOpt.locales || false;
-  params.source = yamlOpt.sourceFiles ? yamlOpt.sourceFiles.join(',') : '';
-  if (yamlOpt.targetFiles !== undefined) {
-    params.target = yamlOpt.targetFiles.join(',')
+// デフォルトのプリセットファイルの書き出し
+if (args.defaultPreset) {
+  writeDefaultPreset()
+// プリセットモードを実行する場合
+} else if (args.preset) {
+  const control = new CLIController()
+  // 指定ファイルの存在を確認し、なかった場合は　'./preset.yaml' を使用する
+  let preset = './preset.yaml'
+  try {
+    statSync(args.yaml)
+    preset = args.yaml
+  } catch {
+    console.log(`${args.yaml} does not exist`)
   }
-  if (yamlOpt.common !== undefined) {
-    if (yamlOpt.common.excludePattern !== undefined && yamlOpt.common.excludePattern !== '') {
-      params.excluding = true;
-      params.excludePattern = yamlOpt.common.excludePattern;
-    } else {
-      params.excluding = false;
-    }
-    if (yamlOpt.common.withSeparator !== undefined) {
-      params.withSeparator = yamlOpt.common.withSeparator;
-    }
-  }
-  if (yamlOpt.word !== undefined) {
-    if (yamlOpt.word.rev !== undefined) {
-      params.wordRev = yamlOpt.word.rev;
-    }
-  }
-  if (yamlOpt.excel !== undefined) {
-    if (yamlOpt.excel.readHiddenSheet !== undefined) {
-      params.readHiddenSheet = yamlOpt.excel.readHiddenSheet;
-    }
-    if (yamlOpt.excel.readFilledCell !== undefined) {
-      params.readFilledCell = yamlOpt.excel.readFilledCell;
-    }
-  }
-  if (yamlOpt.ppt !== undefined) {
-    if (yamlOpt.ppt.readNote !== undefined) {
-      params.readNote = yamlOpt.ppt.readNote;
-    }
-  }
-  console.log(params)
-  params.executeByParams();
-} else if (args.cmd === false) {
-  selectHyperMode().then((hm) => {
-    if (hm === 'OFFICE') {
+  // プリセットファイルの読み込み
+  const presetYaml = readFileSync(preset).toString();
+  const yo = load(presetYaml) as any;
+  control.setMode1(yo.mode)
+  control.setSource(yo.sourceFiles)
+  control.setTarget(yo.targetgtFiles)
+  control.setConsole(yo.console)
+  control.setOutputFile(yo.outputFile);
+  control.setOfficeOptions(yo.office)
+  control.setCatOptions(yo.cat)
+  control.setWWCOption(yo.wwc)
+  control.executeByParams();
+} else {
+  selectmodeLg().then((lg) => {
+    if (lg === 'DEFAULT PRESET') {
+      writeDefaultPreset();
+    } else if (lg === 'OFFICE' || lg === 'COUNT') {
       if (args.args.length !== 0) {
-        officeInquirerDialog(args.args[0]);
+        officeInquirerDialog(lg, args.args[0]);
       } else {
-        officeInquirerDialog();
+        officeInquirerDialog(lg);
       }
     } else {
       if (args.args.length !== 0) {
@@ -843,7 +814,98 @@ if (args.preset) {
       }
     }
   })
-} else {
-  const params = new CLIParams(args);
-  params.executeByParams();
+}
+
+function writeDefaultPreset() {
+  const defaultPreset = `
+  # ------------------------------------------------------------
+  # [mode]
+  # Select from the followings:
+    # - 'OFFICE:EXTRACT txt'
+    # - 'OFFICE:EXTRACT DIFF json'
+    # - 'OFFICE:EXTRACT DIFF tovis' 
+    # - 'OFFICE:ALIGN tsv' 
+    # - 'COUNT:CHARAS tsv'
+    # - 'COUNT:WORDS tsv'
+    # - 'COUNT:DIFF-CHARAS tsv'
+    # - 'COUNT:DIFF-WORDS tsv'
+    # - 'CAT:EXTRACT tsv'
+    # - 'CAT:EXTRACT DIFF json'
+    # - 'CAT:EXTRACT DIFF tovis'
+    # - 'CAT:UPDATE xliff'
+  # If the selection is not proper, then the mode will be set as 'OFFICE:EXTRACT txt' implicity
+  # OFFICE supports: docx / docm / xlsx / xlsm / pptx / pptm
+  # CAT supports: xliff / mxliff / tmx / tbx
+  # ------------------------------------------------------------
+  mode: 'OFFICE:EXTRACT txt'
+
+  # ------------------------------------------------------------
+  # [console]
+  # Set true if you do not want to create a file
+  # ------------------------------------------------------------
+  console: false
+
+  # ---------------
+  # [outputFile]
+  # Set a filename to output (default: preset)
+  # It is NOT mandantory, and be ignored when the console is true
+  # ---------------
+  outputFile: './result.txt'
+
+  # ---------------
+  # [sourceFiles]
+  # list up the source file(s) or folder(s)
+  # ---------------
+  sourceFiles:
+    - './jp/'
+    
+  # ---------------
+  # [targetFiles]
+  # list up the target file(s) or folder(s)
+  # ---------------
+  targetFiles:
+    - ./en/
+
+  # ---------------
+  # [office]
+  # Setting for detailed extraction (for office files)
+  # ---------------
+  office:
+    common:
+      segmentation: true
+      delimiters: '(\\。|\\. |\\! |\\? |\\！|\\？)'
+      excludePattern: ''
+      withSeparator: true
+
+    word:
+      rev: true
+    excel:
+      readHiddenSheet: false
+      readFilledCell: true
+    ppt:
+      readNote: true
+
+  # ---------------
+  # [cat] 
+  # Setting for detailed extraction (for CAT files)
+  # ---------------
+  cat:
+    locales: 'all'
+    fullset: false
+    overWite: false
+
+  # ---------------
+  # [WWC] 
+  # Setting for Weighted Word Count(for COUNT)
+  # ---------------
+  wwc:
+    dupli: 0.15
+    over95: 0.3
+    over85: 0.6
+    over75: 0.8
+    over50: 1
+    under49: 1
+  `
+  writeFileSync('./preset.yaml', defaultPreset)
+  console.log('Default preset.yaml has been set: "./preset.yaml"')
 }
