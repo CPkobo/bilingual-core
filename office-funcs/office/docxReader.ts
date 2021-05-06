@@ -18,8 +18,17 @@ export async function docxReader(docxFile: any, fileName: string, opt: ReadingOp
           // Wordファイルは修正履歴などの順番を保つ必要があるため、xml2js ではなく xmldom を使う
           const dom: any = require('xmldom').DOMParser;
           const doc: any = new dom().parseFromString(wordxml);
-          // root > w:document > w:body
-          const bodyNd: any = doc.lastChild.firstChild;
+          // root > w:document
+          const docNd: any = doc.lastChild || {};
+          const docCds: any = docNd.childNodes || [];
+          // w:document > w:body
+          let bodyNd: any = {};
+          for (let i = 0; i < docCds.length; i++) {
+              if (docCds[i].nodeName === 'w:body') {
+                  bodyNd = docCds[i]
+                  break
+              }
+          }
           // w:body の直下のノードから w:p または w:tbl のみを選択して処理
           const bodyCds: any = bodyNd.childNodes || [];
           const bodyCdsLen: number = bodyCds.length;
