@@ -21,12 +21,12 @@ type ModeMiddleCat = 'EXTRACT tsv' | 'EXTRACT-DIFF json' | 'EXTRACT-DIFF tovis' 
 
 // とり得る値としてのタイプ
 type ModeOption =
-    'OFFICE:EXTRACT txt' | 'OFFICE:EXTRACT json' |
-    'OFFICE:EXTRACT-DIFF json' | 'OFFICE:EXTRACT-DIFF tovis' | 
-    'OFFICE:ALIGN tsv' | 
-    'COUNT:CHARAS tsv' | 'COUNT:WORDS tsv' |'COUNT:DIFF-CHARAS tsv' |'COUNT:DIFF-WORDS tsv' |
-    'CAT:EXTRACT tsv' | 'CAT:EXTRACT-DIFF json' | 'CAT:EXTRACT-DIFF tovis' | 
-    'CAT:UPDATE xliff' | 'CAT:REPLACE xliff' 
+  'OFFICE:EXTRACT txt' | 'OFFICE:EXTRACT json' |
+  'OFFICE:EXTRACT-DIFF json' | 'OFFICE:EXTRACT-DIFF tovis' |
+  'OFFICE:ALIGN tsv' |
+  'COUNT:CHARAS tsv' | 'COUNT:WORDS tsv' | 'COUNT:DIFF-CHARAS tsv' | 'COUNT:DIFF-WORDS tsv' |
+  'CAT:EXTRACT tsv' | 'CAT:EXTRACT-DIFF json' | 'CAT:EXTRACT-DIFF tovis' |
+  'CAT:UPDATE xliff' | 'CAT:REPLACE xliff'
 
 const officeModes: ModeMiddleOffice[] = [
   'EXTRACT txt', 'ALIGN tsv', 'EXTRACT json', 'EXTRACT-DIFF json', 'EXTRACT-DIFF tovis'
@@ -176,12 +176,12 @@ class CLIController {
               this.mode.md = modes[1]
               this.mode.format = modes[1].substr(modes[1].lastIndexOf(' ') + 1)
               return true
-          
+
             default:
               return false
           }
 
-        case 'COUNT':{
+        case 'COUNT': {
           switch (modes[1]) {
             case 'CHARAS tsv':
             case 'WORDS tsv':
@@ -191,7 +191,7 @@ class CLIController {
               this.mode.md = modes[1]
               this.mode.format = 'tsv'
               return true
-          
+
             default:
               return false
           }
@@ -207,11 +207,11 @@ class CLIController {
               this.mode.md = modes[1]
               this.mode.format = modes[1].substr(modes[1].lastIndexOf(' ') + 1)
               return true
-          
+
             default:
               return false;
           }
-      
+
         default:
           return false;
       }
@@ -231,9 +231,12 @@ class CLIController {
     }
   }
 
-  public setConsole(console: boolean | undefined | null): boolean {
+  public setConsole(console: boolean | string | undefined | null): boolean {
     if (console === undefined || console === null) {
       return false
+    } else if (typeof console === 'string') {
+      this.mode.console = console === 'true';
+      return true
     } else {
       this.mode.console = console;
       return true
@@ -254,9 +257,9 @@ class CLIController {
   public setTarget(tgt: string | string[] | undefined | null): boolean {
     if (tgt !== undefined && tgt !== null) {
       if (typeof tgt === 'string') {
-        this.source = tgt
+        this.target = tgt
       } else {
-        this.source = tgt.join(',')
+        this.target = tgt.join(',')
       }
     }
     return this.setFilesArray('target')
@@ -318,8 +321,8 @@ class CLIController {
 
   public setCatOptions(
     catOpt: {
-      locales: string[] | 'all' | undefined, 
-      fullset: boolean | undefined, 
+      locales: string[] | 'all' | undefined,
+      fullset: boolean | undefined,
       overWrite: boolean | undefined,
     } | undefined | null
   ): boolean {
@@ -432,7 +435,7 @@ class CLIController {
           this.outlet(result)
           break;
         }
-        
+
         case 'ALIGN tsv': {
           cxt.readContent(ds[0], ds[1]);
           cxt.getAlignedText(opt).then(result => {
@@ -506,7 +509,7 @@ class CLIController {
         const xliffName = path2Name(this.srcFiles[0])
         const xliffDir = path2Dir(this.srcFiles[0])
         const asTerm = this.mode.md === 'REPLACE xliff'
-        cat.updateXliff(xliffStr, tsv, asTerm, this.catOptions.overWrite).then(({xml, log}) => {
+        cat.updateXliff(xliffStr, tsv, asTerm, this.catOptions.overWrite).then(({ xml, log }) => {
           this.outlet(xml, `${xliffDir}UPDATE_${xliffName}`)
           this.outlet(JSON.stringify(log, null, 2), `${xliffDir}UPDATE_log.txt`)
         })
@@ -658,7 +661,7 @@ function officeInquirerDialog(largeChoice: 'OFFICE' | 'COUNT', sourceFiles?: str
     if (sourceFiles !== undefined) {
       answer.source = sourceFiles;
     }
-    control.setMode2(largeChoice ,answer.modeMd);
+    control.setMode2(largeChoice, answer.modeMd);
     control.setConsole(answer.outputFile === '')
     control.setSource(answer.source);
     control.setTarget(answer.target)
@@ -758,22 +761,22 @@ program
   .option('-p, --preset', 'Use this flag for executing with pre-designated params')
   .option('-y, --yaml <item>', 'Designate the yaml file for preset')
   .option('--default-preset', 'Create the default preset file')
-  // .option('-m, --mode <item>', 'Select Execution Mode. Choose From "EXTRACT" | "ALIGN" | "COUNT" | "DIFF" | "TOVIS"')
-  // .option('-s, --source <item>', 'Source input file(s)/folder(s) with comma separated. You can input directly without option. Remain blank for current directory')
-  // .option('-t, --target <item>', 'Target input file(s)/folder(s) with comma separated.')
-  // .option('-i, --input <item>', 'A txt file which lists the input file. Currently not provided yet')
-  // .option('-o, --output <item>', 'Designate output file name with extension. Format can be selected from json, txt or tsv. Use standard output when blank')
-  // .option('-e, --excludePattern <item>', 'RegExp string for excluding from result. The expression "^" and "$" will be automaticaly added.')
-  // .option('-w, --withSeparator', 'Use separation marks in out file. Default value is "true"', true)
-  // .option('--others <item>',
-    // 'Designate "Without-Separator(or wosep) | Word-Before-Rev(or norev) |PPT-Note(or note) | Excel-Hidden-Sheet(or hide) | Excel-Filled-Cell(or filled) | DEBUG". Multiple selection with comma.');
+// .option('-m, --mode <item>', 'Select Execution Mode. Choose From "EXTRACT" | "ALIGN" | "COUNT" | "DIFF" | "TOVIS"')
+// .option('-s, --source <item>', 'Source input file(s)/folder(s) with comma separated. You can input directly without option. Remain blank for current directory')
+// .option('-t, --target <item>', 'Target input file(s)/folder(s) with comma separated.')
+// .option('-i, --input <item>', 'A txt file which lists the input file. Currently not provided yet')
+// .option('-o, --output <item>', 'Designate output file name with extension. Format can be selected from json, txt or tsv. Use standard output when blank')
+// .option('-e, --excludePattern <item>', 'RegExp string for excluding from result. The expression "^" and "$" will be automaticaly added.')
+// .option('-w, --withSeparator', 'Use separation marks in out file. Default value is "true"', true)
+// .option('--others <item>',
+// 'Designate "Without-Separator(or wosep) | Word-Before-Rev(or norev) |PPT-Note(or note) | Excel-Hidden-Sheet(or hide) | Excel-Filled-Cell(or filled) | DEBUG". Multiple selection with comma.');
 
 const args: any = program.parse(process.argv);
 
 // デフォルトのプリセットファイルの書き出し
 if (args.defaultPreset) {
   writeDefaultPreset()
-// プリセットモードを実行する場合
+  // プリセットモードを実行する場合
 } else if (args.preset) {
   const control = new CLIController()
   // 指定ファイルの存在を確認し、なかった場合は　'./preset.yaml' を使用する
@@ -789,7 +792,7 @@ if (args.defaultPreset) {
   const yo = load(presetYaml) as any;
   control.setMode1(yo.mode)
   control.setSource(yo.sourceFiles)
-  control.setTarget(yo.targetgtFiles)
+  control.setTarget(yo.targetFiles)
   control.setConsole(yo.console)
   control.setOutputFile(yo.outputFile);
   control.setOfficeOptions(yo.office)

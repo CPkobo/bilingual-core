@@ -1,0 +1,89 @@
+
+  # ------------------------------------------------------------
+  # [mode]
+  # Select from the followings:
+    # - 'OFFICE:EXTRACT txt'
+    # - 'OFFICE:EXTRACT DIFF json'
+    # - 'OFFICE:EXTRACT DIFF tovis' 
+    # - 'OFFICE:ALIGN tsv' 
+    # - 'COUNT:CHARAS tsv'
+    # - 'COUNT:WORDS tsv'
+    # - 'COUNT:DIFF-CHARAS tsv'
+    # - 'COUNT:DIFF-WORDS tsv'
+    # - 'CAT:EXTRACT tsv'
+    # - 'CAT:EXTRACT DIFF json'
+    # - 'CAT:EXTRACT DIFF tovis'
+    # - 'CAT:UPDATE xliff'
+  # If the selection is not proper, then the mode will be set as 'OFFICE:EXTRACT txt' implicity
+  # OFFICE supports: docx / docm / xlsx / xlsm / pptx / pptm
+  # CAT supports: xliff / mxliff / tmx / tbx
+  # ------------------------------------------------------------
+  mode: 'OFFICE:ALIGN tsv'
+
+  # ------------------------------------------------------------
+  # [console]
+  # Set true if you do not want to create a file
+  # ------------------------------------------------------------
+  console: fasle
+
+  # ---------------
+  # [outputFile]
+  # Set a filename to output (default: preset)
+  # It is NOT mandantory, and be ignored when the console is true
+  # ---------------
+  outputFile: '../ext/results.tsv'
+
+  # ---------------
+  # [sourceFiles]
+  # list up the source file(s) or folder(s)
+  # ---------------
+  sourceFiles:
+    - ../ext/jp/
+    
+  # ---------------
+  # [targetFiles]
+  # list up the target file(s) or folder(s)
+  # ---------------
+  targetFiles:
+    - ../ext/cn/
+
+  # ---------------
+  # [office]
+  # Setting for detailed extraction (for office files)
+  # ---------------
+  office:
+    common:
+      segmentation: false
+      delimiters: '(\。|\. |\! |\? |\！|\？)'
+      excludePattern: '^[0-9A-z ()（）\[\]%\-～+±]+$'
+      withSeparator: true
+
+    word:
+      rev: true
+    excel:
+      readHiddenSheet: false
+      readFilledCell: true
+    ppt:
+      readNote: true
+
+  # ---------------
+  # [cat] 
+  # Setting for detailed extraction (for CAT files)
+  # ---------------
+  cat:
+    locales: 'all'
+    fullset: false
+    overWite: false
+
+  # ---------------
+  # [WWC] 
+  # Setting for Weighted Word Count(for COUNT)
+  # ---------------
+  wwc:
+    dupli: 0.15
+    over95: 0.3
+    over85: 0.6
+    over75: 0.8
+    over50: 1
+    under49: 1
+  
