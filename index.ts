@@ -169,6 +169,7 @@ class CLIController {
         case 'OFFICE':
           switch (modes[1]) {
             case 'EXTRACT txt':
+            case 'EXTRACT json':
             case 'ALIGN tsv':
             case 'EXTRACT-DIFF json':
             case 'EXTRACT-DIFF tovis':
@@ -568,13 +569,13 @@ class CLIController {
           const clds = readdirSync(f);
           for (const cld of clds) {
             const format = path2Format(cld)
-            if (validFormat.indexOf(format) !== -1) {
+            if (validFormat.indexOf(format) !== -1 && !cld.startsWith('~$')) {
               toWhich.push(`${dirName}${cld}`);
             }
           }
         } else {
           const format = path2Format(f)
-          if (validFormat.indexOf(format) !== -1) {
+          if (validFormat.indexOf(format) !== -1 && !f.startsWith('~$')) {
             toWhich.push(f);
           }
         }
@@ -781,11 +782,18 @@ if (args.defaultPreset) {
   const control = new CLIController()
   // 指定ファイルの存在を確認し、なかった場合は　'./preset.yaml' を使用する
   let preset = './preset.yaml'
+  const pyaml = args.yaml.endsWith('.yaml') ? args.yaml :
+      args.yaml.endsWith('.yml') ? args.yaml : `${args.yaml}.yaml`
   try {
-    statSync(args.yaml)
+    statSync(pyaml)
     preset = args.yaml
   } catch {
-    console.log(`${args.yaml} does not exist`)
+    try {
+      statSync(`./presets/${pyaml}`)
+      preset = `./presets/${pyaml}`
+    } catch {
+      console.log(`${args.yaml} does not exist`)
+    }
   }
   // プリセットファイルの読み込み
   const presetYaml = readFileSync(preset).toString();
@@ -825,6 +833,7 @@ function writeDefaultPreset() {
   # [mode]
   # Select from the followings:
     # - 'OFFICE:EXTRACT txt'
+    # - 'OFFICE:EXTRACT json'
     # - 'OFFICE:EXTRACT DIFF json'
     # - 'OFFICE:EXTRACT DIFF tovis' 
     # - 'OFFICE:ALIGN tsv' 

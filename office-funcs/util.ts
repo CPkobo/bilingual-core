@@ -132,7 +132,10 @@ export function applySegRules(textVal: string[], opt: ReadingOption): string[] {
       applyedValue.push(...newVal);
     }
   });
-  return applyedValue;
+  return applyedValue.filter(val => {
+    let val_ = val.replace('\n', '').replace('\r', '')
+    return val !== '';
+  });
 }
 
 export function applyOpcodes(original: string, diffed: string, opcodes: Opcode[]): string {

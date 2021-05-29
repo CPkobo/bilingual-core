@@ -3,6 +3,7 @@
   # [mode]
   # Select from the followings:
     # - 'OFFICE:EXTRACT txt'
+    # - 'OFFICE:EXTRACT json'
     # - 'OFFICE:EXTRACT DIFF json'
     # - 'OFFICE:EXTRACT DIFF tovis' 
     # - 'OFFICE:ALIGN tsv' 
@@ -31,21 +32,21 @@
   # Set a filename to output (default: preset)
   # It is NOT mandantory, and be ignored when the console is true
   # ---------------
-  outputFile: '../ext/results.tsv'
+  outputFile: '../ext/dev/results.json'
 
   # ---------------
   # [sourceFiles]
   # list up the source file(s) or folder(s)
   # ---------------
   sourceFiles:
-    - ../ext/jp/
+    - ../ext/dev/jp/
     
   # ---------------
   # [targetFiles]
   # list up the target file(s) or folder(s)
   # ---------------
   targetFiles:
-    - ../ext/cn/
+    - ../ext/dev/cn/
 
   # ---------------
   # [office]

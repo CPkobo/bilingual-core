@@ -323,9 +323,6 @@ export class ExtractContext {
               const spfs: ExtractedText[] = [];
               const stfs: ExtractedText[] = [];
               for (const et of sf.exts) {
-                if (!opt.excel.readHiddenSheet && !et.isActive) {
-                  continue;
-                }
                 if (et.type === 'Word-Paragraph') {
                   spfs.push(et);
                 } else if (et.type === 'Word-Table') {
@@ -336,9 +333,6 @@ export class ExtractContext {
               const tpfs: ExtractedText[] = [];
               const ttfs: ExtractedText[] = [];
               for (const et of tf.exts) {
-                if (!opt.excel.readHiddenSheet && !et.isActive) {
-                  continue;
-                }
                 if (et.type === 'Word-Paragraph') {
                   tpfs.push(et);
                 } else if (et.type === 'Word-Table') {
@@ -375,6 +369,9 @@ export class ExtractContext {
               let k = 0;
               for (let j = 0; j <= larger - 1; j++) {
                 k++;
+                // if (!opt.excel.readHiddenSheet && !sf.isActive) {
+                //   continue;
+                // }
                 const sv = sf.exts[j] !== undefined ? sf.exts[j].value.slice() : [''];
                 const tv = tf.exts[j] !== undefined ? tf.exts[j].value.slice() : [''];
                 inFile.push(...this.segPairing(sv, tv, `SHEET${k}`, toSep));
@@ -465,7 +462,7 @@ export class ExtractContext {
     }
     for (let i = 0; i < larger; i++) {
       if (!(sVal[i] === '' && tVal[i] === '')) {
-        inSection.push(`${sVal[i]}\t${tVal[i]}`);
+        inSection.push(`${sVal[i].replace(/\n|\r/g, '')}\t${tVal[i].replace(/\n|\r/g, '')}`);
       }
     }
     return inSection;

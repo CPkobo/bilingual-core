@@ -19,27 +19,27 @@
   # OFFICE supports: docx / docm / xlsx / xlsm / pptx / pptm
   # CAT supports: xliff / mxliff / tmx / tbx
   # ------------------------------------------------------------
-  mode: 'OFFICE:EXTRACT txt'
+  mode: 'COUNT:DIFF-CHARAS tsv'
 
   # ------------------------------------------------------------
   # [console]
   # Set true if you do not want to create a file
   # ------------------------------------------------------------
-  console: true
+  console: fasle
 
   # ---------------
   # [outputFile]
   # Set a filename to output (default: preset)
   # It is NOT mandantory, and be ignored when the console is true
   # ---------------
-  outputFile: ''
+  outputFile: '../ext/gbs.tsv'
 
   # ---------------
   # [sourceFiles]
   # list up the source file(s) or folder(s)
   # ---------------
   sourceFiles:
-    - ./
+    - ../ext/
     
   # ---------------
   # [targetFiles]
@@ -57,7 +57,7 @@
       segmentation: true
       delimiters: '(\\。|\\. |\\! |\\? |\\！|\\？)'
       excludePattern: '^[0-9A-z,\-\.\+%() ]+$'
-      withSeparator: false
+      withSeparator: true
 
     word:
       rev: true

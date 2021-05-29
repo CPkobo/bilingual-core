@@ -197,14 +197,21 @@ function wordRunReader(rNd: any, rev: boolean): string {
 
       // テキストボックスの場合
       // 再度 W:p を探す処理に入る
-      case 'mc:AlternateContent':
-        textVal += shapeVisitor(rCds[i_], rev) + '\n'
+      case 'mc:AlternateContent': {
+        const t = shapeVisitor(rCds[i_], rev)
+        if (t !== '') {
+          textVal +=  t + '\n'
+        }
         break;
+      }
 
       // シェイプの場合
       // 再度 W:p を探す処理に入る
       case 'w:pict': {
-        textVal += shapeVisitor(rCds[i_], rev) + '\n'
+        const t = shapeVisitor(rCds[i_], rev)
+        if (t !== '') {
+          textVal +=  t + '\n'
+        }
         break;
       }
 

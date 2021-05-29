@@ -3,6 +3,7 @@
   # [mode]
   # Select from the followings:
     # - 'OFFICE:EXTRACT txt'
+    # - 'OFFICE:EXTRACT json'
     # - 'OFFICE:EXTRACT DIFF json'
     # - 'OFFICE:EXTRACT DIFF tovis' 
     # - 'OFFICE:ALIGN tsv' 
@@ -31,14 +32,14 @@
   # Set a filename to output (default: preset)
   # It is NOT mandantory, and be ignored when the console is true
   # ---------------
-  outputFile: './count.tsv'
+  outputFile: '../ext/gbs.tsv'
 
   # ---------------
   # [sourceFiles]
   # list up the source file(s) or folder(s)
   # ---------------
   sourceFiles:
-    - ./jp/
+    - ../ext/
     
   # ---------------
   # [targetFiles]
@@ -53,9 +54,9 @@
   # ---------------
   office:
     common:
-      segmentation: false
+      segmentation: true
       delimiters: '(\\。|\\. |\\! |\\? |\\！|\\？)'
-      excludePattern: ''
+      excludePattern: '^[0-9A-z,\-\.\+%() ]+$'
       withSeparator: true
 
     word:
