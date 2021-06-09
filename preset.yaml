@@ -39,7 +39,7 @@
   # list up the source file(s) or folder(s)
   # ---------------
   sourceFiles:
-    - ./
+    - ../ext/
     
   # ---------------
   # [targetFiles]

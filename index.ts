@@ -782,8 +782,11 @@ if (args.defaultPreset) {
   const control = new CLIController()
   // 指定ファイルの存在を確認し、なかった場合は　'./preset.yaml' を使用する
   let preset = './preset.yaml'
-  const pyaml = args.yaml.endsWith('.yaml') ? args.yaml :
+  let pyaml = ''
+  if (args.yaml !== undefined) {
+    const pyaml = args.yaml.endsWith('.yaml') ? args.yaml :
       args.yaml.endsWith('.yml') ? args.yaml : `${args.yaml}.yaml`
+  }
   try {
     statSync(pyaml)
     preset = args.yaml
