@@ -780,26 +780,29 @@ if (args.defaultPreset) {
   // プリセットモードを実行する場合
 } else if (args.preset) {
   const control = new CLIController()
-  // 指定ファイルの存在を確認し、なかった場合は　'./preset.yaml' を使用する
-  let preset = './preset.yaml'
-  let pyaml = ''
-  if (args.yaml !== undefined) {
-    const pyaml = args.yaml.endsWith('.yaml') ? args.yaml :
-      args.yaml.endsWith('.yml') ? args.yaml : `${args.yaml}.yaml`
-  }
+  // yaml ファイルの正規化
+  let pyaml =
+    args.yaml !== undefined ? './preset.yaml' :
+    args.yaml.endsWith('.yaml') ? args.yaml :
+    args.yaml.endsWith('.yml') ? args.yaml :
+    `${args.yaml}.yaml`;
+  // 指定ファイルの存在を確認する。
+  // なかった場合は presets フォルダを確認し、それでもなければ'./preset.yaml' を使用する
   try {
-    statSync(pyaml)
-    preset = args.yaml
-  } catch {
+    statSync(pyaml);
+  }
+  catch {
     try {
-      statSync(`./presets/${pyaml}`)
-      preset = `./presets/${pyaml}`
-    } catch {
-      console.log(`${args.yaml} does not exist`)
+      statSync(`./presets/${pyaml}`);
+      pyaml = `./presets/${pyaml}`;
+    }
+    catch {
+      console.log(`${args.yaml} does not exist`);
+      pyaml = './preset.yaml';
     }
   }
   // プリセットファイルの読み込み
-  const presetYaml = readFileSync(preset).toString();
+  const presetYaml = readFileSync(pyaml).toString();
   const yo = load(presetYaml) as any;
   control.setMode1(yo.mode)
   control.setSource(yo.sourceFiles)
