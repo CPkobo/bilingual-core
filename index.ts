@@ -312,6 +312,9 @@ class CLIController {
         }
       }
       if (opt.ppt !== undefined) {
+        if (opt.ppt.readSlide !== undefined) {
+          this.officeOptions.ppt.readSlide = opt.ppt.readSlide;
+        }
         if (opt.ppt.readNote !== undefined) {
           this.officeOptions.ppt.readNote = opt.ppt.readNote;
         }
@@ -654,7 +657,7 @@ function officeInquirerDialog(largeChoice: 'OFFICE' | 'COUNT', sourceFiles?: str
       message: 'Designate other options(Multiple select with space bar).',
       choices: [
         'Dont add separation marks',
-        'Word-Before-Revision', 'PPT-Note', 'Excel-Hidden-Sheet', 'Excel-Filled-Cell',
+        'Word-Before-Revision', 'PPT-Slide', 'PPT-Note', 'Excel-Hidden-Sheet', 'Excel-Filled-Cell',
         'DEBUG'],
     },
   ];
@@ -680,6 +683,7 @@ function officeInquirerDialog(largeChoice: 'OFFICE' | 'COUNT', sourceFiles?: str
         readHiddenSheet: answer.others['Excel-Hidden-Sheet'],
       },
       ppt: {
+        readSlide: answer.others['PPT-Slide'],
         readNote: answer.others['PPT-Note'],
       }
     })
@@ -782,7 +786,7 @@ if (args.defaultPreset) {
   const control = new CLIController()
   // yaml ファイルの正規化
   let pyaml =
-    args.yaml !== undefined ? './preset.yaml' :
+    args.yaml === undefined ? './preset.yaml' :
     args.yaml.endsWith('.yaml') ? args.yaml :
     args.yaml.endsWith('.yml') ? args.yaml :
     `${args.yaml}.yaml`;
@@ -901,6 +905,7 @@ function writeDefaultPreset() {
       readHiddenSheet: false
       readFilledCell: true
     ppt:
+      readSlide: true
       readNote: true
 
   # ---------------

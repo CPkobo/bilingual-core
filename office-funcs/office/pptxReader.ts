@@ -15,8 +15,11 @@ export async function pptxReader(pptxFile: any, fileName: string, opt: ReadingOp
         if (!path.startsWith('_rels')) {
           prs.push(slideReader(path, file, opt));
         } else {
-          if (path.indexOf('xml') !== -1) {
-            rels.push(await pptRelReader(path, file));
+          // スライドを読み込まないのであればスキップ
+          if (opt.ppt.readSlide) {
+            if (path.indexOf('xml') !== -1) {
+              rels.push(await pptRelReader(path, file));
+            }
           }
         }
       });
@@ -27,17 +30,19 @@ export async function pptxReader(pptxFile: any, fileName: string, opt: ReadingOp
           }
         });
       }
-      inzip.folder('ppt/diagrams/').forEach((path: string, file: any) => {
-        if (path.startsWith('data') && path.endsWith('.xml')) {
-          prs.push(slideDiagramReader(path, file, opt));
-        }
-      });
-      // チャートの種類が多岐にわたるため、課題
-      inzip.folder('ppt/charts/').forEach((path: string, file: any) => {
-        if (path.startsWith('chart') && path.endsWith('.xml')) {
-          prs.push(slideChartReader(path, file, opt));
-        }
-      });
+      if (opt.ppt.readSlide) {
+        inzip.folder('ppt/diagrams/').forEach((path: string, file: any) => {
+          if (path.startsWith('data') && path.endsWith('.xml')) {
+            prs.push(slideDiagramReader(path, file, opt));
+          }
+        });
+        // チャートの種類が多岐にわたるため、課題
+        inzip.folder('ppt/charts/').forEach((path: string, file: any) => {
+          if (path.startsWith('chart') && path.endsWith('.xml')) {
+            prs.push(slideChartReader(path, file, opt));
+          }
+        });
+      }
 
       Promise.all(prs).then((rs: ExtractedText[]) => {
         const datas: ExtractedText[] = [];

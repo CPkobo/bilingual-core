@@ -14,12 +14,15 @@ export function pathContentsReader(paths: string[], opq?: OptionQue): Promise<Ex
     const prs: Array<Promise<any>> = [];
     for (const path of paths) {
       const read = readFileSync(path);
-      if (path.endsWith('.docx')) {
+      if (path.endsWith('.docx') || path.endsWith('.docm')) {
         prs.push(docxReader(read, path, opt));
-      } else if (path.endsWith('.xlsx')) {
+      } else if (path.endsWith('.xlsx') || path.endsWith('.xlsm')) {
         prs.push(xlsxReader(read, path, opt));
-      } else if (path.endsWith('.pptx')) {
-        prs.push(pptxReader(read, path, opt));
+      } else if (path.endsWith('.pptx') || path.endsWith('.pptm')) {
+        // スライドもノートも読み込まない設定の場合はスキップ
+        if (opt.ppt.readSlide || opt.ppt.readNote) {
+          prs.push(pptxReader(read, path, opt));
+        }
       }
     }
     Promise.all(prs).then((res) => {

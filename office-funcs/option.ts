@@ -21,6 +21,7 @@ export class ReadingOption {
       readFilledCell: true
     }
     this.ppt = {
+      readSlide: true,
       readNote: true
     }
     this.readOptionQue(myOption)
@@ -29,7 +30,7 @@ export class ReadingOption {
   public readOptionQue(myOption: OptionQue) {
     if (myOption.common !== undefined) {
       if (myOption.common.name !== undefined && myOption.common.name !== '') {
-          this.common.name = myOption.common.name;
+        this.common.name = myOption.common.name;
       }
       if (myOption.common.segmentation !== undefined) {
         this.common.segmentation = myOption.common.segmentation;
@@ -64,6 +65,9 @@ export class ReadingOption {
     }
     
     if (myOption.ppt !== undefined) {
+      if (myOption.ppt.readSlide !== undefined) {
+        this.ppt.readSlide = myOption.ppt.readSlide;
+      }
       if (myOption.ppt.readNote !== undefined) {
         this.ppt.readNote = myOption.ppt.readNote;
       }

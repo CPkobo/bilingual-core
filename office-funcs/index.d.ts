@@ -110,7 +110,8 @@ declare interface ExcelOption {
 }
 
 declare interface PptOption {
-  readNote?: boolean
+  readSlide? : boolean;
+  readNote?: boolean;
 }
 
 declare interface OptionQue {
@@ -130,6 +131,7 @@ declare interface OptionQue {
     readFilledCell?: boolean;
   }
   ppt?: {
+    readSlide? : boolean;
     readNote?: boolean;
   }
 }

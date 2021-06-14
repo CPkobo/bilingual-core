@@ -3,6 +3,10 @@ import { xlsxReader } from './office/xlsxReader';
 import { pptxReader } from './office/pptxReader';
 import { ReadingOption } from './option';
 
+export function getVer(): string {
+  return '0.3.0'
+}
+
 export function cnm(data: string | object, row?: number) {
   const text = typeof data === 'string' ? data : JSON.stringify(data);
   const log = row ? `${row}: ${text}` : text
@@ -74,12 +78,15 @@ export function blobContentsReader(files: any, order: number[], opq?: OptionQue)
     const prs: Array<Promise<any>> = [];
     for (const ox of order) {
       const fileName = files[ox].name;
-      if (fileName.endsWith('.docx')) {
+      if (fileName.endsWith('.docx') || fileName.endsWith('.docm')) {
         prs.push(docxReader(files[ox], fileName, opt));
-      } else if (fileName.endsWith('.xlsx')) {
+      } else if (fileName.endsWith('.xlsx') ||  fileName.endsWith('.xlsm')) {
         prs.push(xlsxReader(files[ox], fileName, opt));
-      } else if (fileName.endsWith('.pptx')) {
-        prs.push(pptxReader(files[ox], fileName, opt));
+      } else if (fileName.endsWith('.pptx') || fileName.endsWith('.pptm')) {
+        // スライドもノートも読み込まない設定の場合はスキップ
+        if (opt.ppt.readSlide || opt.ppt.readNote) {
+          prs.push(pptxReader(files[ox], fileName, opt));
+        }
       }
     }
     Promise.all(prs).then((res) => {
@@ -134,7 +141,7 @@ export function applySegRules(textVal: string[], opt: ReadingOption): string[] {
   });
   return applyedValue.filter(val => {
     let val_ = val.replace('\n', '').replace('\r', '')
-    return val !== '';
+    return val_ !== '';
   });
 }
 

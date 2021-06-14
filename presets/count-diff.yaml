@@ -65,6 +65,7 @@
       readHiddenSheet: false
       readFilledCell: true
     ppt:
+      readSlide: true
       readNote: true
 
   # ---------------
