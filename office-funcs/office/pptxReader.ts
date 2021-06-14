@@ -13,13 +13,13 @@ export async function pptxReader(pptxFile: any, fileName: string, opt: ReadingOp
       const rels: PPTSubInfoRel[] = [];
       inzip.folder('ppt/slides/').forEach(async (path: string, file: any) => {
         if (!path.startsWith('_rels')) {
-          prs.push(slideReader(path, file, opt));
-        } else {
           // スライドを読み込まないのであればスキップ
           if (opt.ppt.readSlide) {
-            if (path.indexOf('xml') !== -1) {
-              rels.push(await pptRelReader(path, file));
-            }
+            prs.push(slideReader(path, file, opt));
+          }
+        } else {
+          if (path.indexOf('xml') !== -1) {
+            rels.push(await pptRelReader(path, file));
           }
         }
       });

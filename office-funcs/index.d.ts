@@ -186,7 +186,7 @@ declare interface TovisMeta {
 // t: Translation
 // m: Machine Translation or Memory, meaning a non-confirmed translation
 // d: Diff data
-// c: COmments
+// c: Comments
 declare interface TovisBlock {
   s: string;
   t: string;
