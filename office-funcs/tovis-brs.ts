@@ -128,7 +128,7 @@ export class TovisBrowser {
     for (const code of codes) {
       const eachChara = code.split(',');
       opcodes.push([
-        eachChara[0],
+        eachChara[0] as Optag,
         Number(eachChara[1]),
         Number(eachChara[2]),
         Number(eachChara[3]),

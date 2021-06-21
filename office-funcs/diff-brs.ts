@@ -1,8 +1,9 @@
+import { SequenceMatcher } from './sequenceMatcher'
 import { countCharas, countWords} from './util';
 
 export class DiffInfoBrowser {
   public dsegs: DiffSeg[];
-  public d: any;
+  public d: SequenceMatcher;
   public report: WWCReport | undefined;
   public marks: RegExp;
   public spaces: RegExp;
@@ -10,8 +11,10 @@ export class DiffInfoBrowser {
   constructor() {
     const dsegs: DiffSeg[] = [];
     this.dsegs = dsegs;
-    const difflib = require('difflib');
-    this.d = new difflib.SequenceMatcher(null, '', '');
+    // const difflib = require('difflib');
+    // this.d = new difflib.SequenceMatcher(null, '', '');
+    this.d = new SequenceMatcher();
+    this.d.setDefaultDirection('B2A')
     this.marks = new RegExp('(\\,|\\.|:|;|\\!|\\?|\\s)+', 'g');
     this.spaces = new RegExp('\\s+', 'g');
   }
@@ -43,8 +46,7 @@ export class DiffInfoBrowser {
     if (this.dsegs.length === 0) {
       return;
     }
-    const rate: WWCRate = wordWeight !== undefined ?
-      wordWeight :
+    const rate: WWCRate = wordWeight !== undefined ? wordWeight :
       {
         dupli: 1,
         over95: 1,
@@ -256,7 +258,9 @@ export class DiffInfoBrowser {
     const lBound = 0.65;
     const ratioLimit = 51;
     const sims: SimilarSegment[] = [];
-    this.d.setSeq1(st);
+    // this.d.setSeq1(st);
+    // seq2 の方が計算量が多いため、こちらに新しい原文をセットすることで計算量を減らす
+    this.d.setSeq2(st);
     let max = 0;
     let maxp = 0;
 
@@ -265,7 +269,8 @@ export class DiffInfoBrowser {
       if (lenDistance > uBound || lenDistance < lBound) {
         continue;
       }
-      this.d.setSeq2(seg.st);
+      // this.d.setSeq2(seg.st);
+      this.d.setSeq1(seg.st);
       const r = Math.floor(this.d.ratio() * 100);
       if (r > max) {
         max = r;
