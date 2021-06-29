@@ -12,12 +12,8 @@ export class SequenceMatcher {
   private bpopular: string[]
   
   constructor(isjunk: IsJunk | null = null, a: string = '', b: string ='', autojunk: boolean = true, opDirection: 'A2B' | 'B2A' = 'A2B') {
-    if (isjunk === null) {
-      this.isjunk = (chara: string) => {return false}
-    } else {
-      this.isjunk = isjunk
-    }
-    
+    this.isjunk = isjunk
+        
     this.a = ''
     this.b = ''
     this.autojunk = autojunk
@@ -32,7 +28,11 @@ export class SequenceMatcher {
   }
 
   public setDefaultDirection(opDirection: 'A2B' | 'B2A' = 'A2B') {
-    this.opIsA2B = opDirection === 'A2B'
+    if (opDirection === 'A2B') {
+      this.opIsA2B = true
+    } else if (opDirection === 'B2A') {
+      this.opIsA2B = false
+    }
   }
 
   private calculate_ratio(matches: number, length: number): number {
@@ -231,28 +231,28 @@ export class SequenceMatcher {
       let i1 = 0
       let j1 = 0
       let k1 = 0
-      const non_adjacent: Match[] = []
+      const nonAdjacent: Match[] = []
       for (const m of matchingBlocks) {
         const i2 = m[0]
         const j2 = m[1]
         const k2 = m[2]
         if ((i1 + k1 === i2) && (j1 + k1 === j2)) {
           k1 += k2
-        } else{
+        } else {
           if (k1 > 0) {
-            non_adjacent.push([i1, j1, k1])
-            i1 = i2
-            j1 = j2
-            k1 = k2
+            nonAdjacent.push([i1, j1, k1])
           }
+          i1 = i2
+          j1 = j2
+          k1 = k2
         }
       }
       if (k1 > 0) {
-        non_adjacent.push([i1, j1, k1])
+        nonAdjacent.push([i1, j1, k1])
       }
 
-      non_adjacent.push([la, lb, 0])
-      this.matchingBlocks = non_adjacent
+      nonAdjacent.push([la, lb, 0])
+      this.matchingBlocks = nonAdjacent
       return this.matchingBlocks
     }
   }
@@ -334,9 +334,57 @@ export class SequenceMatcher {
     }
   }
 
-  // getGroupedOpcodes(n: number = 3) {
+  public getGroupedOpcodes(n: number = 3) {
+    let tag: Optag
+    let i1: number
+    let i2: number
+    let j1: number
+    let j2: number
+    let codes = this.getOpcodes()
+    if (codes.length === 0) {
+      codes = [['equal', 0, 1, 0, 1]];
+    }
+    if (codes[0][0] === 'equal') {
+      tag = codes[0][0] as Optag
+      i1 = codes[0][1] as number
+      i2 = codes[0][2] as number
+      j1 = codes[0][3] as number
+      j2 = codes[0][4] as number
+      codes[0] = [tag, Math.max(i1, i2 - n), i2, Math.max(j1, j2 - n), j2];
+    }
+    const last = codes.length - 1
+    if (codes[last][0] === 'equal') {
+      tag = codes[last][0] as Optag
+      i1 = codes[last][1] as number
+      i2 = codes[last][2] as number
+      j1 = codes[last][3] as number
+      j2 = codes[last][4] as number
+      codes[last] = [tag, i1, Math.min(i2, i1 + n), j1, Math.min(j2, j1 + n)];
+    }
 
-  // } 
+    const nn = n + n;
+    const groups: Opcode[][] = [];
+    let group: Opcode[] = [];
+    for (const code of codes) {
+      tag = code[0] as Optag
+      i1 = code[1] as number
+      i2 = code[2] as number
+      j1 = code[3] as number
+      j2 = code[4] as number
+      if ((tag === 'equal') && ((i2 - i1) > nn)) {
+        group.push([tag, i1, Math.min(i2, i1 + n), j1, Math.min(j2, j1 + n)]);
+        groups.push(group.slice());
+        group = [];
+        i1 = Math.max(i1, i2 - n)
+        j1 = Math.max(j1, j2 - n);
+      }
+      group.push([tag, i1, i2, j1, j2]);
+    }
+    if (group.length > 0 && !((group.length === 1) && (group[0][0] === 'equal'))) {
+      groups.push(group);
+    }
+    return groups;
+  }
 
   public ratio(): number {
     let matches = 0
