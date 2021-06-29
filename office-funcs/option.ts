@@ -8,7 +8,7 @@ export class ReadingOption {
     this.common = {
       name: 'Result',
       segmentation: true,
-      delimiters: '(\\。|\\. |\\! |\\? |\\！|\\？)',
+      delimiters: '(。|！|？|(\\. )|(\\! )|(\\? ))',
       excluding: false,
       excludePattern: '^[０-９0-9]+$',
       withSeparator: true,

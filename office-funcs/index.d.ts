@@ -185,6 +185,8 @@ declare interface TovisMeta {
   remarks: string;
 }
 
+declare type TovisMinifyMode = 'CHECK-DUPLI' | 'BILINGUAL'
+
 // s: Source
 // t: Translation
 // m: Machine Translation or Memory, meaning a non-confirmed translation

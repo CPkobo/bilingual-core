@@ -4,7 +4,7 @@ import { pptxReader } from './office/pptxReader';
 import { ReadingOption } from './option';
 
 export function getVer(): string {
-  return '0.3.2'
+  return '0.3.3'
 }
 
 export function cnm(data: string | object, row?: number) {

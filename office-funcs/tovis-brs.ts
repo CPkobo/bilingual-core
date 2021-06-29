@@ -103,6 +103,57 @@ export class TovisBrowser {
     return JSON.stringify(this, null, 2);
   }
 
+  public dumpMinify(mode: TovisMinifyMode): string[] {
+    const fx: number[] = []
+    const files: string[] = []
+    for (const file of this.meta.files) {
+      const fileAndIndx = file.split(':');
+      fx.push(Number(fileAndIndx[0]))
+      files.push(fileAndIndx[1])
+    }
+    const sep = '---'
+    const result: string[] = [`MIN-TYPE: ${mode}`, sep];
+    switch (mode) {
+      case 'CHECK-DUPLI':
+        if (fx.length === 0) {
+          result.push('No files included.')
+          return result
+        }
+        let j = 0
+        for (let i = fx[0]; i < this.blocks.length; i++) {
+          if (i === fx[j]) {
+            result.push(`@${fx[j]}`)
+            result.push(files[j])
+            if (j < fx.length - 1) {
+              j++
+            }
+          }
+          const block = this.blocks[i]
+          const df = block.d
+          if (df.length === 0) {
+            result.push('_000');
+          } else {
+            const maxdf = df[0];
+            const r3 = `00${maxdf.ratio}`.slice(-3);
+            if (maxdf.from === i) {
+              result.push(`<${r3}`)
+            } else {
+              result.push(`>${r3}`)
+            }
+          }
+          result.push(block.s);
+        }
+        break;
+
+      case 'BILINGUAL':
+        break;
+    
+      default:
+        break;
+    }
+    return result
+  }
+
   protected createBlock(): TovisBlock {
     return {
       s: '',
@@ -232,6 +283,11 @@ export class TovisBrowser {
           };
           block.d.push(refInfo);
           this.blocks[sim.advPid].d.push(refInfo);
+          this.blocks[sim.advPid].d.sort((a, b) => {
+            if (a.ratio < b.ratio) { return 1; }
+            if (a.ratio > b.ratio) { return -1; }
+            return 0;
+          });
         }
         this.blocks.push(block);
       }

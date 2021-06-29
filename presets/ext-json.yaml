@@ -4,16 +4,18 @@
   # Select from the followings:
     # - 'OFFICE:EXTRACT txt'
     # - 'OFFICE:EXTRACT json'
-    # - 'OFFICE:EXTRACT DIFF json'
-    # - 'OFFICE:EXTRACT DIFF tovis' 
+    # - 'OFFICE:EXTRACT-DIFF json'
+    # - 'OFFICE:EXTRACT-DIFF tovis' 
+    # - 'OFFICE:EXTRACT-DIFF min-tovis' 
     # - 'OFFICE:ALIGN tsv' 
     # - 'COUNT:CHARAS tsv'
     # - 'COUNT:WORDS tsv'
     # - 'COUNT:DIFF-CHARAS tsv'
     # - 'COUNT:DIFF-WORDS tsv'
     # - 'CAT:EXTRACT tsv'
-    # - 'CAT:EXTRACT DIFF json'
-    # - 'CAT:EXTRACT DIFF tovis'
+    # - 'CAT:EXTRACT-DIFF json'
+    # - 'CAT:EXTRACT-DIFF tovis'
+    # - 'CAT:EXTRACT-DIFF min-tovis'
     # - 'CAT:UPDATE xliff'
   # If the selection is not proper, then the mode will be set as 'OFFICE:EXTRACT txt' implicity
   # OFFICE supports: docx / docm / xlsx / xlsm / pptx / pptm
@@ -89,3 +91,10 @@
     over50: 1
     under49: 1
   
+    
+  # ------------------------------------------------------------
+  # [debug]
+  # Not create output file, nor display on console.
+  # It is prior to the console and outputfile option. 
+  # ------------------------------------------------------------
+  debug: false

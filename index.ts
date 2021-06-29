@@ -14,28 +14,28 @@ import { path2Format, path2Name, path2Dir } from './office-funcs/util';
 
 type ModeLarge = 'OFFICE' | 'COUNT' | 'CAT' | 'DEFAULT PRESET'
 
-type ModeMiddleOffice = 'EXTRACT txt' | 'ALIGN tsv' | 'EXTRACT json' | 'EXTRACT-DIFF json' | 'EXTRACT-DIFF tovis'
+type ModeMiddleOffice = 'EXTRACT txt' | 'ALIGN tsv' | 'EXTRACT json' | 'EXTRACT-DIFF json' | 'EXTRACT-DIFF tovis' | 'EXTRACT-DIFF min-tovis'
 type ModeMiddleCount = 'CHARAS tsv' | 'WORDS tsv' | 'DIFF-CHARAS tsv' | 'DIFF-WORDS tsv'
-type ModeMiddleCat = 'EXTRACT tsv' | 'EXTRACT-DIFF json' | 'EXTRACT-DIFF tovis' | 'UPDATE xliff' | 'REPLACE xliff'
+type ModeMiddleCat = 'EXTRACT tsv' | 'EXTRACT-DIFF json' | 'EXTRACT-DIFF tovis' | 'EXTRACT-DIFF min-tovis' |'UPDATE xliff' | 'REPLACE xliff'
 
 
 // とり得る値としてのタイプ
 type ModeOption =
   'OFFICE:EXTRACT txt' | 'OFFICE:EXTRACT json' |
-  'OFFICE:EXTRACT-DIFF json' | 'OFFICE:EXTRACT-DIFF tovis' |
+  'OFFICE:EXTRACT-DIFF json' | 'OFFICE:EXTRACT-DIFF tovis' | 'OFFICE:EXTRACT-DIFF min-tovis' |
   'OFFICE:ALIGN tsv' |
   'COUNT:CHARAS tsv' | 'COUNT:WORDS tsv' | 'COUNT:DIFF-CHARAS tsv' | 'COUNT:DIFF-WORDS tsv' |
-  'CAT:EXTRACT tsv' | 'CAT:EXTRACT-DIFF json' | 'CAT:EXTRACT-DIFF tovis' |
+  'CAT:EXTRACT tsv' | 'CAT:EXTRACT-DIFF json' | 'CAT:EXTRACT-DIFF tovis' | 'CAT:EXTRACT-DIFF min-tovis' |
   'CAT:UPDATE xliff' | 'CAT:REPLACE xliff'
 
 const officeModes: ModeMiddleOffice[] = [
-  'EXTRACT txt', 'ALIGN tsv', 'EXTRACT json', 'EXTRACT-DIFF json', 'EXTRACT-DIFF tovis'
+  'EXTRACT txt', 'ALIGN tsv', 'EXTRACT json', 'EXTRACT-DIFF json', 'EXTRACT-DIFF tovis', 'EXTRACT-DIFF min-tovis'
 ]
 const countModes: ModeMiddleCount[] = [
   'CHARAS tsv', 'WORDS tsv', 'DIFF-CHARAS tsv', 'DIFF-WORDS tsv'
 ]
 const catModes: ModeMiddleCat[] = [
-  'EXTRACT tsv', 'EXTRACT-DIFF json', 'EXTRACT-DIFF tovis', 'UPDATE xliff', 'REPLACE xliff'
+  'EXTRACT tsv', 'EXTRACT-DIFF json', 'EXTRACT-DIFF tovis', 'EXTRACT-DIFF min-tovis', 'UPDATE xliff', 'REPLACE xliff'
 ]
 
 // 初期設定値とともにオプション項目を管理するクラス
@@ -55,7 +55,8 @@ class CLIController {
     lg: ModeLarge,
     md: ModeMiddleOffice | ModeMiddleCount | ModeMiddleCat,
     format: string,
-    console: boolean
+    console: boolean,
+    debug: boolean,
   }
 
   private source: string;
@@ -90,7 +91,8 @@ class CLIController {
       lg: 'OFFICE',
       md: 'EXTRACT txt',
       format: 'txt',
-      console: false
+      console: false,
+      debug: false,
     }
 
     // 原稿ファイルの場所
@@ -108,7 +110,7 @@ class CLIController {
         excluding: false,
         excludePattern: '',
         segmentation: true,
-        delimiters: '(\\。|\\. |\\! |\\? |\\！|\\？)',
+        delimiters: '(。|！|？|(\\. )|(\\! )|(\\? ))',
       },
       word: {
         afterRev: true,
@@ -165,53 +167,32 @@ class CLIController {
       return false
     } else {
       const modes = mode.split(':')
-      switch (modes[0]) {
-        case 'OFFICE':
-          switch (modes[1]) {
-            case 'EXTRACT txt':
-            case 'EXTRACT json':
-            case 'ALIGN tsv':
-            case 'EXTRACT-DIFF json':
-            case 'EXTRACT-DIFF tovis':
-              this.mode.lg = 'OFFICE'
-              this.mode.md = modes[1]
-              this.mode.format = modes[1].substr(modes[1].lastIndexOf(' ') + 1)
-              return true
-
-            default:
-              return false
+      switch (modes[0] as ModeLarge) {
+        case 'OFFICE': 
+          this.mode.lg = 'OFFICE'
+          this.mode.md = modes[1] as ModeMiddleOffice
+          console.log(modes[1].lastIndexOf(' ') + 1)
+          if (this.mode.md !== 'EXTRACT-DIFF min-tovis') {
+            this.mode.format = modes[1].substr(modes[1].lastIndexOf(' ') + 1)
+          } else {
+            this.mode.format = 'mtovis'
           }
+          return true
 
-        case 'COUNT': {
-          switch (modes[1]) {
-            case 'CHARAS tsv':
-            case 'WORDS tsv':
-            case 'DIFF-CHARAS tsv':
-            case 'DIFF-WORDS tsv':
-              this.mode.lg = 'COUNT'
-              this.mode.md = modes[1]
-              this.mode.format = 'tsv'
-              return true
-
-            default:
-              return false
-          }
-        }
+        case 'COUNT': 
+          this.mode.lg = 'COUNT'
+          this.mode.md = modes[1] as ModeMiddleCount
+          return true
 
         case 'CAT':
-          switch (modes[1]) {
-            case 'EXTRACT tsv':
-            case 'EXTRACT-DIFF json':
-            case 'EXTRACT-DIFF tovis':
-            case 'UPDATE xliff':
-              this.mode.lg = 'OFFICE'
-              this.mode.md = modes[1]
-              this.mode.format = modes[1].substr(modes[1].lastIndexOf(' ') + 1)
-              return true
-
-            default:
-              return false;
+          this.mode.lg = 'CAT'
+          this.mode.md = modes[1] as ModeMiddleCat
+          if (this.mode.md !== 'EXTRACT-DIFF min-tovis') {
+            this.mode.format = modes[1].substr(modes[1].lastIndexOf(' ') + 1)
+          } else {
+            this.mode.format = 'mtovis'
           }
+          return true
 
         default:
           return false;
@@ -228,6 +209,11 @@ class CLIController {
     } else {
       this.mode.lg = modeLg;
       this.mode.md = modeMd;
+      if (this.mode.md !== 'EXTRACT-DIFF min-tovis') {
+        this.mode.format = this.mode.md.substr(this.mode.md.lastIndexOf(' ') + 1)
+      } else {
+        this.mode.format = 'mtovis'
+      }
       return true
     }
   }
@@ -242,6 +228,13 @@ class CLIController {
       this.mode.console = console;
       return true
     }
+  }
+
+  public setDebug(debug: boolean | undefined | null): boolean {
+    if (debug !== undefined && debug !== null) {
+      this.mode.debug = debug;  
+    }
+    return true
   }
 
   public setSource(src: string | string[] | undefined | null): boolean {
@@ -478,6 +471,15 @@ class CLIController {
           break
         }
 
+        case 'EXTRACT-DIFF min-tovis': {
+          diff.analyze(ds[0])
+          const tovis = new Tovis()
+          tovis.parseFromObj(diff)
+          const result = tovis.dumpMinify('CHECK-DUPLI')
+          this.outlet(result)
+          break
+        }
+
         default:
           break;
       }
@@ -492,7 +494,9 @@ class CLIController {
   private outlet(result: string | string[], name?: string) {
     const data = typeof result === 'string' ? result : result.join('\n')
     const filename = name ? name : this.outputFile
-    if (this.mode.console) {
+    if (this.mode.debug) {
+      console.log('Success: DEBUG')
+    } else if (this.mode.console) {
       console.log(data)
     } else {
       writeFileSync(filename, data)
@@ -644,7 +648,7 @@ function officeInquirerDialog(largeChoice: 'OFFICE' | 'COUNT', sourceFiles?: str
       name: 'outputFile',
       message: (answerSoFar: any): string => {
         const format = answerSoFar.modeMd.substr(answerSoFar.modeMd.lastIndexOf(' ') + 1)
-        return 'Input filename for output. ' + format + 'is selected'
+        return `Input filename for output. [${format}] is selected`
       },
     },
     {
@@ -670,21 +674,24 @@ function officeInquirerDialog(largeChoice: 'OFFICE' | 'COUNT', sourceFiles?: str
     control.setSource(answer.source);
     control.setTarget(answer.target)
     control.setOutputFile(answer.outputFile)
+    if (answer.others.indexOf('DEBUG') !== -1) {
+      control.setDebug(true)
+    }
     control.setOfficeOptions({
       common: {
         excludePattern: answer.excludingPattern,
-        withSeparator: answer.others['Dont add separation marks']
+        withSeparator: answer.others.indexOf('Dont add separation marks') !== -1
       },
       word: {
-        afterRev: answer.others['Word-Before-Revision']
+        afterRev: answer.others.indexOf('Word-Before-Revision') !== -1
       },
       excel: {
-        readFilledCell: answer.others['Excel-Filled-Cell'],
-        readHiddenSheet: answer.others['Excel-Hidden-Sheet'],
+        readFilledCell: answer.others.indexOf('Excel-Filled-Cell') !== -1,
+        readHiddenSheet: answer.others.indexOf('Excel-Hidden-Sheet') !== -1,
       },
       ppt: {
-        readSlide: answer.others['PPT-Slide'],
-        readNote: answer.others['PPT-Note'],
+        readSlide: answer.others.indexOf('PPT-Slide') !== -1,
+        readNote: answer.others.indexOf('PPT-Note') !== -1,
       }
     })
     control.executeByParams();
@@ -812,6 +819,7 @@ if (args.defaultPreset) {
   control.setSource(yo.sourceFiles)
   control.setTarget(yo.targetFiles)
   control.setConsole(yo.console)
+  control.setDebug(yo.debug)
   control.setOutputFile(yo.outputFile);
   control.setOfficeOptions(yo.office)
   control.setCatOptions(yo.cat)
@@ -844,16 +852,18 @@ function writeDefaultPreset() {
   # Select from the followings:
     # - 'OFFICE:EXTRACT txt'
     # - 'OFFICE:EXTRACT json'
-    # - 'OFFICE:EXTRACT DIFF json'
-    # - 'OFFICE:EXTRACT DIFF tovis' 
+    # - 'OFFICE:EXTRACT-DIFF json'
+    # - 'OFFICE:EXTRACT-DIFF tovis' 
+    # - 'OFFICE:EXTRACT-DIFF min-tovis' 
     # - 'OFFICE:ALIGN tsv' 
     # - 'COUNT:CHARAS tsv'
     # - 'COUNT:WORDS tsv'
     # - 'COUNT:DIFF-CHARAS tsv'
     # - 'COUNT:DIFF-WORDS tsv'
     # - 'CAT:EXTRACT tsv'
-    # - 'CAT:EXTRACT DIFF json'
-    # - 'CAT:EXTRACT DIFF tovis'
+    # - 'CAT:EXTRACT-DIFF json'
+    # - 'CAT:EXTRACT-DIFF tovis'
+    # - 'CAT:EXTRACT-DIFF min-tovis'
     # - 'CAT:UPDATE xliff'
   # If the selection is not proper, then the mode will be set as 'OFFICE:EXTRACT txt' implicity
   # OFFICE supports: docx / docm / xlsx / xlsm / pptx / pptm
@@ -871,6 +881,8 @@ function writeDefaultPreset() {
   # [outputFile]
   # Set a filename to output (default: preset)
   # It is NOT mandantory, and be ignored when the console is true
+  # When set '!DEBUG!', the system would enter DEBUG mode, it does not create file
+  # and neither display the result on console.
   # ---------------
   outputFile: './result.txt'
 
@@ -895,7 +907,7 @@ function writeDefaultPreset() {
   office:
     common:
       segmentation: true
-      delimiters: '(\\。|\\. |\\! |\\? |\\！|\\？)'
+      delimiters: '(。|！|？|(\. )|(\! )|(\? ))'
       excludePattern: ''
       withSeparator: true
 
@@ -928,6 +940,13 @@ function writeDefaultPreset() {
     over75: 0.8
     over50: 1
     under49: 1
+
+  # ------------------------------------------------------------
+  # [debug]
+  # Not create output file, nor display on console.
+  # It is prior to the console and outputfile option. 
+  # ------------------------------------------------------------
+  debug: false
   `
   writeFileSync('./preset.yaml', defaultPreset)
   console.log('Default preset.yaml has been set: "./preset.yaml"')

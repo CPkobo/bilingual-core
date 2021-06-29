@@ -21,20 +21,20 @@
   # OFFICE supports: docx / docm / xlsx / xlsm / pptx / pptm
   # CAT supports: xliff / mxliff / tmx / tbx
   # ------------------------------------------------------------
-  mode: 'COUNT:DIFF-CHARAS tsv'
+  mode: 'OFFICE:EXTRACT-DIFF min-tovis'
 
   # ------------------------------------------------------------
   # [console]
   # Set true if you do not want to create a file
   # ------------------------------------------------------------
-  console: true
+  console: fasle
 
   # ---------------
   # [outputFile]
   # Set a filename to output (default: preset)
   # It is NOT mandantory, and be ignored when the console is true
   # ---------------
-  outputFile: '../ext/gbs.tsv'
+  outputFile: './tovis/demo.mtovis'
 
   # ---------------
   # [sourceFiles]
