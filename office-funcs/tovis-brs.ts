@@ -34,17 +34,17 @@ export class TovisBrowser {
         const srcContent = data.getRawContent('src')
         if (srcContent !== null) {
           diff.analyze(srcContent)
-        this.parseDiffInfo(diff.dsegs).then((message) => {
-          resolve({isOk: true, message})
-        }).catch((errMessage) => {
-          reject({ isOk: false, message: errMessage });
-        });
+          this.parseDiffInfo(diff.dsegs).then((message) => {
+            resolve({ isOk: true, message })
+          }).catch((errMessage) => {
+            reject({ isOk: false, message: errMessage });
+          });
         } else {
-          reject({ isOk: false, message: 'No Catovis Context'})
+          reject({ isOk: false, message: 'No Catovis Context' })
         }
       } else if (data instanceof DiffInfoBrowser) {
         this.parseDiffInfo(data.dsegs).then((message) => {
-          resolve({isOk: true, message})
+          resolve({ isOk: true, message })
         }).catch((errMessage) => {
           reject({ isOk: false, message: errMessage });
         });
@@ -111,8 +111,7 @@ export class TovisBrowser {
       fx.push(Number(fileAndIndx[0]))
       files.push(fileAndIndx[1])
     }
-    const sep = '---'
-    const result: string[] = [`MIN-TYPE: ${mode}`, sep];
+    const result: string[] = [`MIN-TYPE: ${mode}`, this.meta.files.join(',')];
     switch (mode) {
       case 'CHECK-DUPLI':
         if (fx.length === 0) {
@@ -147,7 +146,7 @@ export class TovisBrowser {
 
       case 'BILINGUAL':
         break;
-    
+
       default:
         break;
     }
@@ -194,53 +193,53 @@ export class TovisBrowser {
     if (line.startsWith('#')) {
       const metaData = line.split(':');
       if (metaData.length > 1) {
-      switch (metaData[0]) {
-        case '#SourceLang':
-          this.meta.srcLang = metaData[1].trim();
-          valid = true;
-          break;
-        case '#TargetLang':
-          this.meta.tgtLang = metaData[1].trim();
-          valid = true;
-          break;
-        case '#IncludingFiles':
-          this.meta.files = metaData[1].trim().split(',');
-          valid = true;
-          break;
-        case '#Tags':
-          this.meta.tags = metaData[1].trim().split(',');
-          valid = true;
-          break;
-        case '#Groups': {
+        switch (metaData[0]) {
+          case '#SourceLang':
+            this.meta.srcLang = metaData[1].trim();
+            valid = true;
+            break;
+          case '#TargetLang':
+            this.meta.tgtLang = metaData[1].trim();
+            valid = true;
+            break;
+          case '#IncludingFiles':
+            this.meta.files = metaData[1].trim().split(',');
+            valid = true;
+            break;
+          case '#Tags':
+            this.meta.tags = metaData[1].trim().split(',');
+            valid = true;
+            break;
+          case '#Groups': {
             this.meta.groups = metaData[1].trim().split(',').map(val => {
               return Number(val)
             })
-          valid = true;
-          break;
+            valid = true;
+            break;
+          }
+
+          case '#Remarks':
+            this.meta.remarks += `${metaData[1]};`;
+            valid = true;
+            break;
+
+          default:
+            break;
         }
-
-        case '#Remarks':
-          this.meta.remarks += `${metaData[1]};`;
-          valid = true;
-          break;
-
-        default:
-          break;
+      } else {
+        this.meta.remarks += `${line};`;
+        valid = true;
       }
-    } else {
-      this.meta.remarks += `${line};`;
-      valid = true;
-    }
     } else if (line !== '') {
       const matchObj: RegExpMatchArray | null = line.match(this.lineHead);
-        if (matchObj !== null) {
-          const index = Number(matchObj[2]);
-          while (this.blocks.length < index + 1) {
-            this.blocks.push(this.createBlock());
-          }
-          this.upsertBlocks(line.substr(0, 1), index, line.replace(this.lineHead, '').trim());
-          valid = true;
+      if (matchObj !== null) {
+        const index = Number(matchObj[2]);
+        while (this.blocks.length < index + 1) {
+          this.blocks.push(this.createBlock());
         }
+        this.upsertBlocks(line.substr(0, 1), index, line.replace(this.lineHead, '').trim());
+        valid = true;
+      }
     }
     return valid
   }
