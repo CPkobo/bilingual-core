@@ -99,7 +99,7 @@ export function blobContentsReader(files: any, order: number[], opq?: OptionQue)
 
 export function splitSegmentation(text: string, delimiters: RegExp, exceptions?: RegExp): string[] {
   const t = text.replace(delimiters, '$1\n');
-  const ex = exceptions || new RegExp('((Mr)|(Ms)|(No)|(Co)|(co)|(etc))\\. $')
+  const ex = exceptions || new RegExp('((Mr)|(Ms)|(No)|(Co)|(co)|(Ltd)|(Inc)|(etc))\\. $')
   let tv = ''
   const ts: string[] = [];
   for (const v of t.split('\n')) {

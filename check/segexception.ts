@@ -1,7 +1,7 @@
 function splitSegmentation(text: string, delimiters: RegExp): string[] {
   const t = text.replace(delimiters, '$1\n');
   const ts: string[] = []
-  const exceptions = new RegExp('((Mr)|(Ms)|(No)|(Co)|(co)|(etc))\\. $')
+  const exceptions = new RegExp('((Mr)|(Ms)|(No)|(Co)|(co)|(Ltd)|(Inc)(etc))\\. $')
   let tv = ''
   const vs = t.split('\n')
   console.log(vs)
