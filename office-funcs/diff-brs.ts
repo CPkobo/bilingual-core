@@ -200,8 +200,9 @@ export class DiffInfoBrowser {
           const unit = prop === 'wwc-chara' ? 'chara' : 'word';
           const unitHead = prop === 'wwc-chara' ? '文字' : '単語';
           const line: string[] = [`ファイル名\t${unitHead}数\tWWC適用後\t重複\t95-99%\t85-94%\t75-84%\t50-74%\t0-49%`];
-          this.calcWWC(unit, wwc);
-
+          if (this.report === undefined) {
+            this.calcWWC(unit, wwc);
+          }
           if (this.report !== undefined) {
             line.push(
               this.report.name + '\t' +

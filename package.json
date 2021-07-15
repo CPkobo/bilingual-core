@@ -1,6 +1,6 @@
 {
   "name": "catovis-office-cli",
-  "version": "0.3.0",
+  "version": "0.3.4",
   "description": "Tools for Translators, enabling to extract/align/diff/ for MS Office files and etc.",
   "keywords": [
     "translation",

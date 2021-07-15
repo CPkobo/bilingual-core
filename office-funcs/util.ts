@@ -4,7 +4,7 @@ import { pptxReader } from './office/pptxReader';
 import { ReadingOption } from './option';
 
 export function getVer(): string {
-  return '0.3.3'
+  return '0.3.4'
 }
 
 export function cnm(data: string | object, row?: number) {
@@ -97,12 +97,23 @@ export function blobContentsReader(files: any, order: number[], opq?: OptionQue)
   });
 }
 
-export function splitSegmentation(text: string, delimiters: RegExp): string[] {
+export function splitSegmentation(text: string, delimiters: RegExp, exceptions?: RegExp): string[] {
   const t = text.replace(delimiters, '$1\n');
-  const ts: string[] = t.split('\n').filter((val) => {
-    return val !== '';
-  });
-
+  const ex = exceptions || new RegExp('((Mr)|(Ms)|(No)|(Co)|(co)|(etc))\\. $')
+  let tv = ''
+  const ts: string[] = [];
+  for (const v of t.split('\n')) {
+    tv += v
+    if (tv === '' || ex.test(tv)) {
+      continue
+    } else {
+      ts.push(tv)
+      tv = ''
+    }
+  }
+  if (tv !== '') {
+    ts.push(tv)
+  }
   return ts;
 }
 
