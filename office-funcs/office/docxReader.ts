@@ -12,6 +12,7 @@ export async function docxReader(docxFile: any, fileName: string, opt: ReadingOp
       format: 'docx',
       exts: [],
     };
+    const rev = opt.word.afterRev === undefined ? true : opt.word.afterRev;
     zip.loadAsync(docxFile).then((inzip: any) => {
       if (inzip !== null) {
         inzip.file('word/document.xml').async('string').then((wordxml: string) => {
@@ -36,7 +37,7 @@ export async function docxReader(docxFile: any, fileName: string, opt: ReadingOp
             switch (bodyCds[String(i)].nodeName) {
               // w:p の場合
               case 'w:p': {
-                const textInPara = wordParaReder(bodyCds[String(i)], opt.word.afterRev || true)
+                const textInPara = wordParaReder(bodyCds[String(i)], rev)
                 if (checkValidText(textInPara)) {
                   const paraTexts: string[] = applySegRules([textInPara], opt);
                   if (paraTexts.length !== 0) {
@@ -57,7 +58,7 @@ export async function docxReader(docxFile: any, fileName: string, opt: ReadingOp
               // w:tbl の場合
               // 実際にはセルの中にまた w:p があるので、関数の中で再度 wordParaReder を呼び出すことになる
               case 'w:tbl': {
-                let tblTexts: string[] = wordTableReader(bodyCds[String(i)], opt.word.afterRev || true);
+                let tblTexts: string[] = wordTableReader(bodyCds[String(i)], rev);
                 tblTexts = applySegRules(tblTexts, opt);
                 if (tblTexts.length !== 0) {
                   const tblContents: ExtractedText = {

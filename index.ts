@@ -683,7 +683,7 @@ function officeInquirerDialog(largeChoice: 'OFFICE' | 'COUNT', sourceFiles?: str
         withSeparator: answer.others.indexOf('Dont add separation marks') !== -1
       },
       word: {
-        afterRev: answer.others.indexOf('Word-Before-Revision') !== -1
+        afterRev: answer.others.indexOf('Word-Before-Revision') === -1
       },
       excel: {
         readFilledCell: answer.others.indexOf('Excel-Filled-Cell') !== -1,
