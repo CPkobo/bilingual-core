@@ -77,7 +77,7 @@ office:
 cat:
   locales: "all"
   fullset: false
-  overWite: false
+  overWrite: false
 
 # ---------------
 # [WWC]

@@ -1,6 +1,6 @@
 declare type ClassifiedFormat = 'is-word' | 'is-excel' | 'is-ppt' | ''
 
-declare type CountType = 'unit' | 'chara'
+declare type CountType = 'word' | 'chara'
 
 // CAT
 declare type CatDataType = 'XLIFF' | 'TMX' | 'TBX' | ''

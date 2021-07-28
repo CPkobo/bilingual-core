@@ -238,28 +238,30 @@ export class CatDataContent {
             if (this.langs.indexOf(tgtLang) === -1) {
               this.langs.push(tgtLang)
             }
-            const body = file.body || [{}]
-            const groups = body[0].group || []
-            for (const group of groups) {
-              const unit: TranslationUnit[] = []
-              const tu = group['trans-unit'] || [{}]
-              const srcText = tu[0].source || ''
-              const tgtText = tu[0].target || ''
-              if (srcText !== '') {
-                unit.push({
-                  lang: srcLang,
-                  text: srcText
-                })
-              }
-              if (tgtText !== '') {
-                unit.push({
-                  lang: tgtLang,
-                  text: tgtText
-                })
-              }
-              if (unit.length > 0) {
-                this.contents.push(unit)
-              }
+            const body: any[] = file.body || [{}]
+            const groups: any[] | undefined = body[0].group;
+            const tus: any[] = groups ? groups.map((val: any) => {
+                return val['trans-unit'][0]
+            }) : body[0]['trans-unit'];
+            for (const tu of tus) {
+                const unit = [];
+                const srcText = tu.source[0] || '';
+                const tgtText = tu.target[0] || '';
+                if (srcText !== '') {
+                    unit.push({
+                        lang: srcLang,
+                        text: srcText._ ? srcText._ : srcText
+                    });
+                }
+                if (tgtText !== '') {
+                    unit.push({
+                        lang: tgtLang,
+                        text: tgtText._ ? tgtText._ : tgtText
+                    });
+                }
+                if (unit.length > 0) {
+                    this.contents.push(unit);
+                }           
             }
           }
           resolve(true);

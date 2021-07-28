@@ -10,7 +10,7 @@ import { CatDataContent } from './office-funcs/cats';
 
 // import { cnm, pathContentsReader, ReadFailure } from './office-funcs/util';
 import { pathContentsReader, path2ContentStr, createTsvArray } from './office-funcs/util-sv'
-import { path2Format, path2Name, path2Dir } from './office-funcs/util';
+import { path2Format, path2Name, path2Dir, countFromDoubleArray } from './office-funcs/util';
 
 type ModeLarge = 'OFFICE' | 'COUNT' | 'CAT' | 'DEFAULT PRESET'
 
@@ -530,9 +530,18 @@ class CLIController {
       }
       Promise.all(prs).then(() => {
         const tsv = cat.getMultipleTexts(this.catOptions.locales, this.catOptions.fullset)
-        console.log(cat.getFilesInfo())
-        console.log(cat.getLangsInfo())
-        console.log(cat.getContentLength())
+        const pdFiles = cat.getFilesInfo().join(',')
+        const pdLocales = cat.getLangsInfo().join(',')
+        const pdLines = cat.getContentLength()
+        const pdCharas = countFromDoubleArray(tsv, 'chara', 0)
+        const pdWords = countFromDoubleArray(tsv, 'word', 0)
+        console.log(`
+File： ${pdFiles}
+Locale： ${pdLocales}
+Line: ${pdLines}
+Chara: ${pdCharas}
+Word: ${pdWords}
+        `)
         const tsv_: string[] = []
         for (const t of tsv) {
           tsv_.push(t.join('\t'))
@@ -927,7 +936,7 @@ function writeDefaultPreset() {
   cat:
     locales: 'all'
     fullset: false
-    overWite: false
+    overWrite: false
 
   # ---------------
   # [WWC] 

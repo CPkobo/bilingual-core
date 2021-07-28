@@ -4,7 +4,7 @@ import { pptxReader } from './office/pptxReader';
 import { ReadingOption } from './option';
 
 export function getVer(): string {
-  return '0.3.4'
+  return '0.3.5'
 }
 
 export function cnm(data: string | object, row?: number) {
@@ -61,6 +61,35 @@ export function path2FormatClassify(path: string): ClassifiedFormat {
 
 export function index2Range(index: number, startFrom: number = 0) {
   return [...Array(index).keys()].slice(startFrom)
+}
+
+export function countFromDoubleArray(texts: string[][], unit: CountType, index: number): number {
+  let sum = 0
+  if (unit === 'chara') {
+    for (const text of texts) {
+      sum += countCharas(text[index])
+    }
+  } else if (unit === 'word') {
+    for (const text of texts) {
+      sum += countWords(text[index])
+    }
+  }
+  return sum
+}
+
+
+export function countFromArray(texts: string[], unit: CountType): number {
+  let sum = 0
+  if (unit === 'chara') {
+    for (const text of texts) {
+      sum += countCharas(text)
+    }
+  } else if (unit === 'word') {
+    for (const text of texts) {
+      sum += countWords(text)
+    }
+  }
+  return sum
 }
 
 export function countCharas(text: string): number {
