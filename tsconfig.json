@@ -22,11 +22,11 @@
     ]
   },
   "include": [
-    "office-funcs/*.ts",
-    "office-funcs/office/*.ts",
-    "office-funcs/cat/*.ts",
-    "office-funcs/plugins/*.ts",
-    "index.ts"
+    "src/office-funcs/*.ts",
+    "src/office-funcs/office/*.ts",
+    "src/office-funcs/cat/*.ts",
+    "src/office-funcs/plugins/*.ts",
+    "src/index.ts"
   ],
   "exclude": [
     "node_modules"
