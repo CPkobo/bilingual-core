@@ -1,8 +1,9 @@
 import { SequenceMatcher } from './sequenceMatcher'
 import { countCharas, countWords} from './util';
 
-export class DiffInfoBrowser {
+export class DiffInfo {
   public dsegs: DiffSeg[];
+  public files: string[];
   public d: SequenceMatcher;
   public report: WWCReport | undefined;
   public marks: RegExp;
@@ -12,6 +13,7 @@ export class DiffInfoBrowser {
   constructor() {
     const dsegs: DiffSeg[] = [];
     this.dsegs = dsegs;
+    this.files = [];
     // const difflib = require('difflib');
     // this.d = new difflib.SequenceMatcher(null, '', '');
     this.d = new SequenceMatcher();
@@ -25,23 +27,56 @@ export class DiffInfoBrowser {
     if (adding === undefined || adding === false) {
       this.dsegs.length = 0;
     }
-    let i = -1;
-    let j = -1;
+    let pid = -1;
+    let gid = -1;
+    let fid = -1
     for (const con of cons) {
+      fid++
+      this.files.push(con.name)
       for (const ext of con.exts) {
         if (!ext.isActive) {
           continue;
         }
-        j++
+        gid++
         for (const val of ext.value) {
           if (val === '') {
             continue;
           }
-          i++;
-          this.addDseg(i, j, con.name, val, '');
+          pid++;
+          this.addDseg(pid, gid, fid, val, '');
         }
       }
     }
+  }
+
+  public analyzeFromText(text: string, adding: boolean = false): void {
+    if (!adding) {
+      this.dsegs.length = 0;
+    }
+    const sepMarkA = '_@@_';
+    const sepMarkB = '_@λ_';
+    let fileName = ''
+    const lines: string[] = text.split('\n')
+    let pid = -1
+    let gid = -1
+    let fid = -1
+    lines.forEach(line => {
+      const blt = line.split('\t')
+      const st = blt[0]
+      const tt = blt.length >= 2 ? blt[1] : ''
+      if (st.startsWith(sepMarkA)) {
+        if (!line.endsWith('EOF')) {
+          // fileName = st.replace(sepMarkA, '')
+          fid++
+          this.files.push(st.replace(sepMarkA, ''))
+        }
+      } else if (line.startsWith(sepMarkB)) {
+        gid++
+      } else if (line !== '') {
+        pid++;
+        this.addDseg(pid, gid, fid, st, tt);
+      }
+    });
   }
 
   public calcWWC(unit: 'word' | 'chara', wordWeight?: WWCRate): void {
@@ -62,7 +97,7 @@ export class DiffInfoBrowser {
     // 1つ目のファイルのレポートは別途準備しておく
     const files: WWCInfo[] = [
       {
-        name: this.dsegs[0].file,
+        name: this.files[0] || '',
         sum: 0,
         sum2: 0,
         dupli: 0,
@@ -86,33 +121,33 @@ export class DiffInfoBrowser {
       over50: 0,
       under49: 0,
     };
-    let i = 0;
+    let crt = 0;
     for (const dseg of this.dsegs) {
       // ファイル名が変わった場合に行う処理
-      if (dseg.file !== report.files[i].name) {
+      if (dseg.fid !== crt) {
         // 課金率適用後の文字数を計算
-        report.files[i].sum2 += 
-          Math.round(report.files[i].under49 * rate.under49 * 10) / 10 +
-          Math.round(report.files[i].over50 * rate.over50 * 10) / 10 +
-          Math.round(report.files[i].over75 * rate.over75 * 10) / 10 +
-          Math.round(report.files[i].over85 * rate.over85 * 10) / 10 +
-          Math.round(report.files[i].over95 * rate.over95 * 10) / 10 +
-          Math.round(report.files[i].dupli * rate.dupli * 10) / 10;
+        report.files[crt].sum2 += 
+          Math.round(report.files[crt].under49 * rate.under49 * 10) / 10 +
+          Math.round(report.files[crt].over50 * rate.over50 * 10) / 10 +
+          Math.round(report.files[crt].over75 * rate.over75 * 10) / 10 +
+          Math.round(report.files[crt].over85 * rate.over85 * 10) / 10 +
+          Math.round(report.files[crt].over95 * rate.over95 * 10) / 10 +
+          Math.round(report.files[crt].dupli * rate.dupli * 10) / 10;
 
         // Summary に一つ前のファイルの文字数を加算しておく
-        report.sum += report.files[i].sum;
-        report.sum2 += report.files[i].sum2;
-        report.dupli += report.files[i].dupli;
-        report.over95 += report.files[i].over95;
-        report.over85 += report.files[i].over85;
-        report.over75 += report.files[i].over75;
-        report.over50 += report.files[i].over50;
-        report.under49 += report.files[i].under49;
+        report.sum += report.files[crt].sum;
+        report.sum2 += report.files[crt].sum2;
+        report.dupli += report.files[crt].dupli;
+        report.over95 += report.files[crt].over95;
+        report.over85 += report.files[crt].over85;
+        report.over75 += report.files[crt].over75;
+        report.over50 += report.files[crt].over50;
+        report.under49 += report.files[crt].under49;
 
         // ファイルの参照を進める
-        i++;
+        crt++;
         report.files.push({
-          name: dseg.file,
+          name: this.files[crt] || '',
           sum: 0,
           sum2: 0,
           dupli: 0,
@@ -126,47 +161,47 @@ export class DiffInfoBrowser {
 
       const len: number = unit === 'chara' ? countCharas(dseg.st) : countWords(dseg.st);
 
-      report.files[i].sum += len;
+      report.files[crt].sum += len;
 
       // 一致率に応じて文字数を振り分けておく
       if (dseg.max < 50) {
-        report.files[i].under49 += len;
+        report.files[crt].under49 += len;
         // report.files[i].sum2 += Math.round(len * rate.under49 * 10) / 10;
       } else if (dseg.max < 75) {
-        report.files[i].over50 += len;
+        report.files[crt].over50 += len;
         // report.files[i].sum2 += Math.round(len * rate.over50 * 10) / 10;
       } else if (dseg.max < 85) {
-        report.files[i].over75 += len;
+        report.files[crt].over75 += len;
         // report.files[i].sum2 += Math.round(len * rate.over75 * 10) / 10;
       } else if (dseg.max < 95) {
-        report.files[i].over85 += len;
+        report.files[crt].over85 += len;
         // report.files[i].sum2 += Math.round(len * rate.over85 * 10) / 10;
       } else if (dseg.max < 100) {
-        report.files[i].over95 += len;
+        report.files[crt].over95 += len;
         // report.files[i].sum2 += Math.round(len * rate.over95 * 10) / 10;
       } else {
-        report.files[i].dupli += len;
+        report.files[crt].dupli += len;
         // report.files[i].sum2 += Math.round(len * rate.dupli * 10) / 10;
       }
     }
     // 課金率適用後の文字数を計算
-    report.files[i].sum2 += 
-      Math.round(report.files[i].under49 * rate.under49 * 10) / 10 +
-      Math.round(report.files[i].over50 * rate.over50 * 10) / 10 +
-      Math.round(report.files[i].over75 * rate.over75 * 10) / 10 +
-      Math.round(report.files[i].over85 * rate.over85 * 10) / 10 +
-      Math.round(report.files[i].over95 * rate.over95 * 10) / 10 +
-      Math.round(report.files[i].dupli * rate.dupli * 10) / 10;
+    report.files[crt].sum2 += 
+      Math.round(report.files[crt].under49 * rate.under49 * 10) / 10 +
+      Math.round(report.files[crt].over50 * rate.over50 * 10) / 10 +
+      Math.round(report.files[crt].over75 * rate.over75 * 10) / 10 +
+      Math.round(report.files[crt].over85 * rate.over85 * 10) / 10 +
+      Math.round(report.files[crt].over95 * rate.over95 * 10) / 10 +
+      Math.round(report.files[crt].dupli * rate.dupli * 10) / 10;
 
     // Summary に一つ前のファイルの文字数を加算しておく
-    report.sum += report.files[i].sum;
-    report.sum2 += report.files[i].sum2;
-    report.dupli += report.files[i].dupli;
-    report.over95 += report.files[i].over95;
-    report.over85 += report.files[i].over85;
-    report.over75 += report.files[i].over75;
-    report.over50 += report.files[i].over50;
-    report.under49 += report.files[i].under49;
+    report.sum += report.files[crt].sum;
+    report.sum2 += report.files[crt].sum2;
+    report.dupli += report.files[crt].dupli;
+    report.over95 += report.files[crt].over95;
+    report.over85 += report.files[crt].over85;
+    report.over75 += report.files[crt].over75;
+    report.over50 += report.files[crt].over50;
+    report.under49 += report.files[crt].under49;
 
     this.report = report;
   }
@@ -240,12 +275,12 @@ export class DiffInfoBrowser {
     }
   }
 
-  protected addDseg(pid: number, gid: number, file: string, st: string, tt: string) {
+  protected addDseg(pid: number, gid: number, fid: number, st: string, tt: string) {
     if (this.isDigit.test(st)) {
       this.dsegs.push({
         pid,
         gid,
-        file,
+        fid,
         st,
         tt,
         len: st.length,
@@ -258,7 +293,7 @@ export class DiffInfoBrowser {
       const diff: DiffSeg = {
         pid,
         gid,
-        file,
+        fid,
         st,
         tt,
         len: countCharas(st),

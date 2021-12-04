@@ -1,6 +1,6 @@
 declare type ClassifiedFormat = 'is-word' | 'is-excel' | 'is-ppt' | ''
 
-declare type CountType = 'word' | 'chara' | 'both'
+declare type CountType = 'word' | 'chara'
 
 // CAT
 declare type CatDataType = 'XLIFF' | 'TMX' | 'TBX' | ''
@@ -8,15 +8,6 @@ declare type CatDataType = 'XLIFF' | 'TMX' | 'TBX' | ''
 declare interface TranslationUnit {
   lang: string,
   text: string,
-}
-
-declare interface XliffStats {
-  files: string[];
-  fileNum: number;
-  locales: string[];
-  lines: number;
-  charas?: number;
-  words?: number;
 }
 
 
@@ -74,7 +65,7 @@ declare interface WWCReport extends WWCInfo {
 declare interface DiffSeg {
   pid: number;
   gid: number;
-  file: string;
+  fid: number;
   st: string;
   tt: string;
   len: number;

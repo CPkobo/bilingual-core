@@ -1,16 +1,16 @@
-import { DiffInfoBrowser } from './diff-brs';
+import { DiffInfo } from './diff';
 import { ExtractContext } from './extract';
-// import { MyPlugins } from './plugins'
+import { MyPlugins } from './plugins'
 import { cnm } from './util';
 
 // export type TovisOpcodeSymbol = '='|'~'|'+'|'-'
 
 // export type TovisOpcode = [string, number, number, number, number]
 
-export class TovisBrowser {
+export class Tovis {
   public meta: TovisMeta;
   public blocks: TovisBlock[];
-  // public plugins: MyPlugins;
+  public plugins: MyPlugins;
   protected lineHead: RegExp
 
   constructor() {
@@ -23,18 +23,31 @@ export class TovisBrowser {
       remarks: '',
     };
     this.blocks = [];
-    // this.plugins = new MyPlugins()
+    this.plugins = new MyPlugins()
     this.lineHead = new RegExp('^(@|λ|_|%|\\!)+:(\\d+)}\\s?');
   }
 
-  public parseFromObj(data: ExtractContext | DiffInfoBrowser): Promise<ParseResult> {
+  public loadRunCommand(rcs: string, cwd: string) {
+    if (!rcs.startsWith('!')) {
+      for (const rc of rcs.split('\n')) {
+        if (!rc.startsWith('#')) {
+          const pathAndEx = rc.split('::')
+          const plPath = pathAndEx[0].trim().replace('<cwd>', cwd)
+          const exOption = pathAndEx.length > 1 ? pathAndEx[1].trim() : ''
+          this.plugins.register(plPath, exOption)
+        }
+      }
+    }
+  }
+
+  public parseFromObj(data: ExtractContext | DiffInfo): Promise<ParseResult> {
     return new Promise((resolve, reject) => {
       if (data instanceof ExtractContext) {
-        const diff = new DiffInfoBrowser()
+        const diff = new DiffInfo()
         const srcContent = data.getRawContent('src')
         if (srcContent !== null) {
           diff.analyze(srcContent)
-          this.parseDiffInfo(diff.dsegs).then((message) => {
+          this.parseDiffInfo(diff).then((message) => {
             resolve({ isOk: true, message })
           }).catch((errMessage) => {
             reject({ isOk: false, message: errMessage });
@@ -42,13 +55,88 @@ export class TovisBrowser {
         } else {
           reject({ isOk: false, message: 'No Catovis Context' })
         }
-      } else if (data instanceof DiffInfoBrowser) {
-        this.parseDiffInfo(data.dsegs).then((message) => {
+      } else if (data instanceof DiffInfo) {
+        this.parseDiffInfo(data).then((message) => {
           resolve({ isOk: true, message })
         }).catch((errMessage) => {
           reject({ isOk: false, message: errMessage });
         });
       }
+    })
+  }
+
+  public parseFromFile(data: string, fileType: 'tovis' | 'diff' | 'plain'): Promise<ParseResult> {
+    return new Promise((resolve, reject) => {
+      if (fileType === 'plain') {
+        this.parseFromPlainText(data, true).then((message) => {
+          resolve({ isOk: true, message });
+        }).catch((errMessage) => {
+          reject({ isOk: false, message: errMessage });
+        });
+      } else if (fileType === 'tovis') {
+        // this.readTovisLines(path).then((message) => {
+        //   resolve({ isOk: true, message });
+        // }).catch((errMessage) => {
+        //   reject({ isOk: false, message: errMessage });
+        // });
+      } else if (fileType === 'diff') {
+        this.parseDiffInfo(JSON.parse(data)).then((message) => {
+          resolve({ isOk: true, message });
+        }).catch((errMessage) => {
+          reject({ isOk: false, message: errMessage });
+          });
+      } else {
+        reject({ isOk: false, message: 'fileType sholud designate from "tovis"/"diff"/"plain"' });
+      }
+    });
+  }
+    
+  private parseFromPlainText(data: string, withDiff: boolean): Promise<string> {
+    return new Promise((resolve, reject) => {
+      if (withDiff) {
+        const diff: DiffInfo = new DiffInfo();
+        diff.analyzeFromText(data)
+        this.parseDiffInfo(diff).then(() => {
+          resolve(`success to read rows with Diff`);
+        });
+      } else {
+        let i = -1
+        const sepMarkA = '_@@_';
+        const sepMarkB = '_@λ_';
+        const lines = data.split('\n')
+        lines.forEach(line => {
+          const blt = line.split('\t')
+          const st = blt[0]
+          const tt = blt.length >= 2 ? blt[1] : ''    
+          if (st.startsWith(sepMarkA)) {
+            if (!st.endsWith('EOF')) {
+              const fileName = st.replace(sepMarkA, '');
+              this.meta.files.push(`${i}:${fileName}`)
+            }
+          } else if (line.startsWith(sepMarkB)) {
+            this.meta.groups.push(i)
+          } else if (line !== '') {
+            i++;
+            const block = this.createBlock()
+            this.setSource(block, st)
+            block.t = tt
+            this.blocks.push(block)
+          }
+        });
+      }
+    }) 
+  }
+
+  private readTovisLines(data: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const lines = data.split('\n');
+      let count = 1;
+      const lineHead = new RegExp('^(@|λ|_|%|\\!)+:(\\d+)}\\s?');
+      lines.forEach(line => {
+        if (this.parseByLine(line)) {
+          count++
+        }
+      });
     })
   }
 
@@ -244,7 +332,7 @@ export class TovisBrowser {
     return valid
   }
 
-  protected parseDiffInfo(diff: DiffSeg[]): Promise<string> {
+  protected parseDiffInfo(diff: DiffInfo): Promise<string> {
     return new Promise((resolve, reject) => {
       const codeDict = {
         replace: '~',
@@ -252,13 +340,13 @@ export class TovisBrowser {
         insert: '+',
       };
       let fileName = ''
+      let fid = -1
       let fileStr = ''
       let prevGroup = -1
-      for (const dseg of diff) {
-        if (fileName !== dseg.file) {
-          fileName = dseg.file
-          const pathElements = fileName.split('/')
-          fileStr = `${dseg.pid}:${pathElements[pathElements.length - 1]}`
+      for (const dseg of diff.dsegs) {
+        if (fid !== dseg.fid) {
+          fid = dseg.fid
+          fileStr = `${dseg.pid}:${diff.files[fid]}`
           this.meta.files.push(fileStr)
         }
         if (prevGroup !== dseg.gid) {
@@ -404,20 +492,18 @@ export class TovisBrowser {
   }
 
   protected setSource(block: TovisBlock, text: string): void {
-    // if (this.plugins.onSetSouce.length === 0) {
-    //   block.s = text
-    // } else {
-    //   block.s = this.plugins.execFuncs('onSetSouce', text)
-    // }
-    block.s = text
+    if (this.plugins.onSetSouce.length === 0) {
+      block.s = text
+    } else {
+      block.s = this.plugins.execFuncs('onSetSouce', text)
+    }
   }
 
   protected setMT(block: TovisBlock, type: string, text: string): void {
-    // if (this.plugins.onSetMT.length === 0) {
-    //   block.m.push({ type, text })
-    // } else {
-    //   block.m.push({ type, text: this.plugins.execFuncs('onSetMT', text) })
-    // }
-    block.m.push({ type, text })
+    if (this.plugins.onSetMT.length === 0) {
+      block.m.push({ type, text })
+    } else {
+      block.m.push({ type, text: this.plugins.execFuncs('onSetMT', text) })
+    }
   }
 }
