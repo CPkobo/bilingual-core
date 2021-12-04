@@ -1,6 +1,6 @@
 declare type ClassifiedFormat = 'is-word' | 'is-excel' | 'is-ppt' | ''
 
-declare type CountType = 'word' | 'chara'
+declare type CountType = 'word' | 'chara' | 'both'
 
 // CAT
 declare type CatDataType = 'XLIFF' | 'TMX' | 'TBX' | ''
@@ -8,6 +8,15 @@ declare type CatDataType = 'XLIFF' | 'TMX' | 'TBX' | ''
 declare interface TranslationUnit {
   lang: string,
   text: string,
+}
+
+declare interface XliffStats {
+  files: string[];
+  fileNum: number;
+  locales: string[];
+  lines: number;
+  charas?: number;
+  words?: number;
 }
 
 

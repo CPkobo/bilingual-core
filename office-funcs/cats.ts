@@ -1,9 +1,7 @@
 import { parseString, Builder } from 'xml2js';
 // import Js2Xml from 'js2xml'
 
-import { createTsvArray, path2ContentStr } from './util-sv'
-import { applySegRules, countCharas, countWords, checkValidText, cnm } from './util';
-import { writeFileSync } from 'fs';
+import { countFromDoubleArray } from './util';
 
 export class CatDataContent {
   // public toolName: string;
@@ -34,13 +32,23 @@ export class CatDataContent {
     return this.contents.length;
   }
 
-  public getContentStats(): string {
-    const stats = {
+  public getContentStats(langs: string[] | 'all', onlyFullUnit: boolean = false, unit?: CountType): [XliffStats, string[][]] {
+    const stats: XliffStats = {
       files: this.fileNames,
-      langs: this.langs,
-      segments: this.getContentLength(),
+      fileNum: this.fileNames.length,
+      locales: this.langs,
+      lines: this.getContentLength(),
     }
-    return JSON.stringify(stats, null, 2)
+    const texts = this.getMultipleTexts(langs, onlyFullUnit)
+    if (unit) {
+      if (unit === 'chara' || unit === 'both') {
+        stats.charas = countFromDoubleArray(texts, 'chara', 0)
+      }
+      if (unit === 'word' || unit === 'both') {
+        stats.words = countFromDoubleArray(texts, 'word', 0)
+      }
+    }
+    return [stats, texts]
   }
 
   public loadMultilangXml(fileName: string, xmlStr: string): Promise<boolean> {

@@ -529,19 +529,8 @@ class CLIController {
         prs.push(cat.loadMultilangXml(name, xml))
       }
       Promise.all(prs).then(() => {
-        const tsv = cat.getMultipleTexts(this.catOptions.locales, this.catOptions.fullset)
-        const pdFiles = cat.getFilesInfo().join(',')
-        const pdLocales = cat.getLangsInfo().join(',')
-        const pdLines = cat.getContentLength()
-        const pdCharas = countFromDoubleArray(tsv, 'chara', 0)
-        const pdWords = countFromDoubleArray(tsv, 'word', 0)
-        console.log(`
-File： ${pdFiles}
-Locale： ${pdLocales}
-Line: ${pdLines}
-Chara: ${pdCharas}
-Word: ${pdWords}
-        `)
+        const [stats, tsv] = cat.getContentStats(this.catOptions.locales, this.catOptions.fullset, 'both')
+        console.log(JSON.stringify(stats, null, 2))
         const tsv_: string[] = []
         for (const t of tsv) {
           tsv_.push(t.join('\t'))
@@ -688,7 +677,7 @@ function officeInquirerDialog(largeChoice: 'OFFICE' | 'COUNT', sourceFiles?: str
     }
     control.setOfficeOptions({
       common: {
-        excludePattern: answer.excludingPattern,
+        excludePattern: answer.excludePattern,
         withSeparator: answer.others.indexOf('Dont add separation marks') !== -1
       },
       word: {
