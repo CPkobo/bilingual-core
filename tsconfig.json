@@ -9,17 +9,21 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "sourceMap": false,
-    "baseUrl": ".",
+    "baseUrl": "./src/",
+    "paths": {
+      "#/*": ["*"]
+    },
     "downlevelIteration": true,
     "outDir": "./dist",
     "resolveJsonModule": true,
     "types": [
-      "node"
+      "node",
+      "jest"
     ],
     "lib": [
       "esnext",
       "scripthost"
-    ]
+    ],
   },
   "include": [
     "src/office-funcs/*.ts",
