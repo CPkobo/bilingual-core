@@ -47,7 +47,7 @@ export class Tovis {
         const srcContent = data.getRawContent('src')
         if (srcContent !== null) {
           diff.analyze(srcContent)
-          this.parseDiffInfo(diff).then((message) => {
+          this.parseFromDiff(diff).then((message) => {
             resolve({ isOk: true, message })
           }).catch((errMessage) => {
             reject({ isOk: false, message: errMessage });
@@ -56,7 +56,7 @@ export class Tovis {
           reject({ isOk: false, message: 'No Catovis Context' })
         }
       } else if (data instanceof DiffInfo) {
-        this.parseDiffInfo(data).then((message) => {
+        this.parseFromDiff(data).then((message) => {
           resolve({ isOk: true, message })
         }).catch((errMessage) => {
           reject({ isOk: false, message: errMessage });
@@ -65,10 +65,86 @@ export class Tovis {
     })
   }
 
+  public parseFromExt(data: ExtractContext, isToDiff: boolean = true): Promise<ParseResult> {
+    return new Promise((resolve, reject) => {
+      // 類似解析を行う場合
+      if (isToDiff) {
+        const diff = new DiffInfo()
+        const srcContent = data.getRawContent('src')
+        if (srcContent !== null) {
+          diff.analyze(srcContent)
+          this.parseFromDiff(diff).then((message) => {
+            resolve({ isOk: true, message })
+          }).catch((errMessage) => {
+            reject({ isOk: false, message: errMessage });
+          });
+        } else {
+          reject({ isOk: false, message: 'No Catovis Context' })
+        }
+      // 類似解析を行わない場合
+      } else {
+        const texts = data.getSingleText("src")
+          .then(texts => {
+            this.parseFromStr(texts.join("\n"), false)
+          })
+      }
+    });
+  }
+
+  public parseFromDiff(diff: DiffInfo): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const codeDict = {
+        replace: '~',
+        delete: '-',
+        insert: '+',
+      };
+      let fileName = ''
+      let fid = -1
+      let fileStr = ''
+      let prevGroup = -1
+      for (const dseg of diff.dsegs) {
+        if (fid !== dseg.fid) {
+          fid = dseg.fid
+          fileStr = `${dseg.pid}:${diff.files[fid]}`
+          this.meta.files.push(fileStr)
+        }
+        if (prevGroup !== dseg.gid) {
+          this.meta.groups.push(dseg.pid)
+          prevGroup = dseg.gid
+        }
+        const block = this.createBlock();
+        this.setSource(block, dseg.st)
+        block.t = dseg.tt;
+        for (const sim of dseg.sims) {
+          const refInfo: TovisRef = {
+            from: sim.advPid,
+            to: dseg.pid,
+            ratio: sim.ratio,
+            op: sim.opcode.filter((c: Opcode) => {
+              return c[0] !== 'equal';
+            }).map((c2: Opcode) => {
+              const mark = c2[0] === 'replace' ? '~' : c2[0] === 'delete' ? '-' : '+';
+              return [mark, c2[1], c2[2], c2[3], c2[4]];
+            }),
+          };
+          block.d.push(refInfo);
+          this.blocks[sim.advPid].d.push(refInfo);
+          this.blocks[sim.advPid].d.sort((a, b) => {
+            if (a.ratio < b.ratio) { return 1; }
+            if (a.ratio > b.ratio) { return -1; }
+            return 0;
+          });
+        }
+        this.blocks.push(block);
+      }
+      resolve('DiffInfo successfully parsed into TOVIS');
+    });
+  }
+
   public parseFromFile(data: string, fileType: 'tovis' | 'diff' | 'plain'): Promise<ParseResult> {
     return new Promise((resolve, reject) => {
       if (fileType === 'plain') {
-        this.parseFromPlainText(data, true).then((message) => {
+        this.parseFromStr(data, true).then((message) => {
           resolve({ isOk: true, message });
         }).catch((errMessage) => {
           reject({ isOk: false, message: errMessage });
@@ -80,7 +156,7 @@ export class Tovis {
         //   reject({ isOk: false, message: errMessage });
         // });
       } else if (fileType === 'diff') {
-        this.parseDiffInfo(JSON.parse(data)).then((message) => {
+        this.parseFromDiff(JSON.parse(data)).then((message) => {
           resolve({ isOk: true, message });
         }).catch((errMessage) => {
           reject({ isOk: false, message: errMessage });
@@ -91,40 +167,45 @@ export class Tovis {
     });
   }
     
-  private parseFromPlainText(data: string, withDiff: boolean): Promise<string> {
+  public parseFromStr(data: string, isToDiff: boolean): Promise<string> {
     return new Promise((resolve, reject) => {
-      if (withDiff) {
+      if (isToDiff) {
         const diff: DiffInfo = new DiffInfo();
         diff.analyzeFromText(data)
-        this.parseDiffInfo(diff).then(() => {
+        this.parseFromDiff(diff).then(() => {
           resolve(`success to read rows with Diff`);
         });
       } else {
-        let i = -1
-        const sepMarkA = '_@@_';
-        const sepMarkB = '_@λ_';
-        const lines = data.split('\n')
-        lines.forEach(line => {
-          const blt = line.split('\t')
-          const st = blt[0]
-          const tt = blt.length >= 2 ? blt[1] : ''    
-          if (st.startsWith(sepMarkA)) {
-            if (!st.endsWith('EOF')) {
-              const fileName = st.replace(sepMarkA, '');
-              this.meta.files.push(`${i}:${fileName}`)
-            }
-          } else if (line.startsWith(sepMarkB)) {
-            this.meta.groups.push(i)
-          } else if (line !== '') {
-            i++;
-            const block = this.createBlock()
-            this.setSource(block, st)
-            block.t = tt
-            this.blocks.push(block)
-          }
-        });
+        this.parseFromStrArray(data.split('\n'))
+        resolve(`success to read rows with Diff`)
       }
     }) 
+  }
+
+  public parseFromStrArray(lines: string[]) {
+    let i = -1
+    const sepMarkA = '_@@_';
+    const sepMarkB = '_@λ_';
+    lines.forEach(line => {
+      const blt = line.split('\t')
+      const st = blt[0]
+      const tt = blt.length >= 2 ? blt[1] : ''    
+      if (st.startsWith(sepMarkA)) {
+        if (!st.endsWith('EOF')) {
+          const fileName = st.replace(sepMarkA, '');
+          this.meta.files.push(`${i}:${fileName}`)
+        }
+      } else if (line.startsWith(sepMarkB)) {
+        this.meta.groups.push(i)
+      } else if (line !== '') {
+        i++;
+        const block = this.createBlock()
+        this.setSource(block, st)
+        block.t = tt
+        this.blocks.push(block)
+      }
+    });
+
   }
 
   private readTovisLines(data: string): Promise<string> {
@@ -332,55 +413,7 @@ export class Tovis {
     return valid
   }
 
-  protected parseDiffInfo(diff: DiffInfo): Promise<string> {
-    return new Promise((resolve, reject) => {
-      const codeDict = {
-        replace: '~',
-        delete: '-',
-        insert: '+',
-      };
-      let fileName = ''
-      let fid = -1
-      let fileStr = ''
-      let prevGroup = -1
-      for (const dseg of diff.dsegs) {
-        if (fid !== dseg.fid) {
-          fid = dseg.fid
-          fileStr = `${dseg.pid}:${diff.files[fid]}`
-          this.meta.files.push(fileStr)
-        }
-        if (prevGroup !== dseg.gid) {
-          this.meta.groups.push(dseg.pid)
-          prevGroup = dseg.gid
-        }
-        const block = this.createBlock();
-        this.setSource(block, dseg.st)
-        block.t = dseg.tt;
-        for (const sim of dseg.sims) {
-          const refInfo: TovisRef = {
-            from: sim.advPid,
-            to: dseg.pid,
-            ratio: sim.ratio,
-            op: sim.opcode.filter((c: Opcode) => {
-              return c[0] !== 'equal';
-            }).map((c2: Opcode) => {
-              const mark = c2[0] === 'replace' ? '~' : c2[0] === 'delete' ? '-' : '+';
-              return [mark, c2[1], c2[2], c2[3], c2[4]];
-            }),
-          };
-          block.d.push(refInfo);
-          this.blocks[sim.advPid].d.push(refInfo);
-          this.blocks[sim.advPid].d.sort((a, b) => {
-            if (a.ratio < b.ratio) { return 1; }
-            if (a.ratio > b.ratio) { return -1; }
-            return 0;
-          });
-        }
-        this.blocks.push(block);
-      }
-      resolve('DiffInfo successfully parsed into TOVIS');
-    });
-  }
+
 
   protected upsertBlocks(keyChara: string, index: number, contents: string): boolean {
     let isValid = false;

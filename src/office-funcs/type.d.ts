@@ -1,6 +1,6 @@
 declare type ClassifiedFormat = 'is-word' | 'is-excel' | 'is-ppt' | ''
 
-declare type CountType = 'word' | 'chara'
+declare type CountType = 'word' | 'chara' | 'both'
 
 // CAT
 declare type CatDataType = 'XLIFF' | 'TMX' | 'TBX' | ''
@@ -12,13 +12,26 @@ declare interface TranslationUnit {
 
 
 // extract
+declare type FileFormat = 
+  'docx' | 'xlsx' | 'pptx' | 
+  'plain' | 'xliff' | 'tmx' | 'tbx' | '';
+
 declare interface ExtractedContent {
   name: string;
-  format: 'docx' | 'xlsx' | 'pptx';
+  format: FileFormat
   exts: ExtractedText[];
 }
 
-declare type SeparateMark = 'Word-Paragraph' | 'Word-Table' | 'Excel-Sheet' | 'Excel-Shape' | 'PPT-Slide' | 'PPT-Note' | 'PPT-Diagram' | 'PPT-Chart';
+declare interface BilingualExt {
+  src: ExtractedContent;
+  tgt: ExtractedContent;
+}
+
+declare type SeparateMark = 
+  'Word-Paragraph' | 'Word-Table' |
+  'Excel-Sheet' | 'Excel-Shape' |
+  'PPT-Slide' | 'PPT-Note' | 'PPT-Diagram' | 'PPT-Chart' | 
+  'Plain' | 'Bilingual' | '';
 
 declare interface ExtractedText {
   type: SeparateMark;
@@ -48,6 +61,16 @@ declare interface WWCRate {
   over75: number;
   over50: number;
   under49: number;
+}
+
+// cat
+declare interface XliffStats {
+  files: string[],
+  fileNum: number,
+  locales: string[],
+  lines: number,
+  charas?: number,
+  words?: number,
 }
 
 // diff

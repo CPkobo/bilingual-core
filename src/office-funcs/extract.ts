@@ -127,6 +127,14 @@ export class ExtractContext {
     }
   }
 
+  public getJsonContent(target: 'src' | 'tgt' | 'both'): string {
+    const data = {
+      src: this.src,
+      tgt: this.tgt,
+    }
+    return JSON.stringify(data, null, 2)
+  }
+
   public getSingleText(from: 'src' | 'tgt', opq?: OptionQue): Promise<string[]> {
     const que = opq !== undefined ? opq : {};
     const opt = new ReadingOption(que);

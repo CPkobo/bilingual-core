@@ -226,3 +226,14 @@ export function applyOpcodes(original: string, diffed: string, opcodes: Opcode[]
   return tagged;
 }
 
+export function str2ExtractedText(texts: string[], position: number = 0, type: SeparateMark = '') {
+  const joined = texts.join(' ')
+  return {
+    type,
+    position,
+    isActive: true,
+    value: texts,
+    sumCharas: countCharas(joined),
+    sumWords: countWords(joined) 
+  }
+}

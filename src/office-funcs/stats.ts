@@ -1,6 +1,6 @@
 export class FileStats {
   public name: string;
-  public format: 'docx' | 'xlsx' | 'pptx' | '';
+  public format: FileFormat;
   public doc_para: number;
   public doc_table: number;
   public xl_sheet: number;
@@ -9,7 +9,7 @@ export class FileStats {
   public ppt_dgm: number;
   public ppt_note: number;
 
-  constructor(name: string, format: 'docx' | 'xlsx' | 'pptx' | '') {
+  constructor(name: string, format: FileFormat) {
     this.name = name;
     this.format = format;
     this.doc_para = 0;

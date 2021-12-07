@@ -1,7 +1,7 @@
 import { parseString, Builder } from 'xml2js';
 // import Js2Xml from 'js2xml'
 
-import { countFromDoubleArray } from './util';
+import { countFromDoubleArray, path2Format, str2ExtractedText } from './util';
 
 export class CatDataContent {
   // public toolName: string;
@@ -32,21 +32,21 @@ export class CatDataContent {
     return this.contents.length;
   }
 
-  public getContentStats(langs: string[] | 'all', onlyFullUnit: boolean = false, unit?: CountType): [XliffStats, string[][]] {
+  public getContentStats(langs: string[] | 'all', onlyFullUnit: boolean = false, unit: CountType = 'both'): [XliffStats, string[][]] {
     const stats: XliffStats = {
       files: this.fileNames,
       fileNum: this.fileNames.length,
       locales: this.langs,
       lines: this.getContentLength(),
+      charas: 0,
+
     }
     const texts = this.getMultipleTexts(langs, onlyFullUnit)
-    if (unit) {
-      if (unit === 'chara' || unit === 'both') {
-        stats.charas = countFromDoubleArray(texts, 'chara', 0)
-      }
-      if (unit === 'word' || unit === 'both') {
-        stats.words = countFromDoubleArray(texts, 'word', 0)
-      }
+    if (unit === 'chara' || unit === 'both') {
+      stats.charas = countFromDoubleArray(texts, 'chara', 0)
+    }
+    if (unit === 'word' || unit === 'both') {
+      stats.words = countFromDoubleArray(texts, 'word', 0)
     }
     return [stats, texts]
   }
@@ -126,6 +126,38 @@ export class CatDataContent {
     }
     return texts;
   }
+
+  public dumpToExt(srcLang?: string, tgtLang?: string): BilingualExt[] {
+    const sl = srcLang || this.langs[0]
+    const tl = tgtLang || this.langs[1]
+    const bilingual: BilingualExt[] = []
+    for (const i in this.fileNames) {
+      const idx = Number(i)
+      const name = this.fileNames[idx]
+      const format = path2Format(name) as FileFormat
+      const srcs: string[] = []
+      const tgts: string[] = []
+      for (const tu of this.contents[idx]) {
+        if (tu.lang === srcLang) {
+          srcs.push(tu.text)
+        }
+        if (tu.lang === tgtLang) {
+          tgts.push(tu.text)
+        }
+      }
+      const srcExt: ExtractedContent = {
+        name,
+        format,
+        exts: [str2ExtractedText(srcs, idx, 'Bilingual')]
+      }
+      const tgtExt: ExtractedContent = {
+        name,
+        format,
+        exts: [str2ExtractedText(tgts, idx, 'Bilingual')]
+      }
+    }
+    return bilingual
+  } 
 
   public updateXliff(xliffStr: string, tsv: string[][], asTerm: boolean, overWrite: boolean): Promise<{
     xml: string, 
