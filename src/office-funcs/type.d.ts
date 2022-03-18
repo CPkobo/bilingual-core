@@ -2,18 +2,10 @@ declare type ClassifiedFormat = 'is-word' | 'is-excel' | 'is-ppt' | ''
 
 declare type CountType = 'word' | 'chara' | 'both'
 
-// CAT
-declare type CatDataType = 'XLIFF' | 'TMX' | 'TBX' | ''
-
-declare interface TranslationUnit {
-  lang: string,
-  text: string,
-}
-
 
 // extract
-declare type FileFormat = 
-  'docx' | 'xlsx' | 'pptx' | 
+declare type FileFormat =
+  'docx' | 'xlsx' | 'pptx' |
   'plain' | 'xliff' | 'tmx' | 'tbx' | '';
 
 declare interface ExtractedContent {
@@ -27,10 +19,10 @@ declare interface BilingualExt {
   tgt: ExtractedContent;
 }
 
-declare type SeparateMark = 
+declare type SeparateMark =
   'Word-Paragraph' | 'Word-Table' |
   'Excel-Sheet' | 'Excel-Shape' |
-  'PPT-Slide' | 'PPT-Note' | 'PPT-Diagram' | 'PPT-Chart' | 
+  'PPT-Slide' | 'PPT-Note' | 'PPT-Diagram' | 'PPT-Chart' |
   'Plain' | 'Bilingual' | '';
 
 declare interface ExtractedText {
@@ -64,13 +56,34 @@ declare interface WWCRate {
 }
 
 // cat
+declare interface XliffFileStats {
+  name: string
+  lines: number
+  charas?: number
+  words?: number
+}
+
 declare interface XliffStats {
-  files: string[],
-  fileNum: number,
-  locales: string[],
-  lines: number,
-  charas?: number,
-  words?: number,
+  fileNum: number
+  locales: string[]
+  charas: number
+  words: number
+  contents: XliffFileStats[]
+}
+
+declare type CatDataType = 'XLIFF' | 'TMX' | 'TBX' | ''
+
+declare interface TranslationUnit {
+  lang: string
+  text: string
+}
+
+declare interface CatUpdateLog {
+  filename: string
+  xml: string
+  already: string[]
+  updated: string[]
+  notFounds: string[]
 }
 
 // diff
@@ -105,9 +118,9 @@ declare interface SimilarSegment {
 }
 
 // オペコードのタイプ。類似分の表示に使用
-declare type Optag = 
-	'equal' | 'insert' | 'delete' | 'replace' | 
-	'=' | '+' | '-' | '~' | ''
+declare type Optag =
+  'equal' | 'insert' | 'delete' | 'replace' |
+  '=' | '+' | '-' | '~' | ''
 declare type Opcode = [Optag, number, number, number, number];
 
 declare type Calcresult = {
@@ -136,30 +149,22 @@ declare interface ExcelOption {
 }
 
 declare interface PptOption {
-  readSlide? : boolean;
+  readSlide?: boolean;
   readNote?: boolean;
 }
 
+declare interface CatOption {
+  locales: string[] | 'all';
+  fullset: boolean;
+  overWrite: boolean;
+}
+
 declare interface OptionQue {
-  common?: {
-    name?: string;
-    segmentation?: boolean;
-    delimiters?: string;
-    excluding?: boolean;
-    excludePattern?: string;
-    withSeparator?: boolean;
-  }
-  word?: {
-    afterRev?: boolean;
-  }
-  excel?: {
-    readHiddenSheet?: boolean;
-    readFilledCell?: boolean;
-  }
-  ppt?: {
-    readSlide? : boolean;
-    readNote?: boolean;
-  }
+  common?: CommonOption;
+  word?: WordOption;
+  excel?: ExcelOption;
+  ppt?: PptOption
+  cat?: CatOption
 }
 
 declare type OnSetString = (text: string, ex: any) => string;
@@ -228,22 +233,4 @@ declare interface TovisBlock {
 declare interface ReadFailure {
   name: string;
   detail: any;
-}
-
-// SequenceMatcher
-declare type Match = [number, number, number]
-declare type Queue = [number, number, number, number]
-
-declare type IsJunk = (chara: string) => boolean
-
-declare interface EltCount {
-  [key: string]: number
-}
-
-declare interface EltIndices {
-  [key: string]: number[]
-}
-
-declare interface J2Len {
-  [key: number]: number
 }

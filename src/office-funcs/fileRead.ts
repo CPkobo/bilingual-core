@@ -33,12 +33,31 @@ export function pathContentsReader(paths: string[], opq?: OptionQue): Promise<Ex
   });
 }
 
+export async function batchPathContentsReader(srcFiles: string[], tgtFiles: string[], opt: ReadingOption): Promise<ExtractedContent[][]> {
+  return new Promise((resolve, reject) => {
+    const prs: Array<Promise<ExtractedContent[]>> = [];
+    prs.push(pathContentsReader(srcFiles, opt));
+    if (tgtFiles.length > 0) {
+      prs.push(pathContentsReader(tgtFiles, opt));
+    }
+    Promise.all(prs).then(ds => {
+      resolve(ds)
+    }).catch((failure: ReadFailure) => {
+      console.log(`Error occured at ${failure.name}`);
+      console.log('--------For more details, please see below-----------');
+      console.log(failure.detail);
+      console.log('-----------------------------------------------------');
+      reject(failure)
+    });
+  })
+}
+
 export function path2ContentStr(path: string): string {
   const contents = readFileSync(path).toString();
   return contents;
 }
 
-export function createTsvArray(paths: string | string[]): string[][] | boolean {
+export function createTsvArray(paths: string | string[]): string[][] {
   if (typeof paths === 'string') {
     const tsvStr = path2ContentStr(paths)
     return convertTsv2Array(tsvStr)
@@ -62,7 +81,7 @@ export function convertTsv2Array(tsvStr: string): string[][] {
   return tsvArray
 }
 
-export function convertPlains2Tsv(paths: string[]): string[][] | boolean {
+export function convertPlains2Tsv(paths: string[]): string[][] {
   const contents: string[][] = []
   let srcLength = 0
   for (const path of paths) {
@@ -71,7 +90,7 @@ export function convertPlains2Tsv(paths: string[]): string[][] | boolean {
       srcLength = content.length
     } else {
       if (srcLength !== content.length) {
-        return false
+        return [[]]
       }
     }
     contents.push(content)

@@ -45,9 +45,11 @@
     ]
   },
   "dependencies": {
+    "@types/inquirer": "^8.2.0",
     "@types/js-yaml": "^4.0.0",
     "@types/jszip": "^3.4.1",
     "@types/node": "^14.14.6",
+    "@types/pdf-parse": "^1.1.1",
     "@types/xml2js": "^0.4.5",
     "commander": "^6.2.0",
     "difflib": "^0.2.4",
@@ -55,6 +57,7 @@
     "inquirer": "^7.3.3",
     "js-yaml": "^4.0.0",
     "jszip": "^3.5.0",
+    "pdf-parse": "^1.1.1",
     "ts-lint": "^4.5.1",
     "ts-node": "^9.0.0",
     "tsc": "^1.20150623.0",

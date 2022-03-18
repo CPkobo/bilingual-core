@@ -11,7 +11,9 @@
     "sourceMap": false,
     "baseUrl": "./src/",
     "paths": {
-      "#/*": ["*"]
+      "#/*": [
+        "*"
+      ]
     },
     "downlevelIteration": true,
     "outDir": "./dist",
@@ -26,11 +28,7 @@
     ],
   },
   "include": [
-    "src/office-funcs/*.ts",
-    "src/office-funcs/office/*.ts",
-    "src/office-funcs/cat/*.ts",
-    "src/office-funcs/plugins/*.ts",
-    "src/index.ts"
+    "src/**/*"
   ],
   "exclude": [
     "node_modules"

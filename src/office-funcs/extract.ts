@@ -13,48 +13,64 @@ import { FileStats } from './stats';
 import { cnm } from './util';
 
 export class ExtractContext {
-  private src: ExtractedContent[] | null;
-  private tgt: ExtractedContent[] | null;
+  private src: ExtractedContent[];
+  private tgt: ExtractedContent[];
 
   constructor() {
-    this.src = null;
-    this.tgt = null;
+    this.src = [];
+    this.tgt = [];
   }
 
-  public readContent(src: ExtractedContent[], tgt?: ExtractedContent[]): void {
-    this.src = src;
+  public setContent(src: ExtractedContent[], tgt?: ExtractedContent[]): void {
+    this.src.push(...src);
     if (tgt !== undefined) {
-      this.tgt = tgt;
+      this.tgt.push(...tgt);
     }
+  }
+
+  public resetContent(): void {
+    this.src.length = 0
+    this.tgt.length = 0
   }
 
   public readFromJSON(target: 'src' | 'tgt' | 'both', jsonStr: string): void {
     switch (target) {
       case 'src':
         this.src = JSON.parse(jsonStr);
-        this.tgt = null;
+        this.tgt = [];
         break;
 
       case 'tgt':
-        this.src = null;
+        this.src = [];
         this.tgt = JSON.parse(jsonStr);
         break;
 
       case 'both': {
         const data: any = JSON.parse(jsonStr);
-        this.src = data.src;
-        this.tgt = data.tgt;
+        const hasSrc = data.src !== undefined
+        const hasTgt = data.tgt !== undefined
+        // メンバーにsrcもtgtもいなかった場合、srcのデータとして扱う
+        if (!hasSrc && !hasTgt) {
+          this.src.push(...data)
+        } else {
+          if (hasSrc) {
+            this.src.push(...data.src)
+          }
+          if (hasTgt) {
+            this.tgt.push(...data.tgt)
+          }
+        }
         break;
       }
-      
+
       default:
         break;
     }
   }
 
   public changeActives(target: 'src' | 'tgt', index: number, actives: boolean[]): void {
-    const toChange: ExtractedContent[] | null = target === 'src' ? this.src : this.tgt;
-    if (toChange === null) {
+    const toChange: ExtractedContent[] = target === 'src' ? this.src : this.tgt;
+    if (toChange.length === 0) {
       return;
     } else if (actives.length !== toChange[index].exts.length) {
       return;
@@ -66,8 +82,8 @@ export class ExtractContext {
   }
 
   public changeFilePriority(target: 'src' | 'tgt' | 'both', fx: number, move: -1 | 1): void {
-    const toChange: ExtractedContent[] | null = target === 'src' ? this.src : this.tgt;
-    if (toChange === null) {
+    const toChange: ExtractedContent[] = target === 'src' ? this.src : this.tgt;
+    if (toChange.length === 0) {
       return;
     }
     const tempCon: ExtractedContent = toChange.splice(fx, 1)[0];
@@ -75,69 +91,49 @@ export class ExtractContext {
   }
 
   public getContentsLength(target: 'src' | 'tgt' | 'longer' | 'shorter'): number {
+    const srclen = this.src.length;
+    const tgtlen = this.tgt.length
     switch (target) {
       case 'src':
-        if (this.src === null) {
-          return 0;
-        } else {
-          return this.src.length;
-        }
-    
+        return srclen;
+
       case 'tgt':
-        if (this.tgt === null) {
-          return 0;
-        } else {
-          return this.tgt.length;
-        }
+        return tgtlen;
 
       case 'longer':
-        if (this.src === null && this.tgt === null) {
-          return 0;
-        } else if (this.src === null && this.tgt !== null) {
-          return this.tgt.length;
-        } else if (this.src !== null && this.tgt === null) {
-          return this.src.length;
-        } else if (this.src !== null && this.tgt !== null) {
-          return this.src.length >= this.tgt.length ? this.src.length : this.tgt.length;
-        }
-      
+        return srclen >= tgtlen ? srclen : tgtlen;
+
       case 'shorter':
-        if (this.src === null && this.tgt === null) {
-          return 0;
-        } else if (this.src === null && this.tgt !== null) {
-          return this.tgt.length;
-        } else if (this.src !== null && this.tgt === null) {
-          return this.src.length;
-        } else if (this.src !== null && this.tgt !== null) {
-          return this.src.length <= this.tgt.length ? this.src.length : this.tgt.length;
-        }
-      
+        return srclen <= tgtlen ? srclen : tgtlen;
+
       default:
         return 0;
     }
   }
 
-  public getRawContent(target: 'src' | 'tgt' | 'both'): ExtractedContent[] | null {
+  public getRawContent(target: 'src' | 'tgt'): ExtractedContent[] {
     if (target === 'src') {
       return this.src;
-    } else if (target === 'tgt') {
-      return this.tgt;
     } else {
-      return null;
+      return this.tgt;
     }
   }
 
-  public getJsonContent(target: 'src' | 'tgt' | 'both'): string {
+  public dumpToJson(target: 'src' | 'tgt' | 'both'): string {
     const data = {
       src: this.src,
       tgt: this.tgt,
     }
-    return JSON.stringify(data, null, 2)
+    if (target === 'both') {
+      return JSON.stringify(data, null, 2)
+    } else if (target === 'src') {
+      return JSON.stringify(data.src, null, 2)
+    } else {
+      return JSON.stringify(data.tgt, null, 2)
+    }
   }
 
-  public getSingleText(from: 'src' | 'tgt', opq?: OptionQue): Promise<string[]> {
-    const que = opq !== undefined ? opq : {};
-    const opt = new ReadingOption(que);
+  public getSingleText(from: 'src' | 'tgt', opt: ReadingOption = new ReadingOption()): Promise<string[]> {
     return new Promise((resolve, reject) => {
       let target: ExtractedContent[] = [];
       if (from === 'src') {
@@ -216,18 +212,14 @@ export class ExtractContext {
     });
   }
 
-  public simpleCalcOneFile(unit: 'chara' | 'word', fx: number, opq?: OptionQue, part?: SeparateMark): {subs:number[], sum: number, partial: number} {
-    const que = opq !== undefined ? opq : {};
-    const opt = new ReadingOption(que);
+  public simpleCalcOneFile(unit: 'chara' | 'word', fx: number, opt: ReadingOption = new ReadingOption(), part?: SeparateMark): { subs: number[], sum: number, partial: number } {
     const partMark: SeparateMark = part || 'PPT-Note';
     if (this.src === null) {
-      return {subs:[], sum: 0, partial: 0};
+      return { subs: [], sum: 0, partial: 0 };
     } else {
       const subs: number[] = [];
       let sum: number = 0
       let partial: number = 0
-      // const spaces = new RegExp('\\s+', 'g');
-      // const marks = new RegExp('(\\,|\\.|:|;|\\!|\\?|\\s)+', 'g');
       for (const ext of this.src[fx].exts) {
         if (!ext.isActive) {
           if (this.src[fx].format === 'xlsx') {
@@ -241,27 +233,17 @@ export class ExtractContext {
           }
         }
         const insum = unit === 'chara' ? ext.sumCharas : ext.sumWords;
-        // let insum = 0;
-        // ext.value.map((val: string) => {
-        //   if (unit === 'chara') {
-        //     insum += val.replace(spaces, '').length;
-        //   } else if (unit === 'word') {
-        //     insum += `${val}.`.replace(marks, ' ').split(' ').length - 1;
-        //   }
-        // });
         subs.push(insum);
         sum += insum
         if (ext.type === partMark) {
           partial += insum
         }
       }
-      return {subs, sum, partial};
+      return { subs, sum, partial };
     }
   }
 
-  public simpleCalc(unit: 'chara' | 'word', opq?: OptionQue): string[] {
-    const que = opq !== undefined ? opq : {};
-    const opt = new ReadingOption(que);
+  public simpleCalc(unit: 'chara' | 'word', opt: ReadingOption = new ReadingOption()): string[] {
     let totalSum = 0;
     const unitStr = unit === 'chara' ? '文字数' : '単語数';
     const result: string[] = [`ファイル名\t${unitStr}`, ''];
@@ -287,13 +269,6 @@ export class ExtractContext {
           } else if (unit === 'word') {
             sum += ext.sumWords;
           }
-          // text.value.map((val: string) => {
-          //   if (unit === 'chara') {
-          //     sum += val.replace(spaces, '').length;
-          //   } else if (unit === 'word') {
-          //     sum += `${val}.`.replace(marks, ' ').split(' ').length - 1;
-          //   }
-          // });
         }
         totalSum += sum;
         result.push(`${con.name}\t${sum}`);
@@ -303,9 +278,7 @@ export class ExtractContext {
     }
   }
 
-  public getAlignedText(opq?: OptionQue): Promise<string[]> {
-    const que = opq !== undefined ? opq : {};
-    const opt = new ReadingOption(que);
+  public getAlignedText(opt: ReadingOption = new ReadingOption()): Promise<string[]> {
     return new Promise((resolve, reject) => {
       if (this.src === null) {
         reject('No Source files contained');
@@ -377,9 +350,6 @@ export class ExtractContext {
               let k = 0;
               for (let j = 0; j <= larger - 1; j++) {
                 k++;
-                // if (!opt.excel.readHiddenSheet && !sf.isActive) {
-                //   continue;
-                // }
                 const sv = sf.exts[j] !== undefined ? sf.exts[j].value.slice() : [''];
                 const tv = tf.exts[j] !== undefined ? tf.exts[j].value.slice() : [''];
                 inFile.push(...this.segPairing(sv, tv, `SHEET${k}`, toSep));
