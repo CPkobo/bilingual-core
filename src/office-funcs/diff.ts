@@ -1,5 +1,5 @@
 import { SequenceMatcher } from './sequenceMatcher'
-import { countCharas, countWords} from './util';
+import { countCharas, countWords } from './util';
 
 export class DiffInfo {
   public dsegs: DiffSeg[];
@@ -21,6 +21,24 @@ export class DiffInfo {
     this.marks = new RegExp('(\\,|\\.|:|;|\\!|\\?|\\s)+', 'g');
     this.spaces = new RegExp('\\s+', 'g');
     this.isDigit = new RegExp('^[\\d\\. ]+$');
+  }
+
+  public readFromJson(data: string): void {
+    const jdata = JSON.parse(data)
+    if (jdata.dsegs !== undefined) {
+      this.dsegs = jdata.dsegs
+    }
+    if (jdata.files !== undefined) {
+      this.files = jdata.files
+    }
+  }
+
+  public dumpToJson(): string {
+    const data = {
+      dsegs: this.dsegs,
+      files: this.files
+    }
+    return JSON.stringify(data, null, 2)
   }
 
   public analyze(cons: ExtractedContent[], adding?: boolean): void {
@@ -92,7 +110,7 @@ export class DiffInfo {
         over50: 1,
         under49: 1,
       };
-    
+
     // 結果を格納するオブジェクト report の準備
     // 1つ目のファイルのレポートは別途準備しておく
     const files: WWCInfo[] = [
@@ -126,7 +144,7 @@ export class DiffInfo {
       // ファイル名が変わった場合に行う処理
       if (dseg.fid !== crt) {
         // 課金率適用後の文字数を計算
-        report.files[crt].sum2 += 
+        report.files[crt].sum2 +=
           Math.round(report.files[crt].under49 * rate.under49 * 10) / 10 +
           Math.round(report.files[crt].over50 * rate.over50 * 10) / 10 +
           Math.round(report.files[crt].over75 * rate.over75 * 10) / 10 +
@@ -185,7 +203,7 @@ export class DiffInfo {
       }
     }
     // 課金率適用後の文字数を計算
-    report.files[crt].sum2 += 
+    report.files[crt].sum2 +=
       Math.round(report.files[crt].under49 * rate.under49 * 10) / 10 +
       Math.round(report.files[crt].over50 * rate.over50 * 10) / 10 +
       Math.round(report.files[crt].over75 * rate.over75 * 10) / 10 +

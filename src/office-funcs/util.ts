@@ -53,7 +53,7 @@ export function path2FormatClassify(path: string): ClassifiedFormat {
     case 'pptx':
     case 'pptm':
       return 'is-ppt'
-  
+
     default:
       return ''
   }
@@ -77,7 +77,6 @@ export function countFromDoubleArray(texts: string[][], unit: CountType, index: 
   return sum
 }
 
-
 export function countFromArray(texts: string[], unit: CountType): number {
   let sum = 0
   if (unit === 'chara') {
@@ -98,32 +97,6 @@ export function countCharas(text: string): number {
 
 export function countWords(text: string): number {
   return `${text}.`.replace(/(\,|\.|:|;|\!|\?|\s)+/g, ' ').split(' ').length - 1;
-}
-
-export function blobContentsReader(files: any, order: number[], opq?: OptionQue): Promise<ExtractedContent[]> {
-  const que = opq !== undefined ? opq : {};
-  const opt = new ReadingOption(que);
-  return new Promise((resolve, reject) => {
-    const prs: Array<Promise<any>> = [];
-    for (const ox of order) {
-      const fileName = files[ox].name;
-      if (fileName.endsWith('.docx') || fileName.endsWith('.docm')) {
-        prs.push(docxReader(files[ox], fileName, opt));
-      } else if (fileName.endsWith('.xlsx') ||  fileName.endsWith('.xlsm')) {
-        prs.push(xlsxReader(files[ox], fileName, opt));
-      } else if (fileName.endsWith('.pptx') || fileName.endsWith('.pptm')) {
-        // スライドもノートも読み込まない設定の場合はスキップ
-        if (opt.ppt.readSlide || opt.ppt.readNote) {
-          prs.push(pptxReader(files[ox], fileName, opt));
-        }
-      }
-    }
-    Promise.all(prs).then((res) => {
-      resolve(res);
-    }).catch((failure: ReadFailure) => {
-      reject(failure);
-    });
-  });
 }
 
 export function splitSegmentation(text: string, delimiters: RegExp, exceptions?: RegExp): string[] {
@@ -185,47 +158,6 @@ export function applySegRules(textVal: string[], opt: ReadingOption): string[] {
   });
 }
 
-export function applyOpcodes(original: string, diffed: string, opcodes: Opcode[]): string {
-  // OpcodeのDelete / Replace 用にオリジナルテキストをとっておく
-  const crtSegment = original;
-  // 類似テキストを一つずつ取得して処理
-  // let tagged: string = diffed.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  let tagged:string = diffed
-  const processCodes: Opcode[] = opcodes.reverse();
-  for (const processCode of processCodes) {
-    switch (processCode[0]) {
-      case 'equal':
-      case '=':
-        break;
-      case 'delete':
-      case '-':
-        tagged =
-            tagged.slice(0, processCode[3]) +
-            '<span class="ins">' + crtSegment.slice(processCode[1], processCode[2]) + '</span>' +
-            tagged.slice(processCode[4]);
-        break;
-      case 'replace':
-      case '~':
-        tagged =
-            tagged.slice(0, processCode[3]) +
-            '<span class="ins">' + crtSegment.slice(processCode[1], processCode[2]) + '</span>' +
-            '<span class="del">' + tagged.slice(processCode[3], processCode[4]) + '</span>' +
-            tagged.slice(processCode[4]);
-        break;
-      case 'insert':
-      case '+':
-        tagged =
-            tagged.slice(0, processCode[3]) +
-            '<span class="del">' + tagged.slice(processCode[3], processCode[4]) + '</span>' +
-            tagged.slice(processCode[4]);
-        break;
-      default:
-        break;
-    }
-  }
-  return tagged;
-}
-
 export function str2ExtractedText(texts: string[], position: number = 0, type: SeparateMark = '') {
   const joined = texts.join(' ')
   return {
@@ -234,6 +166,6 @@ export function str2ExtractedText(texts: string[], position: number = 0, type: S
     isActive: true,
     value: texts,
     sumCharas: countCharas(joined),
-    sumWords: countWords(joined) 
+    sumWords: countWords(joined)
   }
 }

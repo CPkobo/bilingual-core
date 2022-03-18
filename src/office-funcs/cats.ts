@@ -5,15 +5,43 @@ import { countFromDoubleArray, path2Format, str2ExtractedText } from './util';
 
 export class CatDataContent {
   // public toolName: string;
-  public fileNames: string[];
+  // public fileNames: string[];
   private langs: string[];
-  private contents: TranslationUnit[][];
+  // 実際のファイルごとにユニットを保存する
+  // 1つのセンテンス（用語）について、{lang: string, text: string}からなる配列があり、
+  // 1つのファイルはその配列の配列からなる
+  private contents: Array<{
+    file: string
+    units: TranslationUnit[][];
+  }>
 
   constructor() {
     // this.toolName = '';
-    this.fileNames = [];
+    // this.fileNames = [];
     this.langs = [];
     this.contents = [];
+  }
+
+  public readFromJson(data: string): void {
+    const jdata = JSON.parse(data)
+    // if (jdata.fileNames !== undefined) {
+    //   this.fileNames = jdata.fileNames
+    // }
+    if (jdata.langs !== undefined) {
+      this.langs = jdata.langs
+    }
+    if (jdata.contents !== undefined) {
+      this.contents = jdata.contents
+    }
+  }
+
+  public dumpToJson(): string {
+    const data = {
+      // fileNames: this.fileNames,
+      langs: this.langs,
+      contents: this.contents
+    }
+    return JSON.stringify(data, null, 2)
   }
 
   public getLangsInfo(): string[] {
@@ -25,7 +53,11 @@ export class CatDataContent {
   }
 
   public getFilesInfo(): string[] {
-    return this.fileNames;
+    const fileNames: string[] = []
+    this.contents.forEach(content => {
+      fileNames.push(content.file)
+    })
+    return fileNames;
   }
 
   public getContentLength(): number {
@@ -33,49 +65,81 @@ export class CatDataContent {
   }
 
   public getContentStats(langs: string[] | 'all', onlyFullUnit: boolean = false, unit: CountType = 'both'): [XliffStats, string[][]] {
+    const files = this.getFilesInfo()
+    // const contents: XliffFileStats[] = []
     const stats: XliffStats = {
-      files: this.fileNames,
-      fileNum: this.fileNames.length,
+      fileNum: this.contents.length,
       locales: this.langs,
-      lines: this.getContentLength(),
       charas: 0,
-
+      words: 0,
+      contents: []
     }
     const texts = this.getMultipleTexts(langs, onlyFullUnit)
-    if (unit === 'chara' || unit === 'both') {
-      stats.charas = countFromDoubleArray(texts, 'chara', 0)
-    }
-    if (unit === 'word' || unit === 'both') {
-      stats.words = countFromDoubleArray(texts, 'word', 0)
-    }
+    this.contents.forEach(inFile => {
+      const fileStats: XliffFileStats = {
+        name: inFile.file,
+        lines: inFile.units.length
+      }
+      if (unit === 'chara' || unit === 'both') {
+        fileStats.charas = countFromDoubleArray(texts, 'chara', 0)
+        stats.charas += fileStats.charas
+      }
+      if (unit === 'word' || unit === 'both') {
+        fileStats.words = countFromDoubleArray(texts, 'word', 0)
+        stats.words += fileStats.words
+      }
+      stats.contents.push(fileStats)
+    })
     return [stats, texts]
   }
 
-  public loadMultilangXml(fileName: string, xmlStr: string): Promise<boolean> {
+  public batchLoadMultilangXml(names: string[], xmlStr: string[], opt: CatOption): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      const name = fileName.toLowerCase()
-      if (name.endsWith('xliff')) {
-        this.loadXliffString(fileName, xmlStr).then(() => {
+      const prs: Promise<boolean>[] = []
+      for (let i = 0; i < names.length; i++) {
+        prs.push(this.loadMultilangXml(names[i], xmlStr[i]))
+      }
+      Promise.all(prs)
+        .then(() => {
+          resolve(true)
+          // const [stats, tsv] = this.getContentStats(opt.locales, opt.fullset, 'both')
+          // const tsv_: string[] = []
+          // for (const t of tsv) {
+          //   tsv_.push(t.join('\t'))
+          // }
+          // resolve(tsv_)
+        })
+        .catch(() => {
+          reject(false)
+        })
+    })
+  }
+
+  public loadMultilangXml(name: string, xmlStr: string): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      const fileName = name.toLowerCase()
+      if (fileName.endsWith('xliff')) {
+        this.loadXliffString(name, xmlStr).then(() => {
           resolve(true)
         }).catch(e => {
           reject(e)
         })
-      } else if (name.endsWith('.tmx')) {
-        this.fileNames.push(name)
-        this.loadTmxString(xmlStr).then(() => {
+      } else if (fileName.endsWith('.tmx')) {
+        // this.fileNames.push(fileName)
+        this.loadTmxString(name, xmlStr).then(() => {
           resolve(true)
         }).catch(e => {
           reject(e)
         })
-      } else if (name.endsWith('.tbx')) {
-        this.fileNames.push(name)
-        this.loadTbxString(xmlStr).then(() => {
+      } else if (fileName.endsWith('.tbx')) {
+        // this.fileNames.push(fileName)
+        this.loadTbxString(name, xmlStr).then(() => {
           resolve(true)
         }).catch(e => {
           reject(e)
         })
       } else {
-        reject('This Program only support "XLIFF", "TMX" and "TBX" files' )
+        reject('This Program only support "XLIFF", "TMX" and "TBX" files')
       }
     })
   }
@@ -88,10 +152,12 @@ export class CatDataContent {
       lang_ = this.langs[0];
     }
     const singleLang: string[] = []
-    for (const tuset of this.contents) {
-      for (const tu of tuset) {
-        if (tu.lang === lang_) {
-          singleLang.push(tu.text)
+    for (const content of this.contents) {
+      for (const inFile of content.units) {
+        for (const tu of inFile) {
+          if (tu.lang === lang_) {
+            singleLang.push(tu.text)
+          }
         }
       }
     }
@@ -107,21 +173,23 @@ export class CatDataContent {
     }
     const langNum = langs_.length;
     const texts: string[][] = []
-    for (const tuset of this.contents) {
-      const inTexts = Array(langNum).fill('')
-      for (const tu of tuset) {
-        const lgx: number = langs_.indexOf(tu.lang)
-        if (lgx > -1) {
-          inTexts[lgx] = tu.text
+    for (const inFile of this.contents) {
+      for (const tuset of inFile.units) {
+        const inTexts = Array(langNum).fill('')
+        for (const tu of tuset) {
+          const lgx: number = langs_.indexOf(tu.lang)
+          if (lgx > -1) {
+            inTexts[lgx] = tu.text
+          }
         }
-      }
-      if (onlyFullUnit) {
-        // 空白文字列が残っていないセットのみをpush
-        if (inTexts.indexOf('') === -1) {
+        if (onlyFullUnit) {
+          // 空白文字列が残っていないセットのみをpush
+          if (inTexts.indexOf('') === -1) {
+            texts.push(inTexts)
+          }
+        } else {
           texts.push(inTexts)
         }
-      } else {
-        texts.push(inTexts)
       }
     }
     return texts;
@@ -131,42 +199,65 @@ export class CatDataContent {
     const sl = srcLang || this.langs[0]
     const tl = tgtLang || this.langs[1]
     const bilingual: BilingualExt[] = []
-    for (const i in this.fileNames) {
-      const idx = Number(i)
-      const name = this.fileNames[idx]
-      const format = path2Format(name) as FileFormat
+    let idx = 0
+    for (const inFile of this.contents) {
+      idx++
+      const format = path2Format(inFile.file) as FileFormat
       const srcs: string[] = []
       const tgts: string[] = []
-      for (const tu of this.contents[idx]) {
-        if (tu.lang === srcLang) {
-          srcs.push(tu.text)
-        }
-        if (tu.lang === tgtLang) {
-          tgts.push(tu.text)
+      for (const unit of inFile.units) {
+        for (const tu of unit) {
+          if (tu.lang === sl) {
+            srcs.push(tu.text)
+          }
+          if (tu.lang === tl) {
+            tgts.push(tu.text)
+          }
         }
       }
       const srcExt: ExtractedContent = {
-        name,
+        name: inFile.file,
         format,
         exts: [str2ExtractedText(srcs, idx, 'Bilingual')]
       }
       const tgtExt: ExtractedContent = {
-        name,
+        name: inFile.file,
         format,
         exts: [str2ExtractedText(tgts, idx, 'Bilingual')]
       }
+      bilingual.push({
+        src: srcExt,
+        tgt: tgtExt
+      })
     }
     return bilingual
-  } 
+  }
 
-  public updateXliff(xliffStr: string, tsv: string[][], asTerm: boolean, overWrite: boolean): Promise<{
-    xml: string, 
-    log: {
-      already: string[],
-      updated: string[],
-      notFounds: string[]
-    }
-  }> {
+  public batchUpdateXliff(names: string[], xliffs: string[], tsv: string[][], asTerm: boolean, overWrite: boolean): Promise<string[]> {
+    return new Promise<string[]>((resolve, reject) => {
+      const prs: Promise<CatUpdateLog>[] = []
+      for (let i = 0; i < names.length; i++) {
+        prs.push(this.updateXliff(names[i], xliffs[i], tsv, asTerm, overWrite))
+      }
+      Promise.all(prs)
+        .then(results => {
+          const logs: Omit<CatUpdateLog, 'xml'>[] = []
+          const xmls: string[] = []
+          results.forEach(result => {
+            logs.push({
+              filename: result.filename,
+              already: result.already,
+              updated: result.updated,
+              notFounds: result.notFounds
+            })
+            xmls.push(result.xml)
+            resolve([JSON.stringify(logs, null, 2), ...xmls])
+          })
+        })
+    })
+  }
+
+  public updateXliff(name: string, xliffStr: string, tsv: string[][], asTerm: boolean, overWrite: boolean): Promise<CatUpdateLog> {
     return new Promise((resolve, reject) => {
       parseString(xliffStr, (err: Error | null, xliff) => {
         if (err !== null) {
@@ -207,20 +298,19 @@ export class CatDataContent {
           // file タグに対する繰り返しここまで
           const builder = new Builder()
           resolve({
+            filename: name,
             xml: builder.buildObject(xliff),
-            log: {
-              already,
-              updated,
-              notFounds
-            }
+            already,
+            updated,
+            notFounds
           })
-        }   
+        }
       })
     })
-    
+
   }
 
-  public exportTMX(): string {
+  public exportTMX(idx: number): string {
     const attrs = [
       `creationtool='CATOVIS CLI'`,
       `creationtoolversion='0.2.0'`,
@@ -240,7 +330,8 @@ export class CatDataContent {
     const body: string[] = ['<body>'];
     // UIDはとりあえず未定
     const uid = '****************';
-    for (const tuset of this.contents) {
+    const target = this.contents[idx]
+    for (const tuset of target.units) {
       const singleTu: string[] = [`<tu tuid='${uid}'>`];
       for (const tu of tuset) {
         if (tu.text !== '') {
@@ -263,12 +354,19 @@ export class CatDataContent {
         } else {
           const xliffTag = xliff.xliff || [{}];
           const files = xliffTag.file || []
+          const content: {
+            file: string
+            units: TranslationUnit[][];
+          } = {
+            file: '',
+            units: []
+          }
           for (const file of files) {
             const oriFileName = file.$['original'] || ''
             if (oriFileName !== '') {
-              this.fileNames.push(`[${oriFileName}]_${xliffName}`)
+              content.file += `[${oriFileName}]_${xliffName} | `
             } else {
-              this.fileNames.push(xliffName)
+              content.file += xliffName
             }
             const srcLang = file.$['source-language'] || ''
             if (this.langs.indexOf(srcLang) === -1) {
@@ -281,36 +379,37 @@ export class CatDataContent {
             const body: any[] = file.body || [{}]
             const groups: any[] | undefined = body[0].group;
             const tus: any[] = groups ? groups.map((val: any) => {
-                return val['trans-unit'][0]
+              return val['trans-unit'][0]
             }) : body[0]['trans-unit'];
             for (const tu of tus) {
-                const unit = [];
-                const srcText = tu.source[0] || '';
-                const tgtText = tu.target[0] || '';
-                if (srcText !== '') {
-                    unit.push({
-                        lang: srcLang,
-                        text: srcText._ ? srcText._ : srcText
-                    });
-                }
-                if (tgtText !== '') {
-                    unit.push({
-                        lang: tgtLang,
-                        text: tgtText._ ? tgtText._ : tgtText
-                    });
-                }
-                if (unit.length > 0) {
-                    this.contents.push(unit);
-                }           
+              const unit = [];
+              const srcText = tu.source[0] || '';
+              const tgtText = tu.target[0] || '';
+              if (srcText !== '') {
+                unit.push({
+                  lang: srcLang,
+                  text: srcText._ ? srcText._ : srcText
+                });
+              }
+              if (tgtText !== '') {
+                unit.push({
+                  lang: tgtLang,
+                  text: tgtText._ ? tgtText._ : tgtText
+                });
+              }
+              if (unit.length > 0) {
+                content.units.push(unit);
+              }
             }
           }
+          this.contents.push(content)
           resolve(true);
         }
       })
     })
   }
-  
-  private loadTmxString(data: string): Promise<boolean> {
+
+  private loadTmxString(name: string, data: string): Promise<boolean> {
     return new Promise((resolve, reject) => {
       parseString(data, (err: Error | null, tmx: any) => {
         if (err !== null) {
@@ -326,6 +425,13 @@ export class CatDataContent {
             const srcLang = headerAttr.srclang
             this.langs[0] === srcLang
             const tus = body[0].tu || []
+            const content: {
+              file: string
+              units: TranslationUnit[][];
+            } = {
+              file: name,
+              units: []
+            }
             for (const tu of tus) {
               const tuvs = tu.tuv || []
               const units: TranslationUnit[] = []
@@ -336,11 +442,12 @@ export class CatDataContent {
                 }
                 const text = tuv.seg.join('')
                 if (text !== '') {
-                  units.push({lang, text})
+                  units.push({ lang, text })
                 }
+                content.units.push(units)
               }
-              this.contents.push(units)
             }
+            this.contents.push(content)
             resolve(true);
           }
         }
@@ -348,7 +455,7 @@ export class CatDataContent {
     })
   }
 
-  private loadTbxString(data: string): Promise<boolean> {
+  private loadTbxString(name: string, data: string): Promise<boolean> {
     return new Promise((resolve, reject) => {
       parseString(data, (err: Error | null, tbx: any) => {
         if (err !== null) {
@@ -362,6 +469,13 @@ export class CatDataContent {
           if (termEntries.length === 0) {
             reject('empty content')
           } else {
+            const content: {
+              file: string
+              units: TranslationUnit[][];
+            } = {
+              file: name,
+              units: []
+            }
             for (const termEntry of termEntries) {
               const units: TranslationUnit[] = [];
               for (const langSet of termEntry.langSet) {
@@ -376,8 +490,9 @@ export class CatDataContent {
                   units.push({ lang, text });
                 }
               }
-              this.contents.push(units)
+              content.units.push(units)
             }
+            this.contents.push(content)
             resolve(true);
           }
         }

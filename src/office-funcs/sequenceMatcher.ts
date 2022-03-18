@@ -237,20 +237,20 @@ export class SequenceMatcher {
       codes = [['equal', 0, 1, 0, 1]];
     }
     if (codes[0][0] === 'equal') {
-      tag = codes[0][0] as Optag;
-      i1 = codes[0][1] as number;
-      i2 = codes[0][2] as number;
-      j1 = codes[0][3] as number;
-      j2 = codes[0][4] as number;
+      tag = codes[0][0];
+      i1 = codes[0][1];
+      i2 = codes[0][2];
+      j1 = codes[0][3];
+      j2 = codes[0][4];
       codes[0] = [tag, Math.max(i1, i2 - n), i2, Math.max(j1, j2 - n), j2];
     }
     const last = codes.length - 1;
     if (codes[last][0] === 'equal') {
-      tag = codes[last][0] as Optag;
-      i1 = codes[last][1] as number;
-      i2 = codes[last][2] as number;
-      j1 = codes[last][3] as number;
-      j2 = codes[last][4] as number;
+      tag = codes[last][0];
+      i1 = codes[last][1];
+      i2 = codes[last][2];
+      j1 = codes[last][3];
+      j2 = codes[last][4];
       codes[last] = [tag, i1, Math.min(i2, i1 + n), j1, Math.min(j2, j1 + n)];
     }
 
@@ -258,11 +258,11 @@ export class SequenceMatcher {
     const groups: Opcode[][] = [];
     let group: Opcode[] = [];
     for (const code of codes) {
-      tag = code[0] as Optag;
-      i1 = code[1] as number;
-      i2 = code[2] as number;
-      j1 = code[3] as number;
-      j2 = code[4] as number;
+      tag = code[0];
+      i1 = code[1];
+      i2 = code[2];
+      j1 = code[3];
+      j2 = code[4];
       if ((tag === 'equal') && ((i2 - i1) > nn)) {
         group.push([tag, i1, Math.min(i2, i1 + n), j1, Math.min(j2, j1 + n)]);
         groups.push(group.slice());
@@ -332,20 +332,20 @@ export class SequenceMatcher {
         case 'delete':
           tagged =
             tagged.slice(0, processCode[3]) +
-            '<span class="ins">' + crtSegment.slice(processCode[1], processCode[2]) + '</span>' +
+            '<ins>' + crtSegment.slice(processCode[1], processCode[2]) + '</ins>' +
             tagged.slice(processCode[4]);
           break;
         case 'replace':
           tagged =
             tagged.slice(0, processCode[3]) +
-            '<span class="ins">' + crtSegment.slice(processCode[1], processCode[2]) + '</span>' +
-            '<span class="del">' + tagged.slice(processCode[3], processCode[4]) + '</span>' +
+            '<ins>' + crtSegment.slice(processCode[1], processCode[2]) + '</ins>' +
+            '<del>' + tagged.slice(processCode[3], processCode[4]) + '</del>' +
             tagged.slice(processCode[4]);
           break;
         case 'insert':
           tagged =
             tagged.slice(0, processCode[3]) +
-            '<span class="del">' + tagged.slice(processCode[3], processCode[4]) + '</span>' +
+            '<del>' + tagged.slice(processCode[3], processCode[4]) + '</del>' +
             tagged.slice(processCode[4]);
           break;
         default:
