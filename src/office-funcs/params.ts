@@ -22,7 +22,7 @@ export const modeCombinations = [
     'COUNT:DIFF-CHARAS tsv', 'COUNT:DIFF-WORDS tsv',
     'CAT:EXTRACT tsv',
     'CAT:EXTRACT-DIFF json', 'CAT:EXTRACT-DIFF tovis', 'CAT:EXTRACT-DIFF min-tovis',
-    'CAT:UPDATE xliff'
+    'CAT:UPDATE xliff', 'CAT:REPLACE xliff'
 ] as const
 
 export type ModeLarge = typeof largeModes[number]

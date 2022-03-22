@@ -141,6 +141,7 @@ declare interface CommonOption {
 
 declare interface WordOption {
   afterRev?: boolean;
+  afterRev2?: boolean;
 }
 
 declare interface ExcelOption {

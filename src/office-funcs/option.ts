@@ -16,7 +16,8 @@ export class ReadingOption {
       withSeparator: true,
     }
     this.word = {
-      afterRev: true
+      afterRev: true,
+      afterRev2: true
     }
     this.excel = {
       readHiddenSheet: false,
