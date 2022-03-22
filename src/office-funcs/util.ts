@@ -1,6 +1,6 @@
-import { docxReader } from './office/docxReader';
-import { xlsxReader } from './office/xlsxReader';
-import { pptxReader } from './office/pptxReader';
+// import { docxReader } from './office/docxReader';
+// import { xlsxReader } from './office/xlsxReader';
+// import { pptxReader } from './office/pptxReader';
 import { ReadingOption } from './option';
 
 export function getVer(): string {

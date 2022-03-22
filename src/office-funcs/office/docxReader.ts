@@ -4,7 +4,7 @@ import { ReadingOption } from '../option';
 import { applySegRules, countCharas, countWords, checkValidText } from '../util';
 
 // Wordファイルの読み込みに使用
-export async function docxReader(docxFile: any, fileName: string, opt: ReadingOption): Promise<ExtractedContent> {
+export async function docxReader(docxFile: any, fileName: string, opt: ReadingOption, isAlignTgt: boolean = false): Promise<ExtractedContent> {
   return new Promise((resolve, reject) => {
     const zip = new JSZip();
     const wordContents: ExtractedContent = {
@@ -12,7 +12,9 @@ export async function docxReader(docxFile: any, fileName: string, opt: ReadingOp
       format: 'docx',
       exts: [],
     };
-    const rev = opt.word.afterRev === undefined ? true : opt.word.afterRev;
+    const rev = !isAlignTgt
+      ? opt.word.afterRev === undefined ? true : opt.word.afterRev
+      : opt.word.afterRev2 === undefined ? true : opt.word.afterRev2;
     zip.loadAsync(docxFile).then((inzip: any) => {
       if (inzip !== null) {
         inzip.file('word/document.xml').async('string').then((wordxml: string) => {
@@ -25,10 +27,10 @@ export async function docxReader(docxFile: any, fileName: string, opt: ReadingOp
           // w:document > w:body
           let bodyNd: any = {};
           for (let i = 0; i < docCds.length; i++) {
-              if (docCds[i].nodeName === 'w:body') {
-                  bodyNd = docCds[i]
-                  break
-              }
+            if (docCds[i].nodeName === 'w:body') {
+              bodyNd = docCds[i]
+              break
+            }
           }
           // w:body の直下のノードから w:p または w:tbl のみを選択して処理
           const bodyCds: any = bodyNd.childNodes || [];
@@ -201,7 +203,7 @@ function wordRunReader(rNd: any, rev: boolean): string {
       case 'mc:AlternateContent': {
         const t = shapeVisitor(rCds[i_], rev)
         if (t !== '') {
-          textVal +=  t + '\n'
+          textVal += t + '\n'
         }
         break;
       }
@@ -211,7 +213,7 @@ function wordRunReader(rNd: any, rev: boolean): string {
       case 'w:pict': {
         const t = shapeVisitor(rCds[i_], rev)
         if (t !== '') {
-          textVal +=  t + '\n'
+          textVal += t + '\n'
         }
         break;
       }
