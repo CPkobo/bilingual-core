@@ -1,11 +1,11 @@
-declare type ClassifiedFormat = 'is-word' | 'is-excel' | 'is-ppt' | ''
+declare type ClassifiedFormat = 'is-word' | 'is-excel' | 'is-ppt' | 'is-pdf' | ''
 
 declare type CountType = 'word' | 'chara' | 'both'
 
 
 // extract
 declare type FileFormat =
-  'docx' | 'xlsx' | 'pptx' |
+  'docx' | 'xlsx' | 'pptx' | 'pdf' |
   'plain' | 'xliff' | 'tmx' | 'tbx' | '';
 
 declare interface ExtractedContent {
@@ -23,6 +23,7 @@ declare type SeparateMark =
   'Word-Paragraph' | 'Word-Table' |
   'Excel-Sheet' | 'Excel-Shape' |
   'PPT-Slide' | 'PPT-Note' | 'PPT-Diagram' | 'PPT-Chart' |
+  'PDF-Paragraph' | 'PDF-Page' |
   'Plain' | 'Bilingual' | '';
 
 declare interface ExtractedText {

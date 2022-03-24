@@ -21,7 +21,7 @@ export class CLIController extends CatovisOrganizer {
   private validated: boolean;
 
   private outputParams: {
-    format: string,
+    // format: string,
     console: boolean,
     debug: boolean,
   }
@@ -38,7 +38,7 @@ export class CLIController extends CatovisOrganizer {
     this.validated = false;
 
     this.outputParams = {
-      format: 'txt',
+      // format: 'txt',
       console: false,
       debug: false,
     }
@@ -126,7 +126,7 @@ export class CLIController extends CatovisOrganizer {
         this.target = tgt
       }
     }
-    if (this.mid === 'ALIGN tsv') {
+    if (this.mid.startsWith('ALIGN')) {
       this.setFilesArray('target')
     }
   }
@@ -138,7 +138,6 @@ export class CLIController extends CatovisOrganizer {
       if (name !== '' && name !== 'console') {
         this.outputFile = name
       } else {
-        // this.outputFile = `./catovis.${this.mode.format}`
         this.setConsole(true)
       }
       return true
@@ -209,8 +208,8 @@ export class CLIController extends CatovisOrganizer {
     if (this.mid === 'ALIGN tsv' && this.srcFiles.length !== this.tgtFiles.length) {
       errMes += 'ALIGN File Number Error; ';
     }
-    if (!this.outputFile.endsWith(this.outputParams.format)) {
-      this.outputFile = `${this.outputFile}.${this.outputParams.format}`
+    if (!this.outputFile.endsWith(this.recomendFormat)) {
+      this.outputFile = `${this.outputFile}.${this.recomendFormat}`
     }
     if (this.hasAnyErr.length > 0) {
       console.log(errMes)
@@ -221,7 +220,7 @@ export class CLIController extends CatovisOrganizer {
 
   private setFilesArray(srcOrTgt: 'source' | 'target'): void {
     const validFormat = this.lg === 'OFFICE' || this.lg === 'COUNT'
-      ? ['docx', 'docm', 'xlsx', 'xlsm', 'pptx', 'pptm', 'json']
+      ? ['docx', 'docm', 'xlsx', 'xlsm', 'pptx', 'pptm', 'pdf', 'json']
       : this.mid === 'UPDATE xliff' ? ['xliff', 'mxliff'] : ['xliff', 'mxliff', 'tmx', 'tbx'];
     const files = srcOrTgt === 'source' ? this.source : this.target;
     const toWhich = srcOrTgt === 'source' ? this.srcFiles : this.tgtFiles;

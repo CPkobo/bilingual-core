@@ -42,13 +42,16 @@ export function selectOfficeDialog(ctrl: CLIController, sourceFiles?: string): P
         name: 'target',
         message: 'Target input file(s)/folder(s) with comma separated.',
         when: (answerSoFar: any): boolean => {
-          return answerSoFar.modeMd === 'ALIGN tsv';
+          return answerSoFar.modeMd === 'ALIGN tsv' || answerSoFar.modeMd === 'ALIGN-DIFF html';
         },
       },
       {
         name: 'outputFile',
         message: (answerSoFar: any): string => {
-          const format = answerSoFar.modeMd.substr(answerSoFar.modeMd.lastIndexOf(' ') + 1)
+          let format = answerSoFar.modeMd.substring(answerSoFar.modeMd.lastIndexOf(' ') + 1)
+          if (format === 'min-tovis') {
+            format = 'mtovis'
+          }
           return `Input filename for output. [${format}] is selected`
         },
       },

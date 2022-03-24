@@ -3,7 +3,8 @@ export const largeModes = [
 ] as const
 
 export const officeModes = [
-    'EXTRACT txt', 'ALIGN tsv', 'EXTRACT json', 'EXTRACT-DIFF json', 'EXTRACT-DIFF tovis', 'EXTRACT-DIFF min-tovis'
+    'EXTRACT txt', 'ALIGN tsv', 'ALIGN-DIFF html',
+    'EXTRACT json', 'EXTRACT-DIFF json', 'EXTRACT-DIFF tovis', 'EXTRACT-DIFF min-tovis'
 ] as const
 
 export const countModes = [
@@ -11,13 +12,15 @@ export const countModes = [
 ] as const
 
 export const catModes = [
-    'EXTRACT tsv', 'EXTRACT-DIFF json', 'EXTRACT-DIFF tovis', 'EXTRACT-DIFF min-tovis', 'UPDATE xliff', 'REPLACE xliff'
+    'EXTRACT tsv',
+    'EXTRACT-DIFF json', 'EXTRACT-DIFF tovis', 'EXTRACT-DIFF min-tovis',
+    'UPDATE xliff', 'REPLACE xliff'
 ] as const
 
 export const modeCombinations = [
     'OFFICE:EXTRACT txt', 'OFFICE:EXTRACT json', 'OFFICE:EXTRACT-DIFF json',
     'OFFICE:EXTRACT-DIFF tovis', 'OFFICE:EXTRACT-DIFF min-tovis',
-    'OFFICE:ALIGN tsv',
+    'OFFICE:ALIGN tsv', 'OFFICE:ALIGN-DIFF html',
     'COUNT:CHARAS tsv', 'COUNT:WORDS tsv',
     'COUNT:DIFF-CHARAS tsv', 'COUNT:DIFF-WORDS tsv',
     'CAT:EXTRACT tsv',
