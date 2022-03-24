@@ -5,6 +5,7 @@ import { readFileSync } from 'fs'
 import { docxReader } from './office/docxReader';
 import { xlsxReader } from './office/xlsxReader';
 import { pptxReader } from './office/pptxReader';
+import { pdfReader } from './office/pdfRead';
 import { ReadingOption } from './option';
 
 export function pathContentsReader(paths: string[], opq?: OptionQue): Promise<ExtractedContent[]> {
@@ -23,6 +24,8 @@ export function pathContentsReader(paths: string[], opq?: OptionQue): Promise<Ex
         if (opt.ppt.readSlide || opt.ppt.readNote) {
           prs.push(pptxReader(read, path, opt));
         }
+      } else if (path.endsWith('.pdf')) {
+        prs.push(pdfReader(read, path, opt))
       }
     }
     Promise.all(prs).then((res) => {

@@ -41,6 +41,11 @@ export class DiffInfo {
     return JSON.stringify(data, null, 2)
   }
 
+  public exportDiffText(text1: string, text2: string): string {
+    this.d.setSeqs(text1, text2)
+    return this.d.applyOpcodes()
+  }
+
   public analyze(cons: ExtractedContent[], adding?: boolean): void {
     if (adding === undefined || adding === false) {
       this.dsegs.length = 0;

@@ -24,6 +24,7 @@ export class CatovisOrganizer {
   public cat: CatDataContent;
   public tov: Tovis;
   public wwc: WWCRate
+  public recomendFormat: string
 
   constructor() {
     this.lg = CatovisOrganizer.largeModes[0]
@@ -42,6 +43,7 @@ export class CatovisOrganizer {
       over50: 1,
       under49: 1,
     }
+    this.recomendFormat = '.txt'
   }
 
   public readOption(opq: OptionQue) {
@@ -68,7 +70,13 @@ export class CatovisOrganizer {
   }
 
   // ModeMiddleを設定する
-  public setModeMiddle(middle: string | undefined | null): void {
+  public setModeMiddle(middle: string | undefined | null, recomendFormat?: string): void {
+    this.recomendFormat = recomendFormat !== undefined ? recomendFormat
+      : middle === undefined || middle === null ? this.recomendFormat
+        : middle.substring(middle.lastIndexOf(' ') + 1)
+    if (this.recomendFormat === 'min-tovis') {
+      this.recomendFormat = 'mtovis'
+    }
     if (middle === undefined || middle === null || middle === "") {
       this.hasAnyErr.push('MIDDLE')
     } else {
@@ -147,7 +155,7 @@ export class CatovisOrganizer {
 
 
   public execOfficeOrCount(src: ExtractedContent[], tgt: ExtractedContent[]): Promise<string | string[]> {
-    return new Promise(async (resolve, reject) => {
+    return new Promise<string | string[]>(async (resolve, reject) => {
       this.ext.setContent(src, tgt)
       switch (this.mid) {
         case 'EXTRACT txt':
@@ -161,6 +169,10 @@ export class CatovisOrganizer {
         case 'ALIGN tsv':
           resolve(await this.officeAlignTsv())
           break;
+
+        case 'ALIGN-DIFF html':
+          resolve(await this.officeAlignDiffHtml())
+          break
 
         case 'EXTRACT-DIFF json':
           resolve(this.officeExtractDiffJson())
@@ -213,6 +225,38 @@ export class CatovisOrganizer {
         .then(result => resolve(result))
         .catch(err => reject(err))
     })
+  }
+
+  public async officeAlignDiffHtml(): Promise<string> {
+    this.opt.common.withSeparator = false
+    const text1 = await this.ext.getSingleText('src', this.opt)
+    const text2 = await this.ext.getSingleText('tgt', this.opt)
+    const diffed = this.diff.exportDiffText(text1.join('\n'), text2.join('\n'))
+    return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diff Text by CATOVIS</title>
+    <style>
+      ins {
+        color: red;
+      }
+    
+      del {
+        color: blue
+      }
+    </style>
+</head>
+<body>
+    <p>
+      ${diffed.replace(/\n/g, '<br />')}
+    </p>
+</body>
+</html>
+`
   }
 
   public officeExtractJson(): string {

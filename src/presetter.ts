@@ -2,7 +2,7 @@ import { writeFileSync } from 'fs'
 
 
 export function writeDefaultPreset() {
-    const defaultPreset = `
+  const defaultPreset = `
     # ------------------------------------------------------------
     # [mode]
     # Select from the followings:
@@ -12,6 +12,7 @@ export function writeDefaultPreset() {
       # - 'OFFICE:EXTRACT-DIFF tovis' 
       # - 'OFFICE:EXTRACT-DIFF min-tovis' 
       # - 'OFFICE:ALIGN tsv' 
+      # - 'OFFICE:ALIGN-DIFF html' 
       # - 'COUNT:CHARAS tsv'
       # - 'COUNT:WORDS tsv'
       # - 'COUNT:DIFF-CHARAS tsv'
@@ -22,7 +23,7 @@ export function writeDefaultPreset() {
       # - 'CAT:EXTRACT-DIFF min-tovis'
       # - 'CAT:UPDATE xliff'
     # If the selection is not proper, then the mode will be set as 'OFFICE:EXTRACT txt' implicity
-    # OFFICE supports: docx / docm / xlsx / xlsm / pptx / pptm
+    # OFFICE supports: docx / docm / xlsx / xlsm / pptx / pptm / pdf
     # CAT supports: xliff / mxliff / tmx / tbx
     # ------------------------------------------------------------
     mode: 'OFFICE:EXTRACT txt'
@@ -104,6 +105,6 @@ export function writeDefaultPreset() {
     # ------------------------------------------------------------
     debug: false
     `
-    writeFileSync('./preset.yaml', defaultPreset)
-    console.log('Default preset.yaml has been set: "./preset.yaml"')
+  writeFileSync('./preset.yaml', defaultPreset)
+  console.log('Default preset.yaml has been set: "./preset.yaml"')
 }

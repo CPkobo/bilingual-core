@@ -53,53 +53,20 @@ export class ReadingOption {
       this.common.excluding = myOption.common.excluding || this.common.excluding
       this.common.excludePattern = myOption.common.excludePattern || this.common.excludePattern
       this.common.withSeparator = myOption.common.withSeparator || this.common.withSeparator
-      // if (myOption.common.name !== undefined && myOption.common.name !== '') {
-      //   this.common.name = myOption.common.name;
-      // }
-      // if (myOption.common.segmentation !== undefined) {
-      //   this.common.segmentation = myOption.common.segmentation;
-      // }
-      // if (myOption.common.delimiters !== undefined && myOption.common.delimiters !== '') {
-      //   this.common.delimiters = myOption.common.delimiters;
-      // }
-      // if (myOption.common.excluding !== undefined) {
-      //   this.common.excluding = myOption.common.excluding;
-      // }
-      // if (myOption.common.excludePattern !== undefined && myOption.common.excludePattern !== '') {
-      //   this.common.excludePattern = myOption.common.excludePattern;
-      // }
-      // if (myOption.common.withSeparator !== undefined) {
-      //   this.common.withSeparator = myOption.common.withSeparator;
-      // }
     }
 
     if (myOption.word !== undefined) {
       this.word.afterRev = myOption.word.afterRev || this.word.afterRev
-      // if (myOption.word.afterRev !== undefined) {
-      //   this.word.afterRev = myOption.word.afterRev;
-      // }
     }
 
     if (myOption.excel !== undefined) {
       this.excel.readHiddenSheet = myOption.excel.readHiddenSheet || this.excel.readHiddenSheet
       this.excel.readFilledCell = myOption.excel.readFilledCell || this.excel.readFilledCell
-      // if (myOption.excel.readHiddenSheet !== undefined) {
-      //   this.excel.readHiddenSheet = myOption.excel.readHiddenSheet;
-      // }
-      // if (myOption.excel.readFilledCell !== undefined) {
-      //   this.excel.readFilledCell = myOption.excel.readFilledCell;
-      // }
     }
 
     if (myOption.ppt !== undefined) {
       this.ppt.readSlide = myOption.ppt.readSlide || this.ppt.readSlide
       this.ppt.readNote = myOption.ppt.readNote || this.ppt.readNote
-      // if (myOption.ppt.readSlide !== undefined) {
-      //   this.ppt.readSlide = myOption.ppt.readSlide;
-      // }
-      // if (myOption.ppt.readNote !== undefined) {
-      //   this.ppt.readNote = myOption.ppt.readNote;
-      // }
     }
 
     if (myOption.cat !== undefined) {
