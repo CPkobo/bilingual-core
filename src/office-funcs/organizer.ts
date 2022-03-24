@@ -231,7 +231,7 @@ export class CatovisOrganizer {
     this.opt.common.withSeparator = false
     const text1 = await this.ext.getSingleText('src', this.opt)
     const text2 = await this.ext.getSingleText('tgt', this.opt)
-    const diffed = this.diff.exportDiffText(text1.join('\n'), text2.join('\n'))
+    const diffed = this.diff.exportDiffText(text2.join('\n'), text1.join('\n'))
     return `
 <!DOCTYPE html>
 <html lang="en">
@@ -242,11 +242,11 @@ export class CatovisOrganizer {
     <title>Diff Text by CATOVIS</title>
     <style>
       ins {
-        color: red;
+        color: blue;
       }
     
       del {
-        color: blue
+        color: red
       }
     </style>
 </head>
