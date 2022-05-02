@@ -8,11 +8,11 @@ const f: OnSetString = (text: string, ex: any): string => {
   })
 }
 
-export const plugin: TovisPluginExternal = {
+const plugin: TovisPluginExternal = {
   triger,
   name,
   f,
   ex,
 }
 
-// module.exports = plugin
+export default plugin

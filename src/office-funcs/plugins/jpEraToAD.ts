@@ -10,9 +10,9 @@ const f: OnSetString = (text: string, ex: any): string => {
     return text
   }
   for (const m of mObj) {
-    const eraName = m.substr(0,2)
+    const eraName = m.substr(0, 2)
     const year = Number(m.replace(eraName, '').replace(' ', '').replace('年', ''))
-    switch(eraName) {
+    switch (eraName) {
       case '明治':
         if (year > 0 && year < 45) {
           processed = processed.replace(m, `${year + 1867}年`)
@@ -47,9 +47,11 @@ const f: OnSetString = (text: string, ex: any): string => {
 }
 
 
-export const plugin: TovisPluginExternal = {
+const plugin: TovisPluginExternal = {
   triger,
   name,
   f,
   ex
 }
+
+export default plugin

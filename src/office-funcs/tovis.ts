@@ -1,6 +1,6 @@
 import { DiffInfo } from './diff';
 import { ExtractContext } from './extract';
-import { MyPlugins } from './plugins'
+import { BuiltinPlugins } from './builtinPlugins'
 import { cnm } from './util';
 
 // export type TovisOpcodeSymbol = '='|'~'|'+'|'-'
@@ -10,10 +10,10 @@ import { cnm } from './util';
 export class Tovis {
   public meta: TovisMeta;
   public blocks: TovisBlock[];
-  public plugins?: MyPlugins;
+  public plugins: BuiltinPlugins;
   protected lineHead: RegExp
 
-  constructor(isServer = true) {
+  constructor() {
     this.meta = {
       srcLang: '',
       tgtLang: '',
@@ -23,9 +23,7 @@ export class Tovis {
       remarks: '',
     };
     this.blocks = [];
-    if (isServer) {
-      this.plugins = new MyPlugins()
-    }
+    this.plugins = new BuiltinPlugins()
     this.lineHead = new RegExp('^(@|λ|_|%|\\!)+:(\\d+)}\\s?');
   }
 
@@ -529,26 +527,18 @@ export class Tovis {
   }
 
   protected setSource(block: TovisBlock, text: string): void {
-    if (this.plugins === undefined) {
+    if (this.plugins.onSetSouce.length === 0) {
       block.s = text
     } else {
-      if (this.plugins.onSetSouce.length === 0) {
-        block.s = text
-      } else {
-        block.s = this.plugins.execFuncs('onSetSouce', text)
-      }
+      block.s = this.plugins.execFuncs('onSetSouce', text)
     }
   }
 
   protected setMT(block: TovisBlock, type: string, text: string): void {
-    if (this.plugins === undefined) {
+    if (this.plugins.onSetMT.length === 0) {
       block.m.push({ type, text })
     } else {
-      if (this.plugins.onSetMT.length === 0) {
-        block.m.push({ type, text })
-      } else {
-        block.m.push({ type, text: this.plugins.execFuncs('onSetMT', text) })
-      }
+      block.m.push({ type, text: this.plugins.execFuncs('onSetMT', text) })
     }
   }
 }
