@@ -10,10 +10,10 @@ import { cnm } from './util';
 export class Tovis {
   public meta: TovisMeta;
   public blocks: TovisBlock[];
-  public plugins: MyPlugins;
+  public plugins?: MyPlugins;
   protected lineHead: RegExp
 
-  constructor() {
+  constructor(isServer = true) {
     this.meta = {
       srcLang: '',
       tgtLang: '',
@@ -23,7 +23,9 @@ export class Tovis {
       remarks: '',
     };
     this.blocks = [];
-    this.plugins = new MyPlugins()
+    if (isServer) {
+      this.plugins = new MyPlugins()
+    }
     this.lineHead = new RegExp('^(@|λ|_|%|\\!)+:(\\d+)}\\s?');
   }
 
@@ -34,7 +36,9 @@ export class Tovis {
           const pathAndEx = rc.split('::')
           const plPath = pathAndEx[0].trim().replace('<cwd>', cwd)
           const exOption = pathAndEx.length > 1 ? pathAndEx[1].trim() : ''
-          this.plugins.register(plPath, exOption)
+          if (this.plugins !== undefined) {
+            this.plugins.register(plPath, exOption)
+          }
         }
       }
     }
@@ -81,7 +85,7 @@ export class Tovis {
         } else {
           reject({ isOk: false, message: 'No Catovis Context' })
         }
-      // 類似解析を行わない場合
+        // 類似解析を行わない場合
       } else {
         const texts = data.getSingleText("src")
           .then(texts => {
@@ -160,13 +164,13 @@ export class Tovis {
           resolve({ isOk: true, message });
         }).catch((errMessage) => {
           reject({ isOk: false, message: errMessage });
-          });
+        });
       } else {
         reject({ isOk: false, message: 'fileType sholud designate from "tovis"/"diff"/"plain"' });
       }
     });
   }
-    
+
   public parseFromStr(data: string, isToDiff: boolean): Promise<string> {
     return new Promise((resolve, reject) => {
       if (isToDiff) {
@@ -179,7 +183,7 @@ export class Tovis {
         this.parseFromStrArray(data.split('\n'))
         resolve(`success to read rows with Diff`)
       }
-    }) 
+    })
   }
 
   public parseFromStrArray(lines: string[]) {
@@ -189,7 +193,7 @@ export class Tovis {
     lines.forEach(line => {
       const blt = line.split('\t')
       const st = blt[0]
-      const tt = blt.length >= 2 ? blt[1] : ''    
+      const tt = blt.length >= 2 ? blt[1] : ''
       if (st.startsWith(sepMarkA)) {
         if (!st.endsWith('EOF')) {
           const fileName = st.replace(sepMarkA, '');
@@ -525,18 +529,26 @@ export class Tovis {
   }
 
   protected setSource(block: TovisBlock, text: string): void {
-    if (this.plugins.onSetSouce.length === 0) {
+    if (this.plugins === undefined) {
       block.s = text
     } else {
-      block.s = this.plugins.execFuncs('onSetSouce', text)
+      if (this.plugins.onSetSouce.length === 0) {
+        block.s = text
+      } else {
+        block.s = this.plugins.execFuncs('onSetSouce', text)
+      }
     }
   }
 
   protected setMT(block: TovisBlock, type: string, text: string): void {
-    if (this.plugins.onSetMT.length === 0) {
+    if (this.plugins === undefined) {
       block.m.push({ type, text })
     } else {
-      block.m.push({ type, text: this.plugins.execFuncs('onSetMT', text) })
+      if (this.plugins.onSetMT.length === 0) {
+        block.m.push({ type, text })
+      } else {
+        block.m.push({ type, text: this.plugins.execFuncs('onSetMT', text) })
+      }
     }
   }
 }
