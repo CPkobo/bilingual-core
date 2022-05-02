@@ -13,11 +13,11 @@ const f: OnSetString = (text: string, ex: any): string => {
   return text.normalize(ex)
 }
 
-export const plugin: TovisPluginExternal = {
+const plugin: TovisPluginExternal = {
   triger,
   name,
   f,
   ex
 }
 
-// module.exports = plugin
+export default plugin

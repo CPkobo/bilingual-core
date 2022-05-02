@@ -26,7 +26,7 @@ export class CatovisOrganizer {
   public wwc: WWCRate
   public recomendFormat: string
 
-  constructor(isServer = true) {
+  constructor() {
     this.lg = CatovisOrganizer.largeModes[0]
     this.mid = CatovisOrganizer.officeModes[0]
     this.hasAnyErr = []
@@ -34,7 +34,7 @@ export class CatovisOrganizer {
     this.ext = new ExtractContext()
     this.diff = new DiffInfo()
     this.cat = new CatDataContent()
-    this.tov = new Tovis(isServer)
+    this.tov = new Tovis()
     this.wwc = {
       dupli: 1,
       over95: 1,
