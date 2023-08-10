@@ -1,5 +1,5 @@
 declare interface PresetOptions {
-    mode: import("./office-funcs/params").ModeCombinations
+    mode: import("../util/params").ModeCombinations
     console: boolean
     outputFile: string
     sourceFiles: string | string[]

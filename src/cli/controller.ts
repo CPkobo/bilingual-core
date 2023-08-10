@@ -1,11 +1,11 @@
 import { readFileSync, readdirSync, statSync, writeFileSync } from 'fs';
 import { load } from 'js-yaml'
 
-import { CatovisOrganizer } from "./office-funcs/organizer"
-import { pathContentsReader, batchPathContentsReader, path2ContentStr, createTsvArray } from './office-funcs/fileRead'
-import { path2Format, path2Name, path2Dir, countFromDoubleArray } from './office-funcs/util';
+import { CatovisOrganizer } from "../bilingualOrganizer"
+import { pathContentsReader, batchPathContentsReader, path2ContentStr, createTsvArray } from '../util/fileRead'
+import { path2Format, path2Name, path2Dir, countFromDoubleArray } from '../util/util';
 
-import type { ModeLarge, ModeMiddleOffice, ModeMiddleCount, ModeMiddleCat } from './office-funcs/params'
+import type { ModeLarge, ModeMiddleOffice, ModeMiddleCount, ModeMiddleCat } from '../util/params'
 // 初期設定値とともにオプション項目を管理するクラス
 // 主要な機能は以下のとおり
 // 1. コンストラクタ

@@ -1,7 +1,7 @@
 import { parseString, Builder } from 'xml2js';
 // import Js2Xml from 'js2xml'
 
-import { countFromDoubleArray, path2Format, str2ExtractedText } from './util';
+import { countFromDoubleArray, path2Format, str2ExtractedText } from '../util/util';
 
 export class CatDataContent {
   // public toolName: string;

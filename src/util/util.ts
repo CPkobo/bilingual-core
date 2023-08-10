@@ -1,7 +1,7 @@
 // import { docxReader } from './office/docxReader';
 // import { xlsxReader } from './office/xlsxReader';
 // import { pptxReader } from './office/pptxReader';
-import { ReadingOption } from './option';
+import { ReadingOption } from '../office/option';
 
 export function getVer(): string {
   return '0.3.5'

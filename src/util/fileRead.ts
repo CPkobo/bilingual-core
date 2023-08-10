@@ -2,11 +2,11 @@
 
 import { readFileSync } from 'fs'
 
-import { docxReader } from './office/docxReader';
-import { xlsxReader } from './office/xlsxReader';
-import { pptxReader } from './office/pptxReader';
-import { pdfReader } from './office/pdfRead';
-import { ReadingOption } from './option';
+import { docxReader } from '../office/docxReader';
+import { xlsxReader } from '../office/xlsxReader';
+import { pptxReader } from '../office/pptxReader';
+import { pdfReader } from '../office/pdfRead';
+import { ReadingOption } from '../office/option';
 
 export function pathContentsReader(paths: string[], opq?: OptionQue): Promise<ExtractedContent[]> {
   const que = opq !== undefined ? opq : {};

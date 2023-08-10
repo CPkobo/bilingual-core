@@ -1,11 +1,11 @@
 import { statSync, readFileSync, writeFileSync } from 'fs'
 import { load } from "js-yaml"
 
-import { CLIController } from './controller'
-import { selectLargeDialog, selectOfficeDialog, selectCountDialog, selectCatDialog } from './dialogs'
-import { writeDefaultPreset } from './presetter'
-import type { ModeLarge, ModeMiddleOffice, ModeMiddleCount, ModeMiddleCat } from './office-funcs/params'
-import { largeModes, officeModes, countModes, catModes } from './office-funcs/params'
+import { CLIController } from './cli/controller'
+import { selectLargeDialog, selectOfficeDialog, selectCountDialog, selectCatDialog } from '#/cli/dialogs'
+import { writeDefaultPreset } from '#/cli/presetter'
+import type { ModeLarge, ModeMiddleOffice, ModeMiddleCount, ModeMiddleCat } from './util/params'
+import { largeModes, officeModes, countModes, catModes } from './util/params'
 
 // #起動時に処理される部分
 console.log('------------------------');

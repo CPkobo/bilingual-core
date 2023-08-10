@@ -1,12 +1,12 @@
-import { ReadingOption } from "./option"
-import { ExtractContext } from "./extract"
-import { DiffInfo } from "./diff"
-import { CatDataContent } from "./cats"
-import { Tovis } from "./tovis"
+import { ReadingOption } from "./office/option"
+import { ExtractContext } from "./office/extract"
+import { DiffInfo } from "./diffs/diff"
+import { CatDataContent } from "./cat/cat"
+import { Tovis } from "./tovis/tovis"
 
 export type JsonType = 'extract' | 'diff' | 'cat' | 'tovis'
-import { largeModes, officeModes, countModes, catModes } from './params'
-import type { ModeLarge, ModeMiddleOffice, ModeMiddleCount, ModeMiddleCat } from './params'
+import { largeModes, officeModes, countModes, catModes } from './util/params'
+import type { ModeLarge, ModeMiddleOffice, ModeMiddleCount, ModeMiddleCat } from './util/params'
 
 export class CatovisOrganizer {
   static largeModes = largeModes

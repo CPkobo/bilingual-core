@@ -1,7 +1,7 @@
-import { DiffInfo } from './diff';
-import { ExtractContext } from './extract';
-import { BuiltinPlugins } from './builtinPlugins'
-import { cnm } from './util';
+import { DiffInfo } from '#/diffs/diff'
+import { ExtractContext } from '#/office/extract';
+import { BuiltinPlugins } from '#/plugins/builtinPlugins'
+import { cnm } from '#/util/util';
 
 // export type TovisOpcodeSymbol = '='|'~'|'+'|'-'
 

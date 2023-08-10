@@ -1,5 +1,5 @@
-import { SequenceMatcher } from './sequenceMatcher'
-import { countCharas, countWords } from './util';
+import { SequenceMatcher } from '@/difflib/src/sequenceMatcher'
+import { countCharas, countWords } from '../util/util';
 
 export class DiffInfo {
   public dsegs: DiffSeg[];

@@ -1,8 +1,8 @@
 const JSZip = require('jszip');
 import { parseString } from 'xml2js';
 
-import { ReadingOption } from '../option';
-import { applySegRules, countCharas, countWords, checkValidText } from '../util';
+import { ReadingOption } from './option';
+import { applySegRules, countCharas, countWords, checkValidText } from '../util/util';
 
 // Excelファイルを読み込むための関数
 export async function xlsxReader(xlsxFile: any, fileName: string, opt: ReadingOption): Promise<ExtractedContent> {

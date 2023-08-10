@@ -1,7 +1,7 @@
 const JSZip = require('jszip');
 
-import { ReadingOption } from '../option';
-import { applySegRules, countCharas, countWords, checkValidText } from '../util';
+import { ReadingOption } from './option';
+import { applySegRules, countCharas, countWords, checkValidText } from '../util/util';
 
 // Wordファイルの読み込みに使用
 export async function docxReader(docxFile: any, fileName: string, opt: ReadingOption, isAlignTgt: boolean = false): Promise<ExtractedContent> {

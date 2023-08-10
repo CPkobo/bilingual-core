@@ -10,7 +10,7 @@ const JSZip = require('jszip');
 
 import { ReadingOption } from './option';
 import { FileStats } from './stats';
-import { cnm } from './util';
+import { cnm } from '../util/util';
 
 export class ExtractContext {
   private src: ExtractedContent[];

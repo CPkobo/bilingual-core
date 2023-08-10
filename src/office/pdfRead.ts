@@ -1,6 +1,6 @@
 import pdf from "pdf-parse"
-import { ReadingOption } from "../option";
-import { applySegRules, countCharas, countWords, checkValidText } from '../util';
+import { ReadingOption } from "./option";
+import { applySegRules, countCharas, countWords, checkValidText } from '../util/util';
 
 export async function pdfReader(pdfBuffer: Buffer, fileName: string, opt: ReadingOption): Promise<ExtractedContent> {
   return new Promise((resolve, reject) => {

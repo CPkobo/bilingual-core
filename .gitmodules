@@ -1,0 +1,6 @@
+[submodule "submodule"]
+	path = submodule
+	url = git@github.com:CPkobo/difflib-ts.git
+[submodule "difflib"]
+	path = difflib
+	url = git@github.com:CPkobo/difflib-ts.git
