@@ -1,20 +1,19 @@
 const JSZip = require('jszip');
 
-import { ReadingOption } from './option';
 import { applySegRules, countCharas, countWords, checkValidText } from '../util/util';
 
 // Wordファイルの読み込みに使用
-export async function docxReader(docxFile: any, fileName: string, opt: ReadingOption, isAlignTgt: boolean = false): Promise<ExtractedContent> {
+export async function docxReader(docxFile: any, fileName: string, opt: MyOption, isAlignTgt: boolean = false): Promise<OfficeContent> {
   return new Promise((resolve, reject) => {
     const zip = new JSZip();
-    const wordContents: ExtractedContent = {
+    const wordContents: OfficeContent = {
       name: fileName,
       format: 'docx',
       exts: [],
     };
     const rev = !isAlignTgt
-      ? opt.word.afterRev === undefined ? true : opt.word.afterRev
-      : opt.word.afterRev2 === undefined ? true : opt.word.afterRev2;
+      ? opt.office.word.afterRev === undefined ? true : opt.office.word.afterRev
+      : opt.office.word.afterRev2 === undefined ? true : opt.office.word.afterRev2;
     zip.loadAsync(docxFile).then((inzip: any) => {
       if (inzip !== null) {
         inzip.file('word/document.xml').async('string').then((wordxml: string) => {

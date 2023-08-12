@@ -1,8 +1,13 @@
-export class ReadingOption {
+export class ReadingOption implements MyOption {
   public common: Required<CommonOption>;
-  public word: Required<WordOption>;
-  public excel: Required<ExcelOption>;
-  public ppt: Required<PptOption>;
+  public office: {
+    word: Required<WordOption>;
+    excel: Required<ExcelOption>;
+    ppt: Required<PptOption>;
+  };
+  // public word: Required<WordOption>;
+  // public excel: Required<ExcelOption>;
+  // public ppt: Required<PptOption>;
   public cat: Required<CatOption>
   public wwc: WWCRate
 
@@ -15,17 +20,19 @@ export class ReadingOption {
       excludePattern: '^[０-９0-9]+$',
       withSeparator: true,
     }
-    this.word = {
-      afterRev: true,
-      afterRev2: true
-    }
-    this.excel = {
-      readHiddenSheet: false,
-      readFilledCell: true
-    }
-    this.ppt = {
-      readSlide: true,
-      readNote: true
+    this.office = {
+      word: {
+        afterRev: true,
+        afterRev2: true
+      },
+      excel: {
+        readHiddenSheet: false,
+        readFilledCell: true
+      },
+      ppt: {
+        readSlide: true,
+        readNote: true
+      }
     }
     this.cat = {
       locales: 'all',
@@ -55,18 +62,20 @@ export class ReadingOption {
       this.common.withSeparator = myOption.common.withSeparator || this.common.withSeparator
     }
 
-    if (myOption.word !== undefined) {
-      this.word.afterRev = myOption.word.afterRev || this.word.afterRev
-    }
+    if (myOption.office !== undefined) {
+      if (myOption.office.word !== undefined) {
+        this.office.word.afterRev = myOption.office.word.afterRev || this.office.word.afterRev
+      }
 
-    if (myOption.excel !== undefined) {
-      this.excel.readHiddenSheet = myOption.excel.readHiddenSheet || this.excel.readHiddenSheet
-      this.excel.readFilledCell = myOption.excel.readFilledCell || this.excel.readFilledCell
-    }
+      if (myOption.office.excel !== undefined) {
+        this.office.excel.readHiddenSheet = myOption.office.excel.readHiddenSheet || this.office.excel.readHiddenSheet
+        this.office.excel.readFilledCell = myOption.office.excel.readFilledCell || this.office.excel.readFilledCell
+      }
 
-    if (myOption.ppt !== undefined) {
-      this.ppt.readSlide = myOption.ppt.readSlide || this.ppt.readSlide
-      this.ppt.readNote = myOption.ppt.readNote || this.ppt.readNote
+      if (myOption.office.ppt !== undefined) {
+        this.office.ppt.readSlide = myOption.office.ppt.readSlide || this.office.ppt.readSlide
+        this.office.ppt.readNote = myOption.office.ppt.readNote || this.office.ppt.readNote
+      }
     }
 
     if (myOption.cat !== undefined) {
@@ -113,9 +122,7 @@ export class ReadingOption {
   public createOptionQue(): Required<OptionQue> {
     return {
       common: this.common,
-      word: this.word,
-      excel: this.excel,
-      ppt: this.ppt,
+      office: this.office,
       cat: this.cat
     };
   }
@@ -126,11 +133,11 @@ export class ReadingOption {
     };
   }
 
-  public getOfficeOptions(): Pick<ReadingOption, 'word' | 'excel' | 'ppt'> {
+  public getOfficeOptions(): Pick<OfficeOption, 'word' | 'excel' | 'ppt'> {
     return {
-      word: this.word,
-      excel: this.excel,
-      ppt: this.ppt,
+      word: this.office.word,
+      excel: this.office.excel,
+      ppt: this.office.ppt,
     };
   }
 

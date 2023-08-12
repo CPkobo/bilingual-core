@@ -1,4 +1,4 @@
-export class FileStats {
+export class MyOfficeFileStats implements OfficeFileStats {
   public name: string;
   public format: FileFormat;
   public doc_para: number;

@@ -17,10 +17,10 @@
   },
   "scripts": {
     "build": "npx tsc --build tsconfig.json",
-    "start": "node ./dist/index.js",
-    "preset": "node ./dist/index.js --preset",
-    "preset:yaml": "node ./dist/index.js --preset --yaml",
-    "preset:default": "node ./dist/index.js --default-preset",
+    "start": "node ./dist/src/index.js",
+    "preset": "node ./dist/src/index.js --preset",
+    "preset:yaml": "node ./dist/src/index.js --preset --yaml",
+    "preset:default": "node ./dist/src/index.js --default-preset",
     "test": "jest"
   },
   "jest": {

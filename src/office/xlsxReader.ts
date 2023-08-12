@@ -1,11 +1,9 @@
 const JSZip = require('jszip');
 import { parseString } from 'xml2js';
-
-import { ReadingOption } from './option';
 import { applySegRules, countCharas, countWords, checkValidText } from '../util/util';
 
 // Excelファイルを読み込むための関数
-export async function xlsxReader(xlsxFile: any, fileName: string, opt: ReadingOption): Promise<ExtractedContent> {
+export async function xlsxReader(xlsxFile: any, fileName: string, opt: MyOption): Promise<OfficeContent> {
   return new Promise((resolve, reject) => {
     const zip = new JSZip();
     zip.loadAsync(xlsxFile).then((inzip: any) => {
@@ -33,7 +31,7 @@ export async function xlsxReader(xlsxFile: any, fileName: string, opt: ReadingOp
                 }).join('');
               }
             });
-            const notHidden: boolean[] = await workbookRelReader(inzip, opt.excel.readHiddenSheet || false);
+            const notHidden: boolean[] = await workbookRelReader(inzip, opt.office.excel.readHiddenSheet || false);
             const filled: string[] = await styleRelReader(inzip, opt);
             xlsxContentsReader(inzip, shared, notHidden, filled, opt).then((datas: ExtractedText[]) => {
               const sortedDatas: ExtractedText[] = datas.sort((a: ExtractedText, b: ExtractedText): any => {
@@ -48,7 +46,7 @@ export async function xlsxReader(xlsxFile: any, fileName: string, opt: ReadingOp
                   return 0;
                 }
               });
-              const excelContents: ExtractedContent = {
+              const excelContents: OfficeContent = {
                 name: fileName,
                 format: 'xlsx',
                 exts: sortedDatas,
@@ -92,7 +90,7 @@ async function workbookRelReader(zipOjt: any, readHidden: boolean): Promise<bool
 }
 
 // 特定の色のセルを読み飛ばすための関数
-async function styleRelReader(zipOjt: any, opt: ReadingOption): Promise<string[]> {
+async function styleRelReader(zipOjt: any, opt: MyOption): Promise<string[]> {
   return new Promise((resolve, reject) => {
     zipOjt.file('xl/styles.xml').async('string').then((styles: any) => {
       parseString(styles, (err: any, root: any) => {
@@ -121,7 +119,7 @@ async function styleRelReader(zipOjt: any, opt: ReadingOption): Promise<string[]
 
 }
 
-async function xlsxContentsReader(zipOjt: any, shared: string[], notHidden: boolean[], filled: string[], opt: ReadingOption): Promise<ExtractedText[]> {
+async function xlsxContentsReader(zipOjt: any, shared: string[], notHidden: boolean[], filled: string[], opt: MyOption): Promise<ExtractedText[]> {
   return new Promise((resolve) => {
     const prs: Array<Promise<ExtractedText>> = [];
     const rels: ExcelSubInfoRel[] = [];
@@ -186,7 +184,7 @@ async function wsRelReader(path: string, fileObj: any): Promise<ExcelSubInfoRel>
   });
 }
 
-async function eachSheetReader(path: string, fileObj: any, shared: string[], filled: string[], opt: ReadingOption): Promise<ExtractedText> {
+async function eachSheetReader(path: string, fileObj: any, shared: string[], filled: string[], opt: MyOption): Promise<ExtractedText> {
   return new Promise((resolve) => {
     fileObj.async('string').then((sht: any) => {
       parseString(sht, (err: any, root: any) => {
@@ -201,7 +199,7 @@ async function eachSheetReader(path: string, fileObj: any, shared: string[], fil
             }
             for (const col of row.c) {
               if (col.$.s !== undefined) {
-                if (!opt.excel.readFilledCell) {
+                if (!opt.office.excel.readFilledCell) {
                   if (filled[Number(col.$.s)] !== '0') {
                     continue;
                   }
@@ -228,7 +226,7 @@ async function eachSheetReader(path: string, fileObj: any, shared: string[], fil
   });
 }
 
-async function eachDrawingReader(path: string, fileObj: any, opt: ReadingOption): Promise<ExtractedText> {
+async function eachDrawingReader(path: string, fileObj: any, opt: MyOption): Promise<ExtractedText> {
   return new Promise((resolve) => {
     fileObj.async('string').then((sht: any) => {
       parseString(sht, (err: any, root: any) => {

@@ -1,10 +1,9 @@
 import pdf from "pdf-parse"
-import { ReadingOption } from "./option";
 import { applySegRules, countCharas, countWords, checkValidText } from '../util/util';
 
-export async function pdfReader(pdfBuffer: Buffer, fileName: string, opt: ReadingOption): Promise<ExtractedContent> {
+export async function pdfReader(pdfBuffer: Buffer, fileName: string, opt: MyOption): Promise<OfficeContent> {
   return new Promise((resolve, reject) => {
-    const pdfContents: ExtractedContent = {
+    const pdfContents: OfficeContent = {
       name: fileName,
       format: 'pdf',
       exts: [],

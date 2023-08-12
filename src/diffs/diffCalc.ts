@@ -1,13 +1,16 @@
-import { SequenceMatcher } from '@/difflib/src/sequenceMatcher'
+import { CountWrapper } from './countIndex'
+import { SequenceMatcher } from '../../difflib/src/sequenceMatcher'
 import { countCharas, countWords } from '../util/util';
 
-export class DiffInfo {
+
+export class DiffCalculator {
   public dsegs: DiffSeg[];
   public files: string[];
   public d: SequenceMatcher;
   public report: WWCReport | undefined;
   public marks: RegExp;
   public spaces: RegExp;
+  private counter: CountWrapper
   protected isDigit: RegExp;
 
   constructor() {
@@ -21,6 +24,16 @@ export class DiffInfo {
     this.marks = new RegExp('(\\,|\\.|:|;|\\!|\\?|\\s)+', 'g');
     this.spaces = new RegExp('\\s+', 'g');
     this.isDigit = new RegExp('^[\\d\\. ]+$');
+    this.counter = new CountWrapper()
+  }
+
+  public setOptions(opt: MyOption | undefined | null): boolean {
+    if (opt === undefined || opt === null) {
+      return false
+    } else {
+      this.counter.opt = opt
+      return true
+    }
   }
 
   public readFromJson(data: string): void {
@@ -41,12 +54,24 @@ export class DiffInfo {
     return JSON.stringify(data, null, 2)
   }
 
+  // counter のラップ
+  public officeCalcSimple(files: OfficeContent[], unit: 'chara' | 'word', opt: MyOption): string[] {
+    return this.counter.officeCalcSimple(files, unit, opt)
+  }
+
+  public officeCalcSimpleOneFile(
+    file: OfficeContent,
+    unit: 'chara' | 'word',
+    opt: MyOption, part?: SeparateMark): { subs: number[], sum: number, partial: number } {
+    return this.counter.officeCalcSimpleOneFile(file, unit, opt, part)
+  }
+
   public exportDiffText(text1: string, text2: string): string {
     this.d.setSeqs(text1, text2)
     return this.d.applyOpcodes()
   }
 
-  public analyze(cons: ExtractedContent[], adding?: boolean): void {
+  public analyze(cons: OfficeContent[], adding?: boolean): void {
     if (adding === undefined || adding === false) {
       this.dsegs.length = 0;
     }

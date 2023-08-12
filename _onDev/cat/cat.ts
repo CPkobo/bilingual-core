@@ -1,10 +1,11 @@
 import { parseString, Builder } from 'xml2js';
 // import Js2Xml from 'js2xml'
 
-// import { countFromDoubleArray, path2Format, str2ExtractedText } from './util';
+import { countFromDoubleArray, path2Format, str2ExtractedText } from '#/util/util';
 
 export class CatDataContent {
-  // private langs: string[];
+  private langs: string[];
+  public toolName: string
   // 実際のファイルごとにユニットを保存する
   // 1つのセンテンス（用語）について、{lang: string, text: string}からなる配列があり、
   // 1つのファイルはその配列の配列からなる
@@ -16,9 +17,8 @@ export class CatDataContent {
   }>
 
   constructor() {
-    // this.toolName = '';
-    // this.fileNames = [];
-    // this.langs = [];
+    this.langs = []
+    this.toolName = '';
     this.contents = [];
   }
 
@@ -32,7 +32,6 @@ export class CatDataContent {
 
   public getContentStats(langs: string[] | 'all', onlyFullUnit: boolean = false, unit: CountType = 'both'): [XliffStats, string[][]] {
     const files = this.getFilesInfo()
-    // const contents: XliffFileStats[] = []
     const stats: XliffStats = {
       fileNum: this.contents.length,
       locales: [],
@@ -44,7 +43,9 @@ export class CatDataContent {
     this.contents.forEach(inFile => {
       const fileStats: XliffFileStats = {
         name: inFile.file,
-        lines: inFile.units.length
+        lines: inFile.units.length,
+        charas: 0,
+        words: 0
       }
       if (unit === 'chara' || unit === 'both') {
         fileStats.charas = countFromDoubleArray(texts, 'chara', 0)
@@ -59,7 +60,7 @@ export class CatDataContent {
     return [stats, texts]
   }
 
-  public batchLoadMultilangXml(names: string[], xmlStr: string[]): Promise<boolean> {
+  public batchLoadMultilangXml(names: string[], xmlStr: string[], opt: CatOption): Promise<boolean> {
     return new Promise((resolve, reject) => {
       const prs: Promise<boolean>[] = []
       for (let i = 0; i < names.length; i++) {
@@ -71,7 +72,7 @@ export class CatDataContent {
         })
         .catch(() => {
           reject(false)
-        }
+        })
     })
   }
 
@@ -187,12 +188,12 @@ export class CatDataContent {
           }
         }
       }
-      const srcExt: ExtractedContent = {
+      const srcExt: OfficeContent = {
         name: inFile.file,
         format,
         exts: [str2ExtractedText(srcs, idx, 'Bilingual')]
       }
-      const tgtExt: ExtractedContent = {
+      const tgtExt: OfficeContent = {
         name: inFile.file,
         format,
         exts: [str2ExtractedText(tgts, idx, 'Bilingual')]
@@ -374,7 +375,7 @@ export class CatDataContent {
               }
             }
           }
-          this.contents.push(content)
+          this.contents.push({ ...content, sourceLang: '', tgtLangs: [] })
           resolve(true);
         }
       })
@@ -439,7 +440,7 @@ export class CatDataContent {
               }
             }
           }
-          this.contents.push(content)
+          this.contents.push({ ...content, sourceLang: '', tgtLangs: [] })
           resolve(true);
         }
       })
@@ -484,7 +485,7 @@ export class CatDataContent {
                 content.units.push(units)
               }
             }
-            this.contents.push(content)
+            this.contents.push({ ...content, sourceLang: '', tgtLangs: [] })
             resolve(true);
           }
         }
@@ -529,7 +530,7 @@ export class CatDataContent {
               }
               content.units.push(units)
             }
-            this.contents.push(content)
+            this.contents.push({ ...content, sourceLang: '', tgtLangs: [] })
             resolve(true);
           }
         }
@@ -560,6 +561,10 @@ export class CatDataContent {
     return langs.filter(val => {
       return this.getLangExists(val)
     });
+  }
+
+  private getLangExists(lang: string): boolean {
+    return this.langs.includes(lang)
   }
 
 }

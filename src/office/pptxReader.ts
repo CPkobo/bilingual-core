@@ -1,20 +1,19 @@
 const JSZip = require('jszip');
 import { parseString } from 'xml2js';
 
-import { ReadingOption } from './option';
 import { applySegRules, countCharas, countWords } from '../util/util';
 
 // PPTファイルを読み込むための関数
-export async function pptxReader(pptxFile: any, fileName: string, opt: ReadingOption): Promise<ExtractedContent> {
+export async function pptxReader(pptxFile: any, fileName: string, opt: MyOption): Promise<OfficeContent> {
   return new Promise((resolve, reject) => {
-    const zip = new JSZip(); 
+    const zip = new JSZip();
     zip.loadAsync(pptxFile).then((inzip: any) => {
       const prs: Array<Promise<ExtractedText>> = [];
       const rels: PPTSubInfoRel[] = [];
       inzip.folder('ppt/slides/').forEach(async (path: string, file: any) => {
         if (!path.startsWith('_rels')) {
           // スライドを読み込まないのであればスキップ
-          if (opt.ppt.readSlide) {
+          if (opt.office.ppt.readSlide) {
             prs.push(slideReader(path, file, opt));
           }
         } else {
@@ -23,14 +22,14 @@ export async function pptxReader(pptxFile: any, fileName: string, opt: ReadingOp
           }
         }
       });
-      if (opt.ppt.readNote) {
+      if (opt.office.ppt.readNote) {
         inzip.folder('ppt/notesSlides/').forEach((path: string, file: any) => {
           if (!path.startsWith('_rels')) {
             prs.push(noteReader(path, file, opt));
           }
         });
       }
-      if (opt.ppt.readSlide) {
+      if (opt.office.ppt.readSlide) {
         inzip.folder('ppt/diagrams/').forEach((path: string, file: any) => {
           if (path.startsWith('data') && path.endsWith('.xml')) {
             prs.push(slideDiagramReader(path, file, opt));
@@ -90,7 +89,7 @@ export async function pptxReader(pptxFile: any, fileName: string, opt: ReadingOp
             }
           }
         });
-        const pptContents: ExtractedContent = {
+        const pptContents: OfficeContent = {
           name: fileName,
           format: 'pptx',
           exts: sortedDatas,
@@ -107,7 +106,7 @@ export async function pptxReader(pptxFile: any, fileName: string, opt: ReadingOp
   });
 }
 
-async function slideReader(path: string, fileObj: any, opt: ReadingOption): Promise<ExtractedText> {
+async function slideReader(path: string, fileObj: any, opt: MyOption): Promise<ExtractedText> {
   return new Promise((resolve) => {
     fileObj.async('string').then((slide: any) => {
       parseString(slide, (err: any, root: any) => {
@@ -219,7 +218,7 @@ async function pptRelReader(path: string, fileObj: any): Promise<PPTSubInfoRel> 
   });
 }
 
-async function noteReader(path: string, fileObj: any, opt: ReadingOption): Promise<ExtractedText> {
+async function noteReader(path: string, fileObj: any, opt: MyOption): Promise<ExtractedText> {
   return new Promise((resolve) => {
     fileObj.async('string').then((note: any) => {
       parseString(note, (err: any, root: any) => {
@@ -262,7 +261,7 @@ async function noteReader(path: string, fileObj: any, opt: ReadingOption): Promi
   });
 }
 
-async function slideDiagramReader(path: string, fileObj: any, opt: ReadingOption): Promise<ExtractedText> {
+async function slideDiagramReader(path: string, fileObj: any, opt: MyOption): Promise<ExtractedText> {
   return new Promise((resolve) => {
     fileObj.async('string').then((dgm: any) => {
       parseString(dgm, (err: any, root: any) => {
@@ -302,7 +301,7 @@ async function slideDiagramReader(path: string, fileObj: any, opt: ReadingOption
   });
 }
 
-async function slideChartReader(path: string, fileObj: any, opt: ReadingOption): Promise<ExtractedText> {
+async function slideChartReader(path: string, fileObj: any, opt: MyOption): Promise<ExtractedText> {
   return new Promise((resolve, reject) => {
     fileObj.async('string').then((chtxml: any) => {
       const dom: any = require('xmldom').DOMParser;

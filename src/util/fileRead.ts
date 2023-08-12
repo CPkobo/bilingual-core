@@ -6,9 +6,9 @@ import { docxReader } from '../office/docxReader';
 import { xlsxReader } from '../office/xlsxReader';
 import { pptxReader } from '../office/pptxReader';
 import { pdfReader } from '../office/pdfRead';
-import { ReadingOption } from '../office/option';
+import { ReadingOption } from './option';
 
-export function pathContentsReader(paths: string[], opq?: OptionQue): Promise<ExtractedContent[]> {
+export function pathContentsReader(paths: string[], opq?: OptionQue): Promise<OfficeContent[]> {
   const que = opq !== undefined ? opq : {};
   const opt = new ReadingOption(que);
   return new Promise((resolve, reject) => {
@@ -21,7 +21,7 @@ export function pathContentsReader(paths: string[], opq?: OptionQue): Promise<Ex
         prs.push(xlsxReader(read, path, opt));
       } else if (path.endsWith('.pptx') || path.endsWith('.pptm')) {
         // スライドもノートも読み込まない設定の場合はスキップ
-        if (opt.ppt.readSlide || opt.ppt.readNote) {
+        if (opt.office.ppt.readSlide || opt.office.ppt.readNote) {
           prs.push(pptxReader(read, path, opt));
         }
       } else if (path.endsWith('.pdf')) {
@@ -36,9 +36,9 @@ export function pathContentsReader(paths: string[], opq?: OptionQue): Promise<Ex
   });
 }
 
-export async function batchPathContentsReader(srcFiles: string[], tgtFiles: string[], opt: ReadingOption): Promise<ExtractedContent[][]> {
+export async function batchPathContentsReader(srcFiles: string[], tgtFiles: string[], opt: ReadingOption): Promise<OfficeContent[][]> {
   return new Promise((resolve, reject) => {
-    const prs: Array<Promise<ExtractedContent[]>> = [];
+    const prs: Array<Promise<OfficeContent[]>> = [];
     prs.push(pathContentsReader(srcFiles, opt));
     if (tgtFiles.length > 0) {
       prs.push(pathContentsReader(tgtFiles, opt));
@@ -107,3 +107,4 @@ export function convertPlains2Tsv(paths: string[]): string[][] {
   }
   return contents;
 }
+

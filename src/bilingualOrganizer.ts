@@ -1,40 +1,46 @@
-import { ReadingOption } from "./office/option"
-import { ExtractContext } from "./office/extract"
-import { DiffInfo } from "./diffs/diff"
-import { CatDataContent } from "./cat/cat"
-import { Tovis } from "./tovis/tovis"
+import { ReadingOption } from "./util/option"
+// import { OfficeExtractor } from "./office/officeExtractor"
+import { DiffCalculator } from "./diffs/diffCalc"
+// import { CatDataContent } from "./cat/cat"
+// import { Tovis } from "./tovis/tovis"
 
-export type JsonType = 'extract' | 'diff' | 'cat' | 'tovis'
+// export type JsonType = 'extract' | 'diff' | 'cat' | 'tovis'
 import { largeModes, officeModes, countModes, catModes } from './util/params'
 import type { ModeLarge, ModeMiddleOffice, ModeMiddleCount, ModeMiddleCat } from './util/params'
+import { OfficeExtractWrapper } from "./office/officeIndex"
 
 export class CatovisOrganizer {
-  static largeModes = largeModes
-  static officeModes = officeModes
-  static countModes = countModes
-  static catModes = catModes
+  // static largeModes = largeModes
+  // static officeModes = officeModes
+  // static countModes = countModes
+  // static catModes = catModes
 
   public lg: ModeLarge
   public mid: ModeMiddleOffice | ModeMiddleCount | ModeMiddleCat
   protected hasAnyErr: string[]
+  public src: ReadData[];
+  public tgt: ReadData[];
 
   public opt: ReadingOption;
-  public ext: ExtractContext;
-  public diff: DiffInfo;
-  public cat: CatDataContent;
-  public tov: Tovis;
+  public office: OfficeExtractWrapper;
+
+  public diff: DiffCalculator;
+  // public cat: CatDataContent;
+  // public tov: Tovis;
   public wwc: WWCRate
   public recomendFormat: string
 
   constructor() {
-    this.lg = CatovisOrganizer.largeModes[0]
-    this.mid = CatovisOrganizer.officeModes[0]
+    this.lg = largeModes[0]
+    this.mid = officeModes[0]
     this.hasAnyErr = []
+    this.src = []
+    this.tgt = []
     this.opt = new ReadingOption()
-    this.ext = new ExtractContext()
-    this.diff = new DiffInfo()
-    this.cat = new CatDataContent()
-    this.tov = new Tovis()
+    this.office = new OfficeExtractWrapper()
+    this.diff = new DiffCalculator()
+    // this.cat = new CatDataContent()
+    // this.tov = new Tovis()
     this.wwc = {
       dupli: 1,
       over95: 1,
@@ -50,13 +56,27 @@ export class CatovisOrganizer {
     this.opt.setOfficeOptions(opq)
   }
 
+  public addContent(content: ReadData[], isSrc: boolean = true): void {
+    if (isSrc) {
+      this.src.push(...content)
+    }
+    else {
+      this.tgt.push(...content)
+    }
+  }
+
+  public resetContent(): void {
+    this.src.length = 0
+    this.tgt.length = 0
+  }
+
   // ModeLargeを設定する
   public setModeLarge(large: string | undefined | null): void {
     if (large === undefined || large === null || large == "") {
       this.hasAnyErr.push('LARGE')
     } else {
       let isOk = false
-      for (const modelg of CatovisOrganizer.largeModes) {
+      for (const modelg of largeModes) {
         if (large === modelg) {
           this.lg = large as ModeLarge
           isOk = true
@@ -83,7 +103,7 @@ export class CatovisOrganizer {
       let isOk = false
       switch (this.lg) {
         case 'OFFICE':
-          for (const modemd of CatovisOrganizer.officeModes) {
+          for (const modemd of officeModes) {
             if (middle === modemd) {
               this.mid = middle as ModeMiddleOffice
               isOk = true
@@ -96,7 +116,7 @@ export class CatovisOrganizer {
           break;
 
         case 'COUNT':
-          for (const modemd of CatovisOrganizer.countModes) {
+          for (const modemd of countModes) {
             if (middle === modemd) {
               this.mid = middle as ModeMiddleCount
               isOk = true
@@ -109,7 +129,7 @@ export class CatovisOrganizer {
           break;
 
         case 'CAT':
-          for (const modemd of CatovisOrganizer.catModes) {
+          for (const modemd of catModes) {
             if (middle === modemd) {
               this.mid = middle as ModeMiddleCat
               isOk = true
@@ -153,84 +173,73 @@ export class CatovisOrganizer {
     return this.opt.createOptionQue()
   }
 
-
-  public execOfficeOrCount(src: ExtractedContent[], tgt: ExtractedContent[]): Promise<string | string[]> {
+  public async execOffice(): Promise<string | string[]> {
     return new Promise<string | string[]>(async (resolve, reject) => {
-      this.ext.setContent(src, tgt)
-      switch (this.mid) {
-        case 'EXTRACT txt':
-          resolve(await this.officeExtractTxt())
-          break;
+      this.office.setExtract(this.src, this.tgt, this.opt).then(data => {
+        switch (this.mid) {
+          case 'EXTRACT txt':
+            resolve(this.office.getSingleText('src', this.opt))
+            break;
 
-        case 'EXTRACT json':
-          resolve(this.officeExtractJson())
-          break
+          case 'EXTRACT json':
+            resolve(JSON.stringify(this.office.getRawContent('src'), null, 2))
+            break
 
-        case 'ALIGN tsv':
-          resolve(await this.officeAlignTsv())
-          break;
+          case 'ALIGN tsv':
+            resolve(this.office.getAlignedText(this.opt))
+            break;
 
-        case 'ALIGN-DIFF html':
-          resolve(await this.officeAlignDiffHtml())
-          break
+          case 'ALIGN-DIFF html': {
+            resolve(this.officeAlignDiffHtml())
+            break
+          }
 
-        case 'EXTRACT-DIFF json':
-          resolve(this.officeExtractDiffJson())
-          break
+          case 'EXTRACT-DIFF json':
+            this.diff.analyze(data.src)
+            resolve(this.diff.exportResult('diff', 'json'))
+            break
 
-        case 'EXTRACT-DIFF tovis':
-          resolve(this.officeExtractDiffTovis())
-          break
+          // case 'EXTRACT-DIFF tovis':
+          //   resolve(this.officeExtractDiffTovis())
+          //   break
 
-        case 'EXTRACT-DIFF min-tovis':
-          resolve(this.officeExtractDiffMinTovis())
-          break
+          // case 'EXTRACT-DIFF min-tovis':
+          //   resolve(this.officeExtractDiffMinTovis())
+          //   break
 
-        case 'CHARAS tsv':
-          resolve(this.countCharasTsv())
-          break;
+          case 'CHARAS tsv':
+            resolve(this.diff.officeCalcSimple(data.src, 'chara', this.opt))
+            break;
 
-        case 'WORDS tsv':
-          resolve(this.countWordsTsv())
-          break;
+          case 'WORDS tsv':
+            resolve(this.diff.officeCalcSimple(data.src, 'word', this.opt))
+            break;
 
-        case 'DIFF-CHARAS tsv':
-          resolve(this.countDiffCharasTsv())
-          break
+          case 'DIFF-CHARAS tsv':
+            this.diff.analyze(data.src)
+            resolve(this.diff.exportResult('wwc-chara', 'human', this.opt.wwc))
+            break
 
-        case 'DIFF-WORDS tsv': {
-          resolve(this.countDiffWordsTsv())
-          break
+          case 'DIFF-WORDS tsv':
+            this.diff.analyze(data.src)
+            resolve(this.diff.exportResult('wwc-word', 'human', this.opt.wwc))
+            break
+
+          default:
+            reject(false)
+            break;
         }
-
-        default:
-          reject(false)
-          break;
-      }
+      })
     })
   }
+
+
 
   // Office または Count を実行する場合の子関数
-  public officeExtractTxt(): Promise<string[]> {
-    return new Promise((resolve, reject) => {
-      this.ext.getSingleText('src', this.opt)
-        .then(result => resolve(result))
-        .catch(err => reject(err))
-    })
-  }
-
-  public officeAlignTsv(): Promise<string[]> {
-    return new Promise((resolve, reject) => {
-      this.ext.getAlignedText(this.opt)
-        .then(result => resolve(result))
-        .catch(err => reject(err))
-    })
-  }
-
   public async officeAlignDiffHtml(): Promise<string> {
     this.opt.common.withSeparator = false
-    const text1 = await this.ext.getSingleText('src', this.opt)
-    const text2 = await this.ext.getSingleText('tgt', this.opt)
+    const text1 = await this.office.getSingleText('src', this.opt)
+    const text2 = await this.office.getSingleText('tgt', this.opt)
     const diffed = this.diff.exportDiffText(text2.join('\n'), text1.join('\n'))
     return `
 <!DOCTYPE html>
@@ -259,212 +268,187 @@ export class CatovisOrganizer {
 `
   }
 
-  public officeExtractJson(): string {
-    return JSON.stringify(this.ext.getRawContent('src'), null, 2)
-  }
 
-  public officeExtractDiffJson(): string {
-    this.diff.analyze(this.ext.getRawContent('src'))
-    return this.diff.exportResult('diff', 'json')
-  }
+  // public officeExtractDiffTovis(): string[] {
+  //   this.diff.analyze(this.office.getRawContent('src'))
+  //   this.convDiff2Tovis()
+  //   return this.tov.dump()
+  // }
 
-  public officeExtractDiffTovis(): string[] {
-    this.diff.analyze(this.ext.getRawContent('src'))
-    this.convDiff2Tovis()
-    return this.tov.dump()
-  }
+  // public officeExtractDiffMinTovis(): string[] {
+  //   this.diff.analyze(this.office.getRawContent('src'))
+  //   this.convDiff2Tovis()
+  //   return this.tov.dumpMinify('CHECK-DUPLI')
+  // }
 
-  public officeExtractDiffMinTovis(): string[] {
-    this.diff.analyze(this.ext.getRawContent('src'))
-    this.convDiff2Tovis()
-    return this.tov.dumpMinify('CHECK-DUPLI')
-  }
 
-  public countCharasTsv(): string[] {
-    return this.ext.simpleCalc('chara')
-  }
+  // public execCat(names: string[], xliffs: string[], tsv: string[][]): Promise<string[]> {
+  //   return new Promise(async (resolve, reject) => {
+  //     switch (this.mid) {
+  //       case 'EXTRACT tsv':
+  //         resolve(await this.catExtractTsv(names, xliffs))
+  //         break;
 
-  public countWordsTsv(): string[] {
-    return this.ext.simpleCalc('word')
-  }
+  //       case 'EXTRACT-DIFF json':
+  //         resolve(await this.catExtractDiffJson(names, xliffs))
+  //         break;
 
-  public countDiffCharasTsv(): string {
-    this.diff.analyze(this.ext.getRawContent('src'))
-    return this.diff.exportResult('wwc-chara', 'human', this.opt.wwc)
-  }
+  //       case 'EXTRACT-DIFF tovis':
+  //         resolve(await this.catExtractDiffTovis(names, xliffs))
+  //         break;
 
-  public countDiffWordsTsv(): string {
-    this.diff.analyze(this.ext.getRawContent('src'))
-    return this.diff.exportResult('wwc-word', 'human', this.opt.wwc)
-  }
+  //       case 'EXTRACT-DIFF min-tovis':
+  //         resolve(await this.catExtractDiffMinTovis(names, xliffs))
+  //         break;
 
-  public execCat(names: string[], xliffs: string[], tsv: string[][]): Promise<string[]> {
-    return new Promise(async (resolve, reject) => {
-      switch (this.mid) {
-        case 'EXTRACT tsv':
-          resolve(await this.catExtractTsv(names, xliffs))
-          break;
+  //       case 'UPDATE xliff': {
+  //         resolve(await this.catUpdateXliff(names, xliffs, tsv))
+  //         break;
+  //       }
 
-        case 'EXTRACT-DIFF json':
-          resolve(await this.catExtractDiffJson(names, xliffs))
-          break;
+  //       case 'REPLACE xliff':
+  //         resolve(await this.catReplaceXliff(names, xliffs, tsv))
+  //         break;
 
-        case 'EXTRACT-DIFF tovis':
-          resolve(await this.catExtractDiffTovis(names, xliffs))
-          break;
+  //       default:
+  //         break;
+  //     }
+  //   })
+  // }
 
-        case 'EXTRACT-DIFF min-tovis':
-          resolve(await this.catExtractDiffMinTovis(names, xliffs))
-          break;
+  // // CATファイルを処理する際の子関数
+  // public catExtractTsv(names: string[], xliffs: string[]): Promise<string[]> {
+  //   return new Promise((resolve, reject) => {
+  //     this.cat.batchLoadMultilangXml(names, xliffs, this.opt.cat)
+  //     const multis = this.cat.getMultipleTexts("all", false)
+  //     const result: string[] = []
+  //     multis.forEach(multi => {
+  //       result.push(multi.join('\t'))
+  //     })
+  //     resolve(result)
+  //   })
+  // }
 
-        case 'UPDATE xliff': {
-          resolve(await this.catUpdateXliff(names, xliffs, tsv))
-          break;
-        }
+  // public catExtractDiffJson(names: string[], xliffs: string[]): Promise<string[]> {
+  //   return new Promise((resolve, reject) => {
+  //     this.cat.batchLoadMultilangXml(names, xliffs, this.opt.cat)
+  //     this.convCat2Extract()
+  //     this.convSrcExt2Diff()
+  //     resolve([this.dumpToJsonStr('diff')])
+  //   })
+  // }
 
-        case 'REPLACE xliff':
-          resolve(await this.catReplaceXliff(names, xliffs, tsv))
-          break;
+  // public catExtractDiffTovis(names: string[], xliffs: string[]): Promise<string[]> {
+  //   return new Promise((resolve, reject) => {
+  //     this.cat.batchLoadMultilangXml(names, xliffs, this.opt.cat)
+  //     this.convCat2Extract()
+  //     this.convSrcExt2Diff()
+  //     this.convDiff2Tovis()
+  //     resolve(this.tov.dump())
+  //   })
+  // }
 
-        default:
-          break;
-      }
-    })
-  }
+  // public catExtractDiffMinTovis(names: string[], xliffs: string[]): Promise<string[]> {
+  //   return new Promise((resolve, reject) => {
+  //     this.cat.batchLoadMultilangXml(names, xliffs, this.opt.cat)
+  //     this.convCat2Extract()
+  //     this.convSrcExt2Diff()
+  //     this.convDiff2Tovis()
+  //     resolve(this.tov.dumpMinify('CHECK-DUPLI'))
+  //   })
+  // }
 
-  // CATファイルを処理する際の子関数
-  public catExtractTsv(names: string[], xliffs: string[]): Promise<string[]> {
-    return new Promise((resolve, reject) => {
-      this.cat.batchLoadMultilangXml(names, xliffs, this.opt.cat)
-      const multis = this.cat.getMultipleTexts("all", false)
-      const result: string[] = []
-      multis.forEach(multi => {
-        result.push(multi.join('\t'))
-      })
-      resolve(result)
-    })
-  }
+  // public catUpdateXliff(names: string[], xliffs: string[], tsv: string[][]): Promise<string[]> {
+  //   return new Promise((resolve, reject) => {
+  //     this.cat.batchUpdateXliff(names, xliffs, tsv, false, this.opt.cat.overWrite)
+  //       .then(result => resolve(result))
+  //       .catch(err => reject(err))
+  //   })
+  // }
 
-  public catExtractDiffJson(names: string[], xliffs: string[]): Promise<string[]> {
-    return new Promise((resolve, reject) => {
-      this.cat.batchLoadMultilangXml(names, xliffs, this.opt.cat)
-      this.convCat2Extract()
-      this.convSrcExt2Diff()
-      resolve([this.dumpToJsonStr('diff')])
-    })
-  }
+  // public catReplaceXliff(names: string[], xliffs: string[], tsv: string[][]): Promise<string[]> {
+  //   return new Promise((resolve, reject) => {
+  //     this.cat.batchUpdateXliff(names, xliffs, tsv, true, this.opt.cat.overWrite)
+  //       .then(result => resolve(result))
+  //       .catch(err => reject(err))
+  //   })
+  // }
 
-  public catExtractDiffTovis(names: string[], xliffs: string[]): Promise<string[]> {
-    return new Promise((resolve, reject) => {
-      this.cat.batchLoadMultilangXml(names, xliffs, this.opt.cat)
-      this.convCat2Extract()
-      this.convSrcExt2Diff()
-      this.convDiff2Tovis()
-      resolve(this.tov.dump())
-    })
-  }
+  // public readFromJsonStr(data: string, type: JsonType) {
+  //   switch (type) {
+  //     case 'extract':
+  //       this.office.readFromJSON("both", data)
+  //       break;
 
-  public catExtractDiffMinTovis(names: string[], xliffs: string[]): Promise<string[]> {
-    return new Promise((resolve, reject) => {
-      this.cat.batchLoadMultilangXml(names, xliffs, this.opt.cat)
-      this.convCat2Extract()
-      this.convSrcExt2Diff()
-      this.convDiff2Tovis()
-      resolve(this.tov.dumpMinify('CHECK-DUPLI'))
-    })
-  }
+  //     case 'diff':
+  //       this.diff.readFromJson(data)
+  //       break;
 
-  public catUpdateXliff(names: string[], xliffs: string[], tsv: string[][]): Promise<string[]> {
-    return new Promise((resolve, reject) => {
-      this.cat.batchUpdateXliff(names, xliffs, tsv, false, this.opt.cat.overWrite)
-        .then(result => resolve(result))
-        .catch(err => reject(err))
-    })
-  }
+  //     case 'cat':
+  //       this.cat.readFromJson(data)
+  //       break;
 
-  public catReplaceXliff(names: string[], xliffs: string[], tsv: string[][]): Promise<string[]> {
-    return new Promise((resolve, reject) => {
-      this.cat.batchUpdateXliff(names, xliffs, tsv, true, this.opt.cat.overWrite)
-        .then(result => resolve(result))
-        .catch(err => reject(err))
-    })
-  }
+  //     case 'tovis':
+  //       // this.tov
+  //       break;
 
-  public readFromJsonStr(data: string, type: JsonType) {
-    switch (type) {
-      case 'extract':
-        this.ext.readFromJSON("both", data)
-        break;
+  //     default:
+  //       break;
+  //   }
+  // }
 
-      case 'diff':
-        this.diff.readFromJson(data)
-        break;
+  // public dumpToJsonStr(type: JsonType): string {
+  //   switch (type) {
+  //     case 'extract':
+  //       return this.office.dumpToJson('both')
 
-      case 'cat':
-        this.cat.readFromJson(data)
-        break;
+  //     case 'diff':
+  //       return this.diff.dumpToJson()
 
-      case 'tovis':
-        // this.tov
-        break;
+  //     case 'cat':
+  //       return this.cat.dumpToJson()
 
-      default:
-        break;
-    }
-  }
+  //     case 'tovis':
+  //       return this.tov.dumpToJson()
 
-  public dumpToJsonStr(type: JsonType): string {
-    switch (type) {
-      case 'extract':
-        return this.ext.dumpToJson('both')
+  //     default:
+  //       return ''
+  //   }
+  // }
 
-      case 'diff':
-        return this.diff.dumpToJson()
+  // public convCat2Extract(srcLang?: string, tgtLang?: string): void {
+  //   const catext = this.cat.dumpToExt(srcLang, tgtLang)
+  //   const srcs: OfficeContent[] = []
+  //   const tgts: OfficeContent[] = []
+  //   catext.forEach(ext => {
+  //     srcs.push(ext.src)
+  //     tgts.push(ext.tgt)
+  //   })
+  //   this.office.setContent(srcs, tgts)
+  // }
 
-      case 'cat':
-        return this.cat.dumpToJson()
+  // public convSrcExt2Diff(): void {
+  //   this.diff.analyze(this.office.getRawContent('src'))
+  // }
 
-      case 'tovis':
-        return this.tov.dumpToJson()
+  // public convBilingualExt2Diff(): Promise<boolean> {
+  //   return new Promise((resolve, reject) => {
+  //     this.office.getAlignedText(this.opt)
+  //       .then(aligned => {
+  //         this.diff.analyzeFromText(aligned.join("\n"))
+  //         resolve(true)
+  //       })
+  //       .catch(() => {
+  //         reject()
+  //       })
+  //   })
+  // }
 
-      default:
-        return ''
-    }
-  }
+  // public convExt2Tovis(): void {
+  //   this.tov.parseFromExt(this.office)
+  // }
 
-  public convCat2Extract(srcLang?: string, tgtLang?: string): void {
-    const catext = this.cat.dumpToExt(srcLang, tgtLang)
-    const srcs: ExtractedContent[] = []
-    const tgts: ExtractedContent[] = []
-    catext.forEach(ext => {
-      srcs.push(ext.src)
-      tgts.push(ext.tgt)
-    })
-    this.ext.setContent(srcs, tgts)
-  }
-
-  public convSrcExt2Diff(): void {
-    this.diff.analyze(this.ext.getRawContent('src'))
-  }
-
-  public convBilingualExt2Diff(): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      this.ext.getAlignedText(this.opt)
-        .then(aligned => {
-          this.diff.analyzeFromText(aligned.join("\n"))
-          resolve(true)
-        })
-        .catch(() => {
-          reject()
-        })
-    })
-  }
-
-  public convExt2Tovis(): void {
-    this.tov.parseFromExt(this.ext)
-  }
-
-  public convDiff2Tovis(): void {
-    this.tov.parseFromDiff(this.diff)
-  }
+  // public convDiff2Tovis(): void {
+  //   this.tov.parseFromDiff(this.diff)
+  // }
 }

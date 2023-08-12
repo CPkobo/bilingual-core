@@ -1,9 +1,8 @@
-import { prompt, QuestionCollection } from "inquirer"
+import { prompt, QuestionCollection } from 'inquirer'
 
-import { CLIController } from "./controller"
-import { CatovisOrganizer } from "./office-funcs/organizer"
-import type { ModeLarge, ModeMiddleOffice, ModeMiddleCount, ModeMiddleCat } from './office-funcs/params'
-import { largeModes, officeModes, countModes, catModes } from './office-funcs/params'
+import { CLIController } from './controller'
+import type { ModeLarge, ModeMiddleOffice, ModeMiddleCount, ModeMiddleCat } from '../util/params'
+import { largeModes, officeModes, countModes, catModes } from '../util/params'
 
 export function selectLargeDialog(): Promise<ModeLarge> {
   console.log('CATOVIS Dialog Interface');
@@ -13,7 +12,7 @@ export function selectLargeDialog(): Promise<ModeLarge> {
         type: 'list',
         name: 'modeLg',
         message: 'Select Format',
-        choices: CatovisOrganizer.largeModes,
+        choices: largeModes,
       },
     ]
     prompt(question).then((answer: any) => {
@@ -29,7 +28,7 @@ export function selectOfficeDialog(ctrl: CLIController, sourceFiles?: string): P
         type: 'list',
         name: 'modeMd',
         message: 'Select Execution Mode.',
-        choices: CatovisOrganizer.officeModes,
+        choices: officeModes,
       },
       {
         name: 'source',
@@ -85,16 +84,18 @@ export function selectOfficeDialog(ctrl: CLIController, sourceFiles?: string): P
           excludePattern: answer.excludePattern,
           withSeparator: answer.others.indexOf('Dont add separation marks') !== -1
         },
-        word: {
-          afterRev: answer.others.indexOf('Word-Before-Revision') === -1
-        },
-        excel: {
-          readFilledCell: answer.others.indexOf('Excel-Filled-Cell') !== -1,
-          readHiddenSheet: answer.others.indexOf('Excel-Hidden-Sheet') !== -1,
-        },
-        ppt: {
-          readSlide: answer.others.indexOf('PPT-Slide') !== -1,
-          readNote: answer.others.indexOf('PPT-Note') !== -1,
+        office: {
+          word: {
+            afterRev: answer.others.indexOf('Word-Before-Revision') === -1
+          },
+          excel: {
+            readFilledCell: answer.others.indexOf('Excel-Filled-Cell') !== -1,
+            readHiddenSheet: answer.others.indexOf('Excel-Hidden-Sheet') !== -1,
+          },
+          ppt: {
+            readSlide: answer.others.indexOf('PPT-Slide') !== -1,
+            readNote: answer.others.indexOf('PPT-Note') !== -1,
+          }
         }
       })
       ctrl.executeByParams();
@@ -109,7 +110,7 @@ export function selectCountDialog(ctrl: CLIController, sourceFiles?: string): Pr
         type: 'list',
         name: 'modeMd',
         message: 'Select Execution Mode.',
-        choices: CatovisOrganizer.countModes,
+        choices: countModes,
       },
       {
         name: 'source',
@@ -162,16 +163,18 @@ export function selectCountDialog(ctrl: CLIController, sourceFiles?: string): Pr
           excludePattern: answer.excludePattern,
           withSeparator: answer.others.indexOf('Dont add separation marks') !== -1
         },
-        word: {
-          afterRev: answer.others.indexOf('Word-Before-Revision') === -1
-        },
-        excel: {
-          readFilledCell: answer.others.indexOf('Excel-Filled-Cell') !== -1,
-          readHiddenSheet: answer.others.indexOf('Excel-Hidden-Sheet') !== -1,
-        },
-        ppt: {
-          readSlide: answer.others.indexOf('PPT-Slide') !== -1,
-          readNote: answer.others.indexOf('PPT-Note') !== -1,
+        office: {
+          word: {
+            afterRev: answer.others.indexOf('Word-Before-Revision') === -1
+          },
+          excel: {
+            readFilledCell: answer.others.indexOf('Excel-Filled-Cell') !== -1,
+            readHiddenSheet: answer.others.indexOf('Excel-Hidden-Sheet') !== -1,
+          },
+          ppt: {
+            readSlide: answer.others.indexOf('PPT-Slide') !== -1,
+            readNote: answer.others.indexOf('PPT-Note') !== -1,
+          }
         }
       })
       ctrl.executeByParams();

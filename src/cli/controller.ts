@@ -1,9 +1,9 @@
-import { readFileSync, readdirSync, statSync, writeFileSync } from 'fs';
-import { load } from 'js-yaml'
+import { readdirSync, statSync, writeFileSync } from 'fs';
 
 import { CatovisOrganizer } from "../bilingualOrganizer"
-import { pathContentsReader, batchPathContentsReader, path2ContentStr, createTsvArray } from '../util/fileRead'
-import { path2Format, path2Name, path2Dir, countFromDoubleArray } from '../util/util';
+// import { batchPathContentsReader, path2ContentStr, createTsvArray } from '../util/fileRead'
+import { path2Buffer } from '../util/readSv'
+import { path2Format, path2Name, path2Dir } from '../util/util';
 
 import type { ModeLarge, ModeMiddleOffice, ModeMiddleCount, ModeMiddleCat } from '../util/params'
 // 初期設定値とともにオプション項目を管理するクラス
@@ -21,7 +21,6 @@ export class CLIController extends CatovisOrganizer {
   private validated: boolean;
 
   private outputParams: {
-    // format: string,
     console: boolean,
     debug: boolean,
   }
@@ -31,6 +30,8 @@ export class CLIController extends CatovisOrganizer {
   private outputFile: string;
   private srcFiles: string[];
   private tgtFiles: string[];
+  private srcData: ReadData[];
+  private tgtData: ReadData[];
 
   constructor() {
     // 初期値の設定を行う
@@ -49,6 +50,8 @@ export class CLIController extends CatovisOrganizer {
     this.target = ['./']
     this.srcFiles = [];
     this.tgtFiles = [];
+    this.srcData = [];
+    this.tgtData = [];
     this.outputFile = './'
   }
 
@@ -149,6 +152,10 @@ export class CLIController extends CatovisOrganizer {
   public async executeByParams(): Promise<boolean> {
     return new Promise(async (resolve, reject) => {
       const err = this.validate();
+      this.srcData = await path2Buffer(this.srcFiles)
+      this.tgtData = await path2Buffer(this.tgtFiles)
+      this.addContent(this.srcData)
+      this.addContent(this.tgtData)
       if (err !== '') {
         console.log(`Validation Error: ${err}`);
         reject(false);
@@ -157,25 +164,26 @@ export class CLIController extends CatovisOrganizer {
         switch (this.lg) {
           case 'OFFICE':
           case 'COUNT': {
-            const exts = await batchPathContentsReader(this.srcFiles, this.tgtFiles, this.opt)
-            const result = await this.execOfficeOrCount(exts[0], exts[1])
+            // const exts = await batchPathContentsReader(this.srcFiles, this.tgtFiles, this.opt)
+            // const result = await this.execOfficeOrCount(exts[0], exts[1])
+            const result = await this.execOffice()
             this.outlet(result)
             resolve(true)
             break;
           }
 
           case 'CAT': {
-            const xliffDir = path2Dir(this.srcFiles[0])
-            const xliffNames: string[] = []
-            const xliffStrs: string[] = []
-            this.srcFiles.forEach(file => {
-              xliffNames.push(path2Name(file))
-              xliffStrs.push(path2ContentStr(file))
-            })
-            const tsv = createTsvArray(this.tgtFiles)
-            const result = await this.execCat(xliffNames, xliffStrs, tsv)
-            this.outlet(result)
-            resolve(true)
+            // const xliffDir = path2Dir(this.srcFiles[0])
+            // const xliffNames: string[] = []
+            // const xliffStrs: string[] = []
+            // this.srcFiles.forEach(file => {
+            //   xliffNames.push(path2Name(file))
+            //   xliffStrs.push(path2ContentStr(file))
+            // })
+            // const tsv = createTsvArray(this.tgtFiles)
+            // const result = await this.execCat(xliffNames, xliffStrs, tsv)
+            // this.outlet(result)
+            // resolve(true)
             break;
           }
 

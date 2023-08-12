@@ -1,5 +1,5 @@
-import { DiffInfo } from '#/diffs/diff'
-import { ExtractContext } from '#/office/extract';
+import { DiffCalculator } from '#/diffs/diffCalc'
+import { OfficeExtractor } from '#/office/officeExtractor';
 import { BuiltinPlugins } from '#/plugins/builtinPlugins'
 import { cnm } from '#/util/util';
 
@@ -42,10 +42,10 @@ export class Tovis {
     }
   }
 
-  public parseFromObj(data: ExtractContext | DiffInfo): Promise<ParseResult> {
+  public parseFromObj(data: OfficeExtractor | DiffCalculator): Promise<ParseResult> {
     return new Promise((resolve, reject) => {
-      if (data instanceof ExtractContext) {
-        const diff = new DiffInfo()
+      if (data instanceof OfficeExtractor) {
+        const diff = new DiffCalculator()
         const srcContent = data.getRawContent('src')
         if (srcContent !== null) {
           diff.analyze(srcContent)
@@ -57,7 +57,7 @@ export class Tovis {
         } else {
           reject({ isOk: false, message: 'No Catovis Context' })
         }
-      } else if (data instanceof DiffInfo) {
+      } else if (data instanceof DiffCalculator) {
         this.parseFromDiff(data).then((message) => {
           resolve({ isOk: true, message })
         }).catch((errMessage) => {
@@ -67,11 +67,11 @@ export class Tovis {
     })
   }
 
-  public parseFromExt(data: ExtractContext, isToDiff: boolean = true): Promise<ParseResult> {
+  public parseFromExt(data: OfficeExtractor, isToDiff: boolean = true): Promise<ParseResult> {
     return new Promise((resolve, reject) => {
       // 類似解析を行う場合
       if (isToDiff) {
-        const diff = new DiffInfo()
+        const diff = new DiffCalculator()
         const srcContent = data.getRawContent('src')
         if (srcContent !== null) {
           diff.analyze(srcContent)
@@ -93,7 +93,7 @@ export class Tovis {
     });
   }
 
-  public parseFromDiff(diff: DiffInfo): Promise<string> {
+  public parseFromDiff(diff: DiffCalculator): Promise<string> {
     return new Promise((resolve, reject) => {
       const codeDict = {
         replace: '~',
@@ -172,7 +172,7 @@ export class Tovis {
   public parseFromStr(data: string, isToDiff: boolean): Promise<string> {
     return new Promise((resolve, reject) => {
       if (isToDiff) {
-        const diff: DiffInfo = new DiffInfo();
+        const diff: DiffCalculator = new DiffCalculator();
         diff.analyzeFromText(data)
         this.parseFromDiff(diff).then(() => {
           resolve(`success to read rows with Diff`);

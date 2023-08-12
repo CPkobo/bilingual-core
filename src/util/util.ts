@@ -1,7 +1,7 @@
 // import { docxReader } from './office/docxReader';
 // import { xlsxReader } from './office/xlsxReader';
 // import { pptxReader } from './office/pptxReader';
-import { ReadingOption } from '../office/option';
+import { ReadingOption } from './option';
 
 export function getVer(): string {
   return '0.3.5'
@@ -126,7 +126,7 @@ export function regexExclusion(texts: string[], ex: RegExp): string[] {
   return excluded;
 }
 
-export function applySegRules(textVal: string[], opt: ReadingOption): string[] {
+export function applySegRules(textVal: string[], opt: MyOption): string[] {
   if (!opt.common.segmentation && !opt.common.excluding) {
     return textVal;
   }
@@ -167,5 +167,14 @@ export function str2ExtractedText(texts: string[], position: number = 0, type: S
     value: texts,
     sumCharas: countCharas(joined),
     sumWords: countWords(joined)
+  }
+}
+
+export function useErrorMessage(err: Partial<ErrorMessage>): ErrorMessage {
+  return {
+    isErr: err.isErr || false,
+    code: err.code || '',
+    name: err.name || '',
+    message: err.message || ''
   }
 }
